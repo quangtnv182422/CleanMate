@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Models.DbContext
 {
-    public class CleanMateMainDbContext : IdentityDbContext<AspNetUser>
+    public partial class CleanMateMainDbContext : IdentityDbContext<AspNetUser, AspNetRole, string>
     {
         public CleanMateMainDbContext()
         {
@@ -247,7 +247,8 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasColumnName("Discount_Percentage");
             });
 
+            OnModelCreatingPartial(modelBuilder);
         }
-
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

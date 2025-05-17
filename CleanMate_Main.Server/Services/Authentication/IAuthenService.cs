@@ -1,0 +1,10 @@
+﻿using CleanMate_Main.Server.Models.ViewModels.Authen;
+
+namespace CleanMate_Main.Server.Services.Authentication
+{
+    public interface IAuthenService
+    {
+        Task<(bool Success, IEnumerable<string> Errors)> RegisterAsync(RegisterModel model);
+        Task<(bool Success, string Token, string Error)> LoginAsync(LoginModel model);
+    }
+}

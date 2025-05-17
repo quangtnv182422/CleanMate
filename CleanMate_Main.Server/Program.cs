@@ -1,5 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.SeedData;
+using CleanMate_Main.Server.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,11 @@ builder.Services.AddDbContext<CleanMateMainDbContext>(options =>
 builder.Services.AddIdentity<AspNetUser, AspNetRole>()
     .AddEntityFrameworkStores<CleanMateMainDbContext>()
     .AddDefaultTokenProviders();
+
+
+//DI
+builder.Services.AddScoped<IAuthenService, AuthenService>();
+
 
 // Cấu hình JWT (dành cho API)
 builder.Services.AddAuthentication(options =>
@@ -44,6 +51,15 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+//Add role tạm thời sau khi khở tạo
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AspNetRole>>();
+
+    await RoleData.SeedRolesAsync(roleManager);
+}
+
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

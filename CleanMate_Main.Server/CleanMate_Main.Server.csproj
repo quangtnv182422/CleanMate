@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Models\DTO\" />
+    <Folder Include="Repository\" />
   </ItemGroup>
 
 </Project>

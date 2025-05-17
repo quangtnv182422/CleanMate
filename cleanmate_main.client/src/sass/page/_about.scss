@@ -1,0 +1,154 @@
+/* 6. wpo-about-section */
+
+.wpo-about-section{
+    background: $section-bg-color;
+    .wpo-about-img{
+        img{
+             width: 100%;
+        }
+    }
+
+    .wpo-section-title-s2{
+        margin-bottom: 30px;
+    }
+    .wpo-about-content{
+       padding-left: 50px;
+
+       @media(max-width:991px){
+            padding-left: 0;
+            margin-top: 50px;
+       }
+
+       
+       .signeture{
+        margin-top: 40px;
+
+        h4{
+            font-size: 22px;
+            font-family: $base-font;
+            font-weight: 700;
+            color: #5c6c8c;
+        }
+
+        p{
+            font-size: 16px;
+            color: #687693;
+            margin-bottom: 30px;
+        }
+    }
+    }
+}
+
+// .partners-section-s2 
+
+.partners-section-s2 {
+ background: $section-bg-color;
+}
+
+
+
+/* 6.1	wpo-fun-fact-section */
+
+.wpo-fun-fact-section {
+	text-align: center;
+    background: url(../../images/funfact.jpg) no-repeat center center;
+    position: relative;
+    background-size: cover;
+    z-index: 1;
+    @media(max-width:767px){
+        padding-top: 60px;
+    }
+    &:before{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: $dark-gray;
+        content: "";
+        z-index: -1;
+        opacity: .92;
+    }
+
+	@include media-query(767px) {
+		padding-bottom: 30px;
+	}
+
+	h2 {
+		font-size: 30px;
+		font-size: calc-rem-value(30);
+		font-weight: 600;
+		margin: 0 0 1.8em;
+
+		
+
+		@include media-query(991px) {
+			font-size: 26px;
+			font-size: calc-rem-value(26);
+		}
+
+		@include media-query(767px) {
+			font-size: 25px;
+			font-size: calc-rem-value(25);
+		}
+	}
+
+	.wpo-fun-fact-grids .grid {
+		width: 25%;
+		float: left;
+
+		@include media-query(767px) {
+			width: 50%;
+			margin-bottom: 50px;
+		}
+	}
+
+	.grid {
+
+        h3 {
+            font-size: 60px;
+            font-size: calc-rem-value(60);
+            font-weight: 700;
+            color: $theme-primary-color;
+            margin: 0 0 0.2em;
+            font-family: $heading-font;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            @include media-query(1200px) {
+                font-size: 50px;
+                ont-size: calc-rem-value(50);
+            }
+    
+            @include media-query(991px) {
+                font-size: 40px;
+                font-size: calc-rem-value(40);
+            }
+    
+            @include media-query(767px) {
+                font-size: 35px;
+                font-size: calc-rem-value(35);
+            }
+        }
+    }
+
+
+
+	.grid h3 + p {
+		font-size: 20px;
+		font-size: calc-rem-value(20);
+		margin: 0;
+        color: $white;
+
+		@include media-query(1200px) {
+			font-size: 20px;
+			font-size: calc-rem-value(20);
+		}
+
+		@include media-query(991px) {
+			font-size: 16px;
+			font-size: calc-rem-value(16);
+		}
+	}
+}

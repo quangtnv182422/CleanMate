@@ -1,0 +1,117 @@
+/*------------------------------------------------------------------
+[Master Stylesheet]
+Theme Name:     Cleener - Cleaning Services React Template
+Version:        1.0.0
+-------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------
+>>> TABLE OF CONTENTS:
+----------------------------------------------------------------
+
+1. General
+	1.1 Theme Reset Style
+	1.2 Global Elements
+
+2. header
+	2.1 topbar
+	2.2 navigation
+
+3. content
+	3.1 wpo-hero-slider
+	3.2 wpo-service-section
+	3.3 wpo-work-section
+	3.4 wpo-contact-section
+	3.5 wpo-project-section
+	3.6 wpo-team-section
+	3.7 wpo-testimonials-section
+	3.8 wpo-blog-section
+	3.9 partners-section
+
+4. wpo-footer
+
+5. Home-style-2
+   5.1	wpo-service-section-s2
+
+
+6. wpo-about-section
+   6.1	wpo-fun-fact-section
+
+7. wpo-service-single-section
+
+8. wpo-project-single-section
+
+9. wpo-pricing-page
+
+10. wpo-terms-section
+
+11. wpo-blog-pg-section
+
+12. wpo-blog-single-section
+
+13. wpo-contact-pg-section
+
+14. error-404-section
+
+----------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+1. General
+----------------------------------------------------------------*/
+
+// helpers
+@import "helpers/variables";
+@import "helpers/functions";
+@import "helpers/mixins";
+
+// base
+@import "base/base";
+
+
+// components
+@import "components/section-title";
+@import "components/buttons";
+@import "components/form";
+@import "components/social-links";
+@import "components/page-title";
+@import "components/preloader";
+@import "components/blog-sidebar";
+@import "components/pagination";
+
+// layout
+@import "layout/header";
+@import "layout/hero-slider";
+@import "layout/footer";
+
+// components
+@import "components/sticky-header";
+
+
+// page
+@import "page/home-default";
+
+@import "page/_home-style2";
+
+@import "page/_about";
+
+@import "page/_service-single";
+
+@import "page/_project";
+
+@import "page/_team";
+
+@import "page/_pricing";
+
+@import "page/_terms";
+
+@import "page/_blog";
+
+@import "page/_blog-single";
+
+@import "page/_contact";
+
+@import "page/_error-404";
+
+
+

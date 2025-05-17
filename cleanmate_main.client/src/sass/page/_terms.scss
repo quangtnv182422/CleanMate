@@ -1,0 +1,65 @@
+/*--------------------------------------------------------------
+10. wpo-terms-section
+--------------------------------------------------------------*/
+
+.wpo-terms-section{
+    .wpo-terms-wrap{
+        .wpo-terms-img{
+            img{
+                width: 100%;
+            }
+        }
+
+        .wpo-terms-text{
+            padding-top: 30px;
+            h2{
+               font-size: 40px;
+               font-weight: 700;
+               margin-bottom: 20px;
+
+               @media(max-width:991px){
+                font-size: 30px;
+               }
+               @media(max-width:767px){
+                font-size: 25px;
+               }
+            }
+
+            ul{
+                list-style: none;
+                margin-top: 20px;
+                margin-bottom: 40px;
+                li{
+                    padding: 10px;
+                    position: relative;
+                    padding-left: 20px;
+
+                    &:before{
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 8px;
+                        height: 8px;
+                        background: $theme-primary-color-s2;
+                        content: "";
+                        border-radius: 50%;
+                        transform: translateY(-50%);
+                    }
+                }
+            }
+
+            .t-sub{
+                padding: 20px 0 0;
+            }
+        }
+
+        .wpo-benefits-section{
+            padding-top: 40px;
+            h2{
+                font-size: 30px;
+                font-weight: 700;
+                margin-bottom: 30px;
+            }
+        }
+    }
+}

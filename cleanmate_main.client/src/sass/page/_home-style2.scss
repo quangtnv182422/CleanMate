@@ -1,0 +1,32 @@
+/*--------------------------------------------------------------
+5. Home-style-2
+--------------------------------------------------------------*/
+
+/* 5.1	wpo-service-section-s2 */
+
+.wpo-service-section-s2{
+    padding-bottom: 90px;
+
+    @media(max-width:767px){
+       padding-bottom: 40px;
+    }
+    .wpo-service-item{
+        padding-top: 40px;
+        .wpo-service-icon{
+             line-height: 50px;
+            &:before{
+                border-radius: 50%;
+                background-color: #d8dee5;
+            }
+            &:after{
+                border-radius: 50%;
+            }
+        }
+
+        .wpo-service-text{
+            h2{
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+﻿import React, {Fragment} from 'react';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import Contactpage from '../../components/Contactpage/Contactpage'
@@ -10,7 +10,7 @@ const ContactPage =() => {
     return(
         <Fragment>
             <Navbar Logo={Logo}/>
-            <PageTitle pageTitle={'Contact Us'} pagesub={'Contact'}/> 
+            <PageTitle pageTitle={'Liên hệ với chúng tôi'} pagesub={'Liên hệ'}/> 
             <Contactpage/>
             <Footer/>
             <Scrollbar/>

@@ -20,8 +20,6 @@ const HomePage2 =() => {
             <Hero2/>
             <ServiceSectionS2/>
             <WorkSection/>
-            <Appointment/>
-            <ProjectSection/>
             <TeamSection/>
             <Testimonial/>
             <BlogSection/>

@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Link } from 'react-router-dom'
 
 const PageTitle = (props) => {
@@ -10,7 +10,7 @@ const PageTitle = (props) => {
                         <div className="wpo-breadcumb-wrap">
                             <h2>{props.pageTitle}</h2>
                             <ol className="wpo-breadcumb-wrap">
-                                <li><Link to="/home">Home</Link></li>
+                                <li><Link to="/home">Trang chủ</Link></li>
                                 <li><span>{props.pagesub}</span></li>
                             </ol>
                         </div>

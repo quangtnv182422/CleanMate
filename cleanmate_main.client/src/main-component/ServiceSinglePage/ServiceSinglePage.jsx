@@ -22,7 +22,7 @@ const ServiceSinglePage =(props) => {
     return(
         <Fragment>
             <Navbar hclass={'wpo-header-style-5'}/>
-            <PageTitle pageTitle={`${serviceDetails.sTitle} Cleaning `} pagesub={'Project'}/> 
+            <PageTitle pageTitle={`${serviceDetails.sTitle} Cleaning `} pagesub={`${serviceDetails.sTitle} Cleaning`}/> 
             <section className="wpo-service-single-section section-padding">
                 <div className="container">
                     <div className="row">

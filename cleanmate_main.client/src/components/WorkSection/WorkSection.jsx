@@ -1,8 +1,8 @@
-import React from 'react'
+﻿import React from 'react'
 
 import wImg1 from '../../images/work/1.jpg'
-import wImg2 from '../../images/work/2.jpg'
-import wImg3 from '../../images/work/3.jpg'
+import wImg2 from '../../images/work/cleaning-image-step-2.jfif'
+import wImg3 from '../../images/work/a-man-enjoying-after-cleaning.jfif'
 
 const WorkSection = (props) => {
     return (
@@ -11,9 +11,8 @@ const WorkSection = (props) => {
                 <div className="row align-items-center justify-content-center">
                     <div className="col-lg-5">
                         <div className="wpo-section-title">
-                            <h2>How It Works</h2>
-                            <p>It was popularised in the with the release desktop
-                                publishing software like versions .</p>
+                            <h2>Cách hoạt động của dịch vụ</h2>
+                            <p>Chỉ với vài bước đơn giản, bạn có thể đặt lịch và tận hưởng dịch vụ vệ sinh chuyên nghiệp ngay tại nhà.</p>
                         </div>
                     </div>
                 </div>
@@ -25,7 +24,7 @@ const WorkSection = (props) => {
                                     <img src={wImg1} alt=""/>
                                 </div>
                                 <div className="wpo-work-text">
-                                    <h2>Easy Online Scheduling</h2>
+                                    <h2>Dễ dàng đặt lịch online</h2>
                                 </div>
                                 <div className="visible-text">
                                     <span>1</span>
@@ -35,7 +34,7 @@ const WorkSection = (props) => {
                         <div className="col col-lg-4 col-md-6 col-12">
                             <div className="wpo-work-item">
                                 <div className="wpo-work-text">
-                                    <h2>Get Clean <br/> And Fresh</h2>
+                                    <h2>Dọn Sạch Sẽ <br/> Và Thân Thiện</h2>
                                 </div>
                                 <div className="visible-text">
                                     <span>2</span>
@@ -51,7 +50,7 @@ const WorkSection = (props) => {
                                     <img src={wImg3} alt=""/>
                                 </div>
                                 <div className="wpo-work-text">
-                                    <h2>Enjoy Happy Cleanliness</h2>
+                                    <h2>Tận hưởng sự sạch sẽ</h2>
                                 </div>
                                 <div className="visible-text">
                                     <span>3</span>

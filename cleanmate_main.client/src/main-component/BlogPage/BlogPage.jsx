@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+﻿import React, {Fragment} from 'react';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import BlogList from '../../components/BlogList/BlogList'
@@ -10,7 +10,7 @@ const BlogPage =() => {
     return(
         <Fragment>
             <Navbar Logo={Logo}/>
-            <PageTitle pageTitle={'Latest News'} pagesub={'Blog'}/> 
+            <PageTitle pageTitle={'Tin mới nhất'} pagesub={'Blog'}/> 
             <BlogList/>
             <Footer/>
             <Scrollbar/>

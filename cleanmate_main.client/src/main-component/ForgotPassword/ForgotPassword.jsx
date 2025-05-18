@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import Grid from "@mui/material/Grid";
 import SimpleReactValidator from "simple-react-validator";
 import {toast} from "react-toastify";
@@ -20,7 +20,18 @@ const ForgotPassword = (props) => {
     };
 
     const [validator] = React.useState(new SimpleReactValidator({
-        className: 'errorMessage'
+        className: 'errorMessage',
+        messages: {
+            required: 'Trường này là bắt buộc.',
+            email: 'Địa chỉ email không hợp lệ.',
+            min: 'Giá trị phải có ít nhất :min ký tự.',
+            max: 'Giá trị không được vượt quá :max ký tự.',
+            numeric: 'Chỉ được nhập số.',
+            alpha: 'Chỉ được nhập chữ cái.',
+            alpha_num: 'Chỉ được nhập chữ và số.',
+            phone: 'Số điện thoại không hợp lệ.',
+            // thêm các quy tắc khác nếu bạn sử dụng
+        }
     }));
 
     const submitForm = (e) => {
@@ -41,8 +52,8 @@ const ForgotPassword = (props) => {
         <Grid className="loginWrapper">
 
             <Grid className="loginForm">
-                <h2>Forgot Password</h2>
-                <p>Reset your account password</p>
+                <h2>Quên mật khẩu</h2>
+                <p>Khởi tạo lại mật khẩu của bạn</p>
                 <form onSubmit={submitForm}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
@@ -64,15 +75,14 @@ const ForgotPassword = (props) => {
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formFooter">
-                                <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Resend
-                                    Password</Button>
+                                <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Gửi lại mật khẩu</Button>
                             </Grid>
                             <Grid className="loginWithSocial">
                                 <Button className="facebook"><i className="fa fa-facebook"></i></Button>
                                 <Button className="twitter"><i className="fa fa-twitter"></i></Button>
                                 <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
-                            <p className="noteHelp">Already have an account? <Link to="/login">Return to Sign In</Link>
+                            <p className="noteHelp">Bạn đã có tài khoản? <Link to="/login">Quay lại đăng nhập</Link>
                             </p>
                         </Grid>
                     </Grid>

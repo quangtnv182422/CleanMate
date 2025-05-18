@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
+﻿import React, { useState } from 'react';
 import Grid from "@mui/material/Grid";
 import SimpleReactValidator from "simple-react-validator";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Logo from '../../images/logo-transparent.png';
 
 import './style.scss';
 
@@ -23,16 +24,26 @@ const LoginPage = (props) => {
     });
 
     const changeHandler = (e) => {
-        setValue({...value, [e.target.name]: e.target.value});
+        setValue({ ...value, [e.target.name]: e.target.value });
         validator.showMessages();
     };
 
     const rememberHandler = () => {
-        setValue({...value, remember: !value.remember});
+        setValue({ ...value, remember: !value.remember });
     };
 
     const [validator] = React.useState(new SimpleReactValidator({
-        className: 'errorMessage'
+        className: 'errorMessage',
+        messages: {
+            required: 'Trường này là bắt buộc.',
+            email: 'Địa chỉ email không hợp lệ.',
+            min: 'Giá trị phải có ít nhất :min ký tự.',
+            max: 'Giá trị không được vượt quá :max ký tự.',
+            numeric: 'Chỉ được nhập số.',
+            alpha: 'Chỉ được nhập chữ cái.',
+            alpha_num: 'Chỉ được nhập chữ và số.',
+            phone: 'Số điện thoại không hợp lệ.',
+        }
     }));
 
 
@@ -51,19 +62,22 @@ const LoginPage = (props) => {
             const email = value.email;
 
             if (email.match(userRegex)) {
-                toast.success('Successfully Login on Cleener !');
+                toast.success('Bạn đã đăng nhập thành công vào CleanMate !');
                 push('/home');
             }
         } else {
             validator.showMessages();
-            toast.error('Empty field is not allowed!');
+            toast.error('Các mục không được để trống!');
         }
     };
     return (
         <Grid className="loginWrapper">
             <Grid className="loginForm">
-                <h2>Sign In</h2>
-                <p>Sign in to your account</p>
+                <div className="logo" onClick={() => push('/home')}>
+                    <img src={Logo} alt="Logo của hệ thống" />
+                </div>
+                <h2>Đăng nhập</h2>
+                <p>Đăng nhập vào tài khoản của bạn</p>
                 <form onSubmit={submitForm}>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
@@ -87,12 +101,12 @@ const LoginPage = (props) => {
                             <TextField
                                 className="inputOutline"
                                 fullWidth
-                                placeholder="Password"
+                                placeholder="Mật khẩu"
                                 value={value.password}
                                 variant="outlined"
                                 name="password"
                                 type="password"
-                                label="Password"
+                                label="Mật khẩu"
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -104,20 +118,20 @@ const LoginPage = (props) => {
                         <Grid item xs={12}>
                             <Grid className="formAction">
                                 <FormControlLabel
-                                    control={<Checkbox checked={value.remember} onChange={rememberHandler}/>}
-                                    label="Remember Me"
+                                    control={<Checkbox checked={value.remember} onChange={rememberHandler} />}
+                                    label="Nhớ mật khẩu"
                                 />
-                                <Link to="/forgot-password">Forgot Password?</Link>
+                                <Link to="/forgot-password">Quên mật khẩu?</Link>
                             </Grid>
                             <Grid className="formFooter">
-                                <Button fullWidth className="cBtnTheme" type="submit">Login</Button>
+                                <Button fullWidth className="cBtnTheme" type="submit">Đăng nhập</Button>
                             </Grid>
                             <Grid className="loginWithSocial">
                                 <Button className="facebook"><i className="fa fa-facebook"></i></Button>
                                 <Button className="twitter"><i className="fa fa-twitter"></i></Button>
                                 <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
-                            <p className="noteHelp">Don't have an account? <Link to="/register">Create free account</Link>
+                            <p className="noteHelp">Bạn chưa có tài khoản? <Link to="/register/user">Đăng ký tài khoản ngay</Link>
                             </p>
                         </Grid>
                     </Grid>

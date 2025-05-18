@@ -1,11 +1,12 @@
-import React from "react";
+﻿import React from "react";
 import Slider from "react-slick";
 import { Link } from 'react-router-dom'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import hero1 from '../../images/slider/slide-2.jpg'
-import hero2 from '../../images/slider/slide-3.jpg'
+import hero1 from '../../images/slider/homepage-banner-image-1.jpg'
+import hero2 from '../../images/slider/homepage-banner-image-2.jpg'
+
 
 
 const settings = {
@@ -31,14 +32,14 @@ const Hero2 = () => {
                                 <div className="container">
                                     <div className="slide-content">
                                         <div className="slide-title">
-                                            <h2>Expert Cleaning Service You Can Trust.</h2>
+                                            <h2>Dịch vụ dọn dẹp chuyên nghiệp được tin tưởng.</h2>
                                         </div>
                                         <div className="slide-text">
-                                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                                            <p>Chúng tôi chăm sóc không gian của bạn như chính ngôi nhà của mình – sạch sẽ, gọn gàng với tất cả sự tận tâm</p>
                                         </div>
                                         <div className="clearfix"></div>
                                         <div className="slide-btns">
-                                            <Link to="/about" className="theme-btn"><i className="fa fa-angle-double-right"></i> Explore more</Link>
+                                            <Link to="/about" className="theme-btn"><i className="fa fa-angle-double-right"></i> Tìm hiểu thêm</Link>
                                         </div>
                                     </div>
                                 </div>
@@ -51,14 +52,14 @@ const Hero2 = () => {
                                 <div className="container">
                                     <div className="slide-content">
                                         <div className="slide-title">
-                                            <h2>Expert Cleaning Service You Can Trust.</h2>
+                                            <h2>Dịch Vụ Vệ Sinh Nhanh Chóng và Hiệu Quả Tận Nơi.</h2>
                                         </div>
                                         <div className="slide-text">
-                                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                                            <p>Giúp ngôi nhà hoặc văn phòng bạn luôn sạch bóng mà không tốn công sức — dịch vụ tin cậy, tiết kiệm thời gian.</p>
                                         </div>
                                         <div className="clearfix"></div>
                                         <div className="slide-btns">
-                                            <Link to="/about" className="theme-btn"><i className="fa fa-angle-double-right"></i> Explore more</Link>
+                                            <Link to="/about" className="theme-btn"><i className="fa fa-angle-double-right"></i> Tìm hiểu thêm</Link>
                                         </div>
                                     </div>
                                 </div>

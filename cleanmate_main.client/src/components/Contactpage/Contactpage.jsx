@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import ContactForm from '../ContactFrom/ContactForm'
 
 
@@ -19,8 +19,9 @@ const Contactpage = () => {
                                             </div>
                                         </div>
                                         <div className="office-info-text">
-                                            <h2>Address</h2>
-                                            <p>7 Green Lake Street Crawfordsville, IN 47933</p>
+                                            <h2>Địa chỉ</h2>
+                                            <p>Đại học FPT</p>
+                                            <p>Khu Công nghệ cao Hòa Lạc, Km29 Đại lộ Thăng Long, huyện Thạch Thất, Hà Nội</p>
                                         </div>
                                     </div>
                                 </div> 
@@ -32,9 +33,9 @@ const Contactpage = () => {
                                             </div>
                                         </div>
                                         <div className="office-info-text">
-                                            <h2>Email Us</h2>
-                                            <p>Cleener@gmail.com</p>
-                                            <p>helloyou@gmail.com</p>
+                                            <h2>Email</h2>
+                                            <p>support@cleanmate.com</p>
+                                            <p>booking@cleanmate.com</p>
                                         </div>
                                     </div>
                                 </div> 
@@ -46,7 +47,7 @@ const Contactpage = () => {
                                             </div>
                                         </div>
                                         <div className="office-info-text">
-                                            <h2>Call Now</h2>
+                                            <h2>Số điện thoại</h2>
                                             <p>+1 800 123 456 789</p>
                                             <p>+1 800 123 654 987</p>
                                         </div>
@@ -55,9 +56,8 @@ const Contactpage = () => {
                             </div>
                         </div>
                         <div className="wpo-contact-title">
-                            <h2>Have Any Question?</h2>
-                            <p>It is a long established fact that a reader will be distracted
-                                content of a page when looking.</p>
+                            <h2>Hãy đặt câu hỏi cho chúng tôi</h2>
+                            <p>Bạn có thắc mắc gì không? Đừng ngần ngại, hãy đặt câu hỏi để được hỗ trợ nhanh chóng!</p>
                         </div>
                         <div className="wpo-contact-form-area">
                             <ContactForm/>

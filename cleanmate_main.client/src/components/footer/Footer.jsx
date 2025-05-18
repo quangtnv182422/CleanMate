@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import Logo from '../../images/footer-logo.svg'
+import Logo from '../../images/logo-with-white-text.jpg'
 import Services from '../../api/service';
 
 
@@ -20,14 +20,8 @@ const Footer = (props) => {
                         <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
                             <div className="widget about-widget">
                                 <div className="logo widget-title">
-                                    <img src={Logo} alt="blog"/>
+                                    <img src={Logo} alt="blog" />
                                 </div>
-                                <p>Many desktop publishing packages
-                                    now use Lorem Ipsum their default
-                                    a search for uncover many.</p>
-                                <p>Many desktop publishing packages
-                                    now use uncover many.</p>
-
                             </div>
                         </div>
                         <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
@@ -54,7 +48,7 @@ const Footer = (props) => {
                                 <p>Now use Lorem Ipsum their default
                                     a search for uncover many.</p>
                                 <form onSubmit={SubmitHandler}>
-                                    <input type="email" placeholder="support@gmail.com" required/>
+                                    <input type="email" placeholder="support@gmail.com" required />
                                     <button type="submit">Send Now <i className="ti-arrow-right"></i></button>
                                 </form>
                             </div>
@@ -66,7 +60,7 @@ const Footer = (props) => {
                                     <h3>Services</h3>
                                 </div>
                                 <ul>
-                                    {Services.slice(0,6).map((service, srv) => (
+                                    {Services.slice(0, 6).map((service, srv) => (
                                         <li key={srv}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
                                     ))}
                                 </ul>

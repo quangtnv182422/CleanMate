@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import classnames from 'classnames';
 import Residential from './Residential';
@@ -20,9 +20,8 @@ const ServiceSectionS2 = (props) => {
                 <div className="row align-items-center justify-content-between">
                     <div className="col-lg-5">
                         <div className="wpo-section-title-s2">
-                            <h2>What We Do?</h2>
-                            <p>It was popularised in the with the release desktop
-                                publishing software like versions .</p>
+                            <h2>Dịch vụ của chúng tôi</h2>
+                            <p>Chúng tôi cung cấp giải pháp vệ sinh chuyên nghiệp, linh hoạt và phù hợp với mọi nhu cầu của bạn.</p>
                         </div>
                     </div>
                     <div className="col-lg-7">

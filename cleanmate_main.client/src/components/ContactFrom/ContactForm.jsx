@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import SimpleReactValidator from 'simple-react-validator';
 
 
@@ -50,7 +50,7 @@ const ContactForm = () => {
                             name="name"
                             onBlur={(e) => changeHandler(e)}
                             onChange={(e) => changeHandler(e)}
-                            placeholder="Your Name" />
+                            placeholder="Họ và tên" />
                         {validator.message('name', forms.name, 'required|alpha_space')}
                     </div>
                 </div>
@@ -62,7 +62,7 @@ const ContactForm = () => {
                             name="email"
                             onBlur={(e) => changeHandler(e)}
                             onChange={(e) => changeHandler(e)}
-                            placeholder="Your Email" />
+                            placeholder="Email của bạn" />
                         {validator.message('email', forms.email, 'required|email')}
                     </div>
                 </div>
@@ -74,7 +74,7 @@ const ContactForm = () => {
                             name="phone"
                             onBlur={(e) => changeHandler(e)}
                             onChange={(e) => changeHandler(e)}
-                            placeholder="Your phone" />
+                            placeholder="Số điện thoại" />
                         {validator.message('phone', forms.phone, 'required|phone')}
                     </div>
                 </div>
@@ -86,7 +86,7 @@ const ContactForm = () => {
                             value={forms.subject}
                             type="text"
                             name="subject">
-                            <option>Choose a Service</option>
+                            <option>Chọn dịch vụ</option>
                             <option>Residential Cleaning</option>
                             <option>Commercial Cleaning</option>
                             <option>Office Cleaning</option>
@@ -105,14 +105,14 @@ const ContactForm = () => {
                         value={forms.message}
                         type="text"
                         name="message"
-                        placeholder="Message">
+                        placeholder="Lời nhắn bạn để lại cho chúng tôi">
                     </textarea>
                     {validator.message('message', forms.message, 'required')}
                 </div>
             </div>
             <div className="submit-area">
                 <button type="submit" className="theme-btn"><i className="fa fa-angle-double-right"
-                    aria-hidden="true"></i> Submit Now</button>
+                    aria-hidden="true"></i> Gửi câu hỏi</button>
             </div>
         </form >
     )

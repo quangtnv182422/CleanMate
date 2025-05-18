@@ -20,10 +20,21 @@ namespace CleanMate_Main.Server.Controllers.Authen
         [HttpPost("registercustomer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] RegisterModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                var validationErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return BadRequest(new { message = "Validation failed", errors = validationErrors });
+            }
+
             var (success, errors) = await _authenService.RegisterCustomerAsync(model);
 
             if (!success)
-                return BadRequest(errors);
+            {
+                return BadRequest(new { message = "Registration failed", errors });
+            }
 
             return Ok(new { message = "Đăng ký thành công" });
         }

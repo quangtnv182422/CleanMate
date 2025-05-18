@@ -1,16 +1,14 @@
 ﻿import React, { useState } from 'react';
-import Grid from "@mui/material/Grid";
-import SimpleReactValidator from "simple-react-validator";
-import { toast } from "react-toastify";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { Link, useNavigate } from "react-router-dom";
+import Grid from '@mui/material/Grid';
+import SimpleReactValidator from 'simple-react-validator';
+import { toast } from 'react-toastify';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../images/logo-transparent.png';
 
-
-const SignUpPageUser = (props) => {
-
-    const push = useNavigate()
+const SignUpPageUser = () => {
+    const navigate = useNavigate();
 
     const [value, setValue] = useState({
         first_name: '',
@@ -21,12 +19,7 @@ const SignUpPageUser = (props) => {
         confirm_password: '',
     });
 
-    const changeHandler = (e) => {
-        setValue({ ...value, [e.target.name]: e.target.value });
-        validator.showMessages();
-    };
-
-    const [validator] = React.useState(new SimpleReactValidator({
+    const [validator] = useState(new SimpleReactValidator({
         className: 'errorMessage',
         messages: {
             required: 'Trường này là bắt buộc.',
@@ -37,35 +30,59 @@ const SignUpPageUser = (props) => {
             alpha: 'Chỉ được nhập chữ cái.',
             alpha_num: 'Chỉ được nhập chữ và số.',
             phone: 'Số điện thoại không hợp lệ.',
-            // thêm các quy tắc khác nếu bạn sử dụng
-        }
+        },
     }));
 
+    const changeHandler = (e) => {
+        setValue({ ...value, [e.target.name]: e.target.value });
+        validator.showMessages();
+    };
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
         if (validator.allValid()) {
-            setValue({
-                first_name: '',
-                last_name: '',
-                phone: '',
-                email: '',
-                password: '',
-                confirm_password: '',
-            });
-            validator.hideMessages();
-            toast.success('Đăng ký tài khoản thành công!');
-            push('/login');
+            try {
+                const response = await fetch('/Authen/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: `${value.first_name} ${value.last_name}`,
+                        email: value.email,
+                        password: value.password,
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Đăng ký thất bại.');
+                }
+
+                setValue({
+                    first_name: '',
+                    last_name: '',
+                    phone: '',
+                    email: '',
+                    password: '',
+                    confirm_password: '',
+                });
+                validator.hideMessages();
+                toast.success('Đăng ký tài khoản thành công!');
+                navigate('/login');
+            } catch (error) {
+                toast.error(error.message);
+            }
         } else {
             validator.showMessages();
             toast.error('Các mục không được để trống!');
         }
     };
+
     return (
         <Grid className="loginWrapper">
-
             <Grid className="loginForm">
-                <div className="logo" onClick={() => push('/home')}>
+                <div className="logo" onClick={() => navigate('/home')}>
                     <img src={Logo} alt="Logo của hệ thống" />
                 </div>
                 <h2>Đăng ký</h2>
@@ -77,34 +94,30 @@ const SignUpPageUser = (props) => {
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Họ"
-                                value={value.firstName}
+                                value={value.first_name}
                                 variant="outlined"
-                                name="firstName"
+                                name="first_name"
                                 label="Họ"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.first_name, 'required|alpha')}
+                            {validator.message('first name', value.first_name, 'required|alpha')}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Tên"
-                                value={value.lastName}
+                                value={value.last_name}
                                 variant="outlined"
-                                name="lastName"
+                                name="last_name"
                                 label="Tên"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.last_name, 'required|alpha')}
+                            {validator.message('last name', value.last_name, 'required|alpha')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -115,13 +128,11 @@ const SignUpPageUser = (props) => {
                                 variant="outlined"
                                 name="phone"
                                 label="Số điện thoại"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.phone, 'required|alpha')}
+                            {validator.message('phone', value.phone, 'required|numeric|min:10|max:11')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -132,9 +143,7 @@ const SignUpPageUser = (props) => {
                                 variant="outlined"
                                 name="email"
                                 label="E-mail"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
@@ -149,26 +158,22 @@ const SignUpPageUser = (props) => {
                                 variant="outlined"
                                 name="password"
                                 label="Mật khẩu"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('password', value.password, 'required')}
+                            {validator.message('password', value.password, 'required|min:6')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Xác nhận mật khẩu"
-                                value={value.password}
+                                value={value.confirm_password}
                                 variant="outlined"
                                 name="confirm_password"
                                 label="Xác nhận mật khẩu"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                InputLabelProps={{ shrink: true }}
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
@@ -176,14 +181,17 @@ const SignUpPageUser = (props) => {
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formFooter">
-                                <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Đăng ký</Button>
+                                <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">
+                                    Đăng ký
+                                </Button>
                             </Grid>
                             <Grid className="loginWithSocial">
                                 <Button className="facebook"><i className="fa fa-facebook"></i></Button>
                                 <Button className="twitter"><i className="fa fa-twitter"></i></Button>
                                 <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
-                            <p className="noteHelp">Bạn đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+                            <p className="noteHelp">
+                                Bạn đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
                             </p>
                         </Grid>
                     </Grid>
@@ -193,7 +201,7 @@ const SignUpPageUser = (props) => {
                 </div>
             </Grid>
         </Grid>
-    )
+    );
 };
 
 export default SignUpPageUser;

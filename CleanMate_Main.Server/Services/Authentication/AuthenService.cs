@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,15 +20,38 @@ namespace CleanMate_Main.Server.Services.Authentication
             _configuration = configuration;
         }
 
-        public async Task<(bool Success, IEnumerable<string> Errors)> RegisterAsync(RegisterModel model)
+        public async Task<(bool Success, IEnumerable<string> Errors)> RegisterCustomerAsync(RegisterModel model)
         {
+            var errors = new List<string>();
+
+            // check mail
+            var existingEmailUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingEmailUser != null)
+            {
+                errors.Add("Email đã được sử dụng.");
+            }
+
+            // check phone
+            var existingPhoneUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
+            if (existingPhoneUser != null)
+            {
+                errors.Add("Số điện thoại đã được sử dụng.");
+            }
+
+            if (errors.Any())
+            {
+                return (false, errors);
+            }
 
             var user = new AspNetUser
             {
-                UserName = model.Email,
+                UserName = model.FullName,
+                PhoneNumber = model.PhoneNumber,
                 Email = model.Email,
-                CreatedDate = DateTime.Now 
+                CreatedDate = DateTime.Now
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
@@ -35,8 +59,17 @@ namespace CleanMate_Main.Server.Services.Authentication
                 return (false, result.Errors.Select(e => e.Description));
             }
 
+            // gán role customer
+            var roleResult = await _userManager.AddToRoleAsync(user, "Customer");
+            if (!roleResult.Succeeded)
+            {
+                return (false, roleResult.Errors.Select(e => e.Description));
+            }
+
             return (true, null);
         }
+
+
 
         public async Task<(bool Success, string Token, string Error)> LoginAsync(LoginModel model)
         {

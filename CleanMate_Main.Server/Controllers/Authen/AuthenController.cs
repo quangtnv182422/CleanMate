@@ -15,11 +15,12 @@ namespace CleanMate_Main.Server.Controllers.Authen
         {
             _authenService = authenService;
         }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        
+        //đăng kí dành cho khách hàng
+        [HttpPost("registercustomer")]
+        public async Task<IActionResult> RegisterCustomer([FromBody] RegisterModel model)
         {
-            var (success, errors) = await _authenService.RegisterAsync(model);
+            var (success, errors) = await _authenService.RegisterCustomerAsync(model);
 
             if (!success)
                 return BadRequest(errors);

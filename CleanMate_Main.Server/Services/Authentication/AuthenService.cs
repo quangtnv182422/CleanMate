@@ -1,9 +1,11 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
+using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -13,11 +15,13 @@ namespace CleanMate_Main.Server.Services.Authentication
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthenService(UserManager<AspNetUser> userManager, IConfiguration configuration)
+        public AuthenService(UserManager<AspNetUser> userManager, IConfiguration configuration, IEmailService emailService)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<(bool Success, IEnumerable<string> Errors)> RegisterCustomerAsync(RegisterModel model)
@@ -43,7 +47,7 @@ namespace CleanMate_Main.Server.Services.Authentication
             {
                 return (false, errors);
             }
-
+            // add new user
             var user = new AspNetUser
             {
                 UserName = model.FullName,
@@ -65,6 +69,14 @@ namespace CleanMate_Main.Server.Services.Authentication
             {
                 return (false, roleResult.Errors.Select(e => e.Description));
             }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = WebUtility.UrlEncode(token);
+
+            //NOTE: cái này đang fix cứng tạm thời
+            var confirmationLink = $"https://localhost:60391/confirm-email?userId={user.Id}&token={encodedToken}";
+
+            await _emailService.SendConfirmEmail(user.Email, confirmationLink);
 
             return (true, null);
         }
@@ -99,5 +111,7 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             return (false, null, "Sai thông tin đăng nhập");
         }
+
+
     }
 }

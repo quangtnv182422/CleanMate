@@ -46,8 +46,9 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             var user = new AspNetUser
             {
-                UserName = model.FullName,
+                UserName = model.Email,
                 PhoneNumber = model.PhoneNumber,
+                FullName = model.FullName,
                 Email = model.Email,
                 CreatedDate = DateTime.Now
             };

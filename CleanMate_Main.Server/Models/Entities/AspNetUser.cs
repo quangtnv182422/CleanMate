@@ -18,6 +18,8 @@ public partial class AspNetUser : IdentityUser
 
     public string? ProfileImage { get; set; }
 
+    public string? FullName { get; set; }
+
 
     public virtual ICollection<Booking> BookingCleaners { get; set; } = new List<Booking>();
 

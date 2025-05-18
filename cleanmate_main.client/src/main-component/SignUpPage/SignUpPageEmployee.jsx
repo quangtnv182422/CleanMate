@@ -1,13 +1,17 @@
-﻿import React, {useState} from 'react';
+﻿import React, { useState, useContext } from 'react';
 import Grid from "@mui/material/Grid";
 import SimpleReactValidator from "simple-react-validator";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {Link, useNavigate} from "react-router-dom";
+
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from '../../images/logo-transparent.png';
+import { AuthContext } from '../../context/AuthContext';
 
 const SignUpPageEmployee = (props) => {
+    const { banks } = useContext(AuthContext);
 
     const push = useNavigate()
 
@@ -16,29 +20,58 @@ const SignUpPageEmployee = (props) => {
         last_name: '',
         phone: '',
         email: '',
+        identification: '',
+        bank: '',
+        bank_account: '',
         password: '',
         confirm_password: '',
     });
 
     const changeHandler = (e) => {
-        setValue({...value, [e.target.name]: e.target.value});
+        setValue({ ...value, [e.target.name]: e.target.value });
         validator.showMessages();
     };
 
-    const [validator] = React.useState(new SimpleReactValidator({
-        className: 'errorMessage',
-        messages: {
-            required: 'Trường này là bắt buộc.',
-            email: 'Địa chỉ email không hợp lệ.',
-            min: 'Giá trị phải có ít nhất :min ký tự.',
-            max: 'Giá trị không được vượt quá :max ký tự.',
-            numeric: 'Chỉ được nhập số.',
-            alpha: 'Chỉ được nhập chữ cái.',
-            alpha_num: 'Chỉ được nhập chữ và số.',
-            phone: 'Số điện thoại không hợp lệ.',
-            // thêm các quy tắc khác nếu bạn sử dụng
-        }
-    }));
+    const [validator] = React.useState(
+        new SimpleReactValidator({
+            className: 'errorMessage',
+            messages: {
+                required: 'Trường này là bắt buộc.',
+                email: 'Địa chỉ email không hợp lệ.',
+                min: 'Giá trị phải có ít nhất :min ký tự.',
+                max: 'Giá trị không được vượt quá :max ký tự.',
+                numeric: 'Chỉ được nhập số.',
+                alpha: 'Chỉ được nhập chữ cái.',
+                alpha_num: 'Chỉ được nhập chữ và số.',
+                phone: 'Số điện thoại không hợp lệ.',
+            },
+            validators: {
+                alpha_vn: {
+                    message: 'Chỉ được nhập chữ cái (bao gồm cả tiếng Việt có dấu).',
+                    rule: (val) => /^[A-Za-zÀ-ỹà-ỹ\s]+$/.test(val),
+                },
+                phone_vn: {
+                    message: 'Số điện thoại phải có đúng 10 chữ số.',
+                    rule: (val) => /^0\d{9}$/.test(val),
+                },
+                cccd: {
+                    message: 'Căn cước công dân phải có đúng 12 chữ số.',
+                    rule: (val) => /^\d{12}$/.test(val),
+                },
+                strong_password: {
+                    message:
+                        'Mật khẩu phải có ít nhất 6 ký tự, bao gồm số và ký tự đặc biệt.',
+                    rule: (val) =>
+                        /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,}$/.test(val),
+                },
+                password_match: {
+                    message: 'Xác nhận mật khẩu không khớp.',
+                    rule: (val, params) => val === params[0],
+                    required: true,
+                },
+            },
+        })
+    );
 
 
     const submitForm = (e) => {
@@ -49,6 +82,9 @@ const SignUpPageEmployee = (props) => {
                 last_name: '',
                 phone: '',
                 email: '',
+                identification: '',
+                bank: '',
+                bank_account: '',
                 password: '',
                 confirm_password: '',
             });
@@ -62,9 +98,8 @@ const SignUpPageEmployee = (props) => {
     };
     return (
         <Grid className="loginWrapper">
-
             <Grid className="loginForm">
-                <div className="logo" onClick={() => push('/home') }>
+                <div className="logo" onClick={() => push('/home')}>
                     <img src={Logo} alt="Logo của hệ thống" />
                 </div>
                 <h2>Đăng ký</h2>
@@ -76,9 +111,9 @@ const SignUpPageEmployee = (props) => {
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Họ"
-                                value={value.firstName}
+                                value={value.first_name}
                                 variant="outlined"
-                                name="firstName"
+                                name="first_name"
                                 label="Họ"
                                 InputLabelProps={{
                                     shrink: true,
@@ -86,16 +121,16 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.first_name, 'required|alpha')}
+                            {validator.message('first name', value.first_name, 'required|alpha_vn')}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Tên"
-                                value={value.lastName}
+                                value={value.last_name}
                                 variant="outlined"
-                                name="lastName"
+                                name="last_name"
                                 label="Tên"
                                 InputLabelProps={{
                                     shrink: true,
@@ -103,7 +138,7 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.last_name, 'required|alpha')}
+                            {validator.message('last name', value.last_name, 'required|alpha_vn')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -120,7 +155,7 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('full name', value.phone, 'required|alpha')}
+                            {validator.message('phone', value.phone, 'required|phone_vn')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -138,9 +173,71 @@ const SignUpPageEmployee = (props) => {
                                 onChange={(e) => changeHandler(e)}
                             />
                             {validator.message('email', value.email, 'required|email')}
+
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                className="inputOutline"
+                                fullWidth
+                                placeholder="Căn cước công dân"
+                                value={value.identification}
+                                variant="outlined"
+                                name="identification"
+                                label="Căn cước công dân"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                onBlur={(e) => changeHandler(e)}
+                                onChange={(e) => changeHandler(e)}
+                            />
+                            {validator.message('identification', value.identification, 'required|cccd')}
+
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth variant="outlined" className="inputOutline">
+                                <InputLabel shrink id="bank-select-label">
+                                    Ngân hàng
+                                </InputLabel>
+                                <Select
+                                    labelId="bank-select-label"
+                                    id="bank-select"
+                                    value={value.bank}
+                                    onChange={(e) => changeHandler({ target: { name: 'bank', value: e.target.value } })}
+                                    name="bank"
+                                    displayEmpty
+                                    inputProps={{ 'aria-label': 'Ngân hàng' }}
+                                >
+                                    <MenuItem value="" disabled>
+                                        Chọn ngân hàng
+                                    </MenuItem>
+                                    {banks.map((bank) => (
+                                        <MenuItem key={bank.bin} value={bank.shortName}>
+                                            {bank.shortName}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                className="inputOutline"
+                                fullWidth
+                                placeholder="Số tài khoản"
+                                value={value.bank_account}
+                                variant="outlined"
+                                name="bank_account"
+                                label="Số tài khoản"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                onBlur={(e) => changeHandler(e)}
+                                onChange={(e) => changeHandler(e)}
+                            />
+                            {validator.message('bank account', value.bank_account, 'required')}
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Mật khẩu"
@@ -154,14 +251,15 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('password', value.password, 'required')}
+                            {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Xác nhận mật khẩu"
-                                value={value.password}
+                                value={value.confirm_password}
                                 variant="outlined"
                                 name="confirm_password"
                                 label="Xác nhận mật khẩu"
@@ -171,7 +269,7 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('confirm password', value.confirm_password, `in:${value.password}`)}
+                            {validator.message('confirm password', value.confirm_password, `required|password_match:${value.password}`)}
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formFooter">

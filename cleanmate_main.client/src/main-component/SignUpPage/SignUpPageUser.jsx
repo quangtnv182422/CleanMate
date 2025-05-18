@@ -151,6 +151,7 @@ const SignUpPageUser = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Mật khẩu"
@@ -166,6 +167,7 @@ const SignUpPageUser = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Xác nhận mật khẩu"
@@ -177,7 +179,7 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('confirm password', value.confirm_password, `in:${value.password}`)}
+                            {validator.message('confirm password', value.confirm_password, `required|password_match:${value.password}`)}
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formFooter">

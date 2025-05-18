@@ -8,7 +8,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from '../../images/logo-transparent.png';
-
 import './style.scss';
 
 
@@ -23,6 +22,47 @@ const LoginPage = (props) => {
         remember: false,
     });
 
+    const [validator] = React.useState(
+        new SimpleReactValidator({
+            className: 'errorMessage',
+            messages: {
+                required: 'Trường này là bắt buộc.',
+                email: 'Địa chỉ email không hợp lệ.',
+                min: 'Giá trị phải có ít nhất :min ký tự.',
+                max: 'Giá trị không được vượt quá :max ký tự.',
+                numeric: 'Chỉ được nhập số.',
+                alpha: 'Chỉ được nhập chữ cái.',
+                alpha_num: 'Chỉ được nhập chữ và số.',
+                phone: 'Số điện thoại không hợp lệ.',
+            },
+            validators: {
+                alpha_vn: {
+                    message: 'Chỉ được nhập chữ cái (bao gồm cả tiếng Việt có dấu).',
+                    rule: (val) => /^[A-Za-zÀ-ỹà-ỹ\s]+$/.test(val),
+                },
+                phone_vn: {
+                    message: 'Số điện thoại phải có đúng 10 chữ số.',
+                    rule: (val) => /^0\d{9}$/.test(val),
+                },
+                cccd: {
+                    message: 'Căn cước công dân phải có đúng 12 chữ số.',
+                    rule: (val) => /^\d{12}$/.test(val),
+                },
+                strong_password: {
+                    message:
+                        'Mật khẩu phải có ít nhất 6 ký tự, bao gồm số và ký tự đặc biệt.',
+                    rule: (val) =>
+                        /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,}$/.test(val),
+                },
+                password_match: {
+                    message: 'Xác nhận mật khẩu không khớp.',
+                    rule: (val, params) => val === params[0],
+                    required: true,
+                },
+            },
+        })
+    );
+
     const changeHandler = (e) => {
         setValue({ ...value, [e.target.name]: e.target.value });
         validator.showMessages();
@@ -31,22 +71,6 @@ const LoginPage = (props) => {
     const rememberHandler = () => {
         setValue({ ...value, remember: !value.remember });
     };
-
-    const [validator] = React.useState(new SimpleReactValidator({
-        className: 'errorMessage',
-        messages: {
-            required: 'Trường này là bắt buộc.',
-            email: 'Địa chỉ email không hợp lệ.',
-            min: 'Giá trị phải có ít nhất :min ký tự.',
-            max: 'Giá trị không được vượt quá :max ký tự.',
-            numeric: 'Chỉ được nhập số.',
-            alpha: 'Chỉ được nhập chữ cái.',
-            alpha_num: 'Chỉ được nhập chữ và số.',
-            phone: 'Số điện thoại không hợp lệ.',
-        }
-    }));
-
-
 
     const submitForm = (e) => {
         e.preventDefault();

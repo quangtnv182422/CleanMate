@@ -42,15 +42,18 @@ const SignUpPageUser = () => {
         e.preventDefault();
         if (validator.allValid()) {
             try {
-                const response = await fetch('/Authen/register', {
+                const response = await fetch('/Authen/registercustomer', {
                     method: 'POST',
                     headers: {
+                        'Accept': '*/*', // Match curl
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        username: `${value.first_name} ${value.last_name}`,
+                        fullName: `${value.first_name}${value.last_name}`, // Combine first_name and last_name with a space
                         email: value.email,
+                        phoneNumber: value.phone, // Include phone number
                         password: value.password,
+                        confirmPassword: value.confirm_password, // Include confirm password
                     }),
                 });
 

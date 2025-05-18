@@ -1,9 +1,12 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Proxy.GGMail;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -40,8 +43,11 @@ builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
     .AddDefaultTokenProviders();
 
 
-//DI
+//AuthenService
 builder.Services.AddScoped<IAuthenService, AuthenService>();
+//emailSender
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 
 // Cấu hình JWT (dành cho API)

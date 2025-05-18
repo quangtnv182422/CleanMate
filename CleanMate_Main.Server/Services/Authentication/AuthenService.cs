@@ -74,7 +74,7 @@ namespace CleanMate_Main.Server.Services.Authentication
             var encodedToken = WebUtility.UrlEncode(token);
 
             //NOTE: cái này đang fix cứng tạm thời
-            var confirmationLink = $"https://localhost:60391/confirm-email?userId={user.Id}&token={encodedToken}";
+            var confirmationLink = $"https://localhost:60391/email-confirmation?userId={user.Id}&token={encodedToken}";
 
             await _emailService.SendConfirmEmail(user.Email, confirmationLink);
 

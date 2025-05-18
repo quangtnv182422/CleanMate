@@ -4,7 +4,9 @@ using CleanMate_Main.Server.Services.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
+using System.Text;
 
 namespace CleanMate_Main.Server.Controllers.Authen
 {
@@ -58,7 +60,7 @@ namespace CleanMate_Main.Server.Controllers.Authen
                 return StatusCode(404, new { message = "Không tìm thấy người dùng." });
             }
 
-            var decodedToken = WebUtility.UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
             if (!result.Succeeded)

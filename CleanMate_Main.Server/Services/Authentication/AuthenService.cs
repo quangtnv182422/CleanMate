@@ -2,6 +2,7 @@
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -71,7 +72,7 @@ namespace CleanMate_Main.Server.Services.Authentication
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             //NOTE: cái này đang fix cứng tạm thời
             var confirmationLink = $"https://localhost:60391/email-confirmation?userId={user.Id}&token={encodedToken}";

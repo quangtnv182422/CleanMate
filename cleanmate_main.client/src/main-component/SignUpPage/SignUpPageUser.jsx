@@ -19,19 +19,46 @@ const SignUpPageUser = () => {
         confirm_password: '',
     });
 
-    const [validator] = useState(new SimpleReactValidator({
-        className: 'errorMessage',
-        messages: {
-            required: 'Trường này là bắt buộc.',
-            email: 'Địa chỉ email không hợp lệ.',
-            min: 'Giá trị phải có ít nhất :min ký tự.',
-            max: 'Giá trị không được vượt quá :max ký tự.',
-            numeric: 'Chỉ được nhập số.',
-            alpha: 'Chỉ được nhập chữ cái.',
-            alpha_num: 'Chỉ được nhập chữ và số.',
-            phone: 'Số điện thoại không hợp lệ.',
-        },
-    }));
+    const [validator] = React.useState(
+        new SimpleReactValidator({
+            className: 'errorMessage',
+            messages: {
+                required: 'Trường này là bắt buộc.',
+                email: 'Địa chỉ email không hợp lệ.',
+                min: 'Giá trị phải có ít nhất :min ký tự.',
+                max: 'Giá trị không được vượt quá :max ký tự.',
+                numeric: 'Chỉ được nhập số.',
+                alpha: 'Chỉ được nhập chữ cái.',
+                alpha_num: 'Chỉ được nhập chữ và số.',
+                phone: 'Số điện thoại không hợp lệ.',
+            },
+            validators: {
+                alpha_vn: {
+                    message: 'Chỉ được nhập chữ cái (bao gồm cả tiếng Việt có dấu).',
+                    rule: (val) => /^[A-Za-zÀ-ỹà-ỹ\s]+$/.test(val),
+                },
+                phone_vn: {
+                    message: 'Số điện thoại phải có đúng 10 chữ số.',
+                    rule: (val) => /^0\d{9}$/.test(val),
+                },
+                cccd: {
+                    message: 'Căn cước công dân phải có đúng 12 chữ số.',
+                    rule: (val) => /^\d{12}$/.test(val),
+                },
+                strong_password: {
+                    message:
+                        'Mật khẩu phải có ít nhất 6 ký tự, bao gồm số và ký tự đặc biệt.',
+                    rule: (val) =>
+                        /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,}$/.test(val),
+                },
+                password_match: {
+                    message: 'Xác nhận mật khẩu không khớp.',
+                    rule: (val, params) => val === params[0],
+                    required: true,
+                },
+            },
+        })
+    );
 
     const changeHandler = (e) => {
         setValue({ ...value, [e.target.name]: e.target.value });
@@ -105,7 +132,7 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('first name', value.first_name, 'required|alpha')}
+                            {validator.message('first name', value.first_name, 'required|alpha_vn')}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -120,7 +147,7 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('last name', value.last_name, 'required|alpha')}
+                            {validator.message('last name', value.last_name, 'required|alpha_vn')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -135,7 +162,7 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('phone', value.phone, 'required|numeric|min:10|max:11')}
+                            {validator.message('phone', value.phone, 'required|phone_vn')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -154,6 +181,7 @@ const SignUpPageUser = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Mật khẩu"
@@ -165,10 +193,11 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('password', value.password, 'required|min:6')}
+                            {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
+                                type="password"
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Xác nhận mật khẩu"
@@ -180,7 +209,7 @@ const SignUpPageUser = () => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('confirm password', value.confirm_password, `in:${value.password}`)}
+                            {validator.message('confirm password', value.confirm_password, `required|password_match:${value.password}`)}
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formFooter">

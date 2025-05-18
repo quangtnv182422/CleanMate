@@ -64,7 +64,18 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:60391") // React app origin
+                  .AllowAnyMethod() // Allow GET, POST, etc.
+                  .AllowAnyHeader() // Allow headers like Content-Type
+                  .AllowCredentials(); // Allow cookies if needed
+        });
+});
 var app = builder.Build();
 
 //Add role tạm thời sau khi khở tạo
@@ -88,7 +99,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors();
+app.UseCors("AllowReactApp"); 
 app.UseAuthentication();
 app.UseAuthorization();
 

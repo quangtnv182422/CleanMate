@@ -97,12 +97,25 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                var claims = new[]
-                {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                // Lấy roles
+                var roles = await _userManager.GetRolesAsync(user);
 
+                // Tạo danh sách claim
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+
+                // Thêm từng role vào claim
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+
+                // Tạo token
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -110,7 +123,7 @@ namespace CleanMate_Main.Server.Services.Authentication
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddDays(1),
+                    expires: DateTime.Now.AddDays(7),
                     signingCredentials: creds
                 );
 
@@ -120,6 +133,7 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             return (false, null, "Sai mật khẩu.");
         }
+
 
 
 

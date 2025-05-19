@@ -1,11 +1,13 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 
 namespace CleanMate_Main.Server.Controllers.Authen
@@ -51,10 +53,42 @@ namespace CleanMate_Main.Server.Controllers.Authen
             var (success, token, error) = await _authenService.LoginAsync(model);
 
             if (!success)
-                return Unauthorized(error);
+                return Unauthorized(new { message = error });
 
-            return Ok(new { token });
+            // Set JWT to HttpOnly cookie
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // đảm bảo chỉ hoạt động với HTTPS
+                SameSite = SameSiteMode.Strict, // tránh bị CSRF nếu muốn
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
+            return Ok(new { message = "Đăng nhập thành công" });
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            return Ok(new { message = "Đăng xuất thành công" });
+        }
+
+
+        [HttpGet("me")]
+        [Authorize]
+        public IActionResult GetCurrentUser()
+        {
+            var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+
+            return Ok(new
+            {
+                email,
+                roles
+            });
+        }
+
 
         //confirm email
         [HttpGet("confirm-email")]

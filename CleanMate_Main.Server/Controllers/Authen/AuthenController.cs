@@ -44,7 +44,28 @@ namespace CleanMate_Main.Server.Controllers.Authen
                 return BadRequest(new { message = "Registration failed", errors });
             }
 
-            return Ok(new { message = "Đăng ký thành công" });
+            return Ok(new { message = "Hãy xác thực tài khoản của ban qua Email!" });
+        }
+        [HttpPost("registeremployee")]
+        public async Task<IActionResult> RegisterEmployee([FromBody] RegisterModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var validationErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return BadRequest(new { message = "Validation failed", errors = validationErrors });
+            }
+
+            var (success, errors) = await _authenService.RegisterEmployeeAsync(model);
+
+            if (!success)
+            {
+                return BadRequest(new { message = "Registration failed", errors });
+            }
+
+            return Ok(new { message = "Hãy xác thực tài khoản của ban qua Email!" });
         }
 
         [HttpPost("login")]

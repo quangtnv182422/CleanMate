@@ -102,7 +102,7 @@ const SignUpPageUser = () => {
                     confirm_password: '',
                 });
                 validator.hideMessages();
-                toast.success('Đăng ký tài khoản thành công!');
+                toast.success('Đăng ký tài khoản thành công!  Hãy xác thực Email của bạn');
                 navigate('/login');
             } catch (error) {
                 toast.error(error.message);

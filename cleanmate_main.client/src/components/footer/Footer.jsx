@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../../images/logo-with-white-text.jpg'
 import Services from '../../api/service';
@@ -27,15 +27,13 @@ const Footer = (props) => {
                         <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
                             <div className="widget link-widget">
                                 <div className="widget-title">
-                                    <h3>Quick Link</h3>
+                                    <h3>Xem nhanh</h3>
                                 </div>
                                 <ul>
-                                    <li><Link to="/about">About Us </Link></li>
-                                    <li><Link to="/service-s2">Service</Link></li>
-                                    <li><Link to="/appointment">Appointment</Link></li>
-                                    <li><Link to="/contact">Contact Us </Link></li>
-                                    <li><Link to="/project">Projects</Link></li>
-                                    <li><Link to="/terms">Terms & Conditions</Link></li>
+                                    <li><Link to="/about">Về chúng tôi </Link></li>
+                                    <li><Link to="/service-s2">Dịch vụ</Link></li>
+                                    <li><Link to="/contact">Liên hệ chúng tôi </Link></li>
+                                    <li><Link to="/terms">Chính sách & Điều khoản</Link></li>
 
                                 </ul>
                             </div>

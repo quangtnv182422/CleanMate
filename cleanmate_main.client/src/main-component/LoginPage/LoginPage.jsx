@@ -72,28 +72,44 @@ const LoginPage = (props) => {
         setValue({ ...value, remember: !value.remember });
     };
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
+
         if (validator.allValid()) {
-            setValue({
-                email: '',
-                password: '',
-                remember: false
-            });
-            validator.hideMessages();
+            try {
+                const response = await fetch('/Authen/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: value.email,
+                        password: value.password,
+                    }),
+                });
 
-            const userRegex = /^user+.*/gm;
-            const email = value.email;
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.token;
 
-            if (email.match(userRegex)) {
-                toast.success('Bạn đã đăng nhập thành công vào CleanMate !');
-                push('/home');
+                    localStorage.setItem('token', token);
+
+                    toast.success('Bạn đã đăng nhập thành công vào CleanMate !');
+                    push('/home');
+                } else {
+                    const error = await response.text();
+                    toast.error(`Đăng nhập thất bại: ${error}`);
+                }
+            } catch (err) {
+                console.error(err);
+                toast.error('Lỗi kết nối đến máy chủ!');
             }
         } else {
             validator.showMessages();
             toast.error('Các mục không được để trống!');
         }
     };
+
     return (
         <Grid className="loginWrapper">
             <Grid className="loginForm">

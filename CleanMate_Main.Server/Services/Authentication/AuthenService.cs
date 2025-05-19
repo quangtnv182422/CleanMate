@@ -179,13 +179,20 @@ namespace CleanMate_Main.Server.Services.Authentication
         public async Task<(bool Success, string Token, string Error)> LoginAsync(LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+
+            if (user == null)
+                return (false, null, "Tài khoản không tồn tại.");
+
+            if (!user.EmailConfirmed)
+                return (false, null, "Email chưa được xác thực. Vui lòng kiểm tra hộp thư để xác nhận tài khoản.");
+
+            if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 var claims = new[]
                 {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -202,8 +209,9 @@ namespace CleanMate_Main.Server.Services.Authentication
                 return (true, jwtToken, null);
             }
 
-            return (false, null, "Sai thông tin đăng nhập");
+            return (false, null, "Sai mật khẩu.");
         }
+
 
 
     }

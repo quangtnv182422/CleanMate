@@ -97,6 +97,9 @@ builder.Services.AddCors(options =>
                   .AllowCredentials(); // Allow cookies if needed
         });
 });
+
+
+
 var app = builder.Build();
 
 //Add role tạm thời sau khi khở tạo

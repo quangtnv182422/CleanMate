@@ -59,8 +59,8 @@ namespace CleanMate_Main.Server.Controllers.Authen
             Response.Cookies.Append("jwt", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // đảm bảo chỉ hoạt động với HTTPS
-                SameSite = SameSiteMode.Strict, // tránh bị CSRF nếu muốn
+                Secure = true, 
+                SameSite = SameSiteMode.None, 
                 Expires = DateTime.UtcNow.AddDays(7)
             });
 
@@ -77,17 +77,32 @@ namespace CleanMate_Main.Server.Controllers.Authen
 
         [HttpGet("me")]
         [Authorize]
-        public IActionResult GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var email = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userEmail))
+                return Unauthorized();
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+                return Unauthorized();
+
+            // Lấy roles nếu cần
+            var roles = await _userManager.GetRolesAsync(user);
 
             return Ok(new
             {
-                email,
-                roles
+                id = user.Id,
+                username = user.UserName,
+                email = user.Email,
+                fullName = user.FullName,
+                avatar = user.ProfileImage,  
+                roles = roles
             });
         }
+
 
 
         //confirm email

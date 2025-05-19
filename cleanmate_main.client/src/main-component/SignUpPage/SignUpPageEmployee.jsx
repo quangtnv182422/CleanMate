@@ -13,7 +13,7 @@ import { AuthContext } from '../../context/AuthContext';
 const SignUpPageEmployee = (props) => {
     const { banks } = useContext(AuthContext);
 
-    const push = useNavigate()
+    const navigate = useNavigate();
 
     const [value, setValue] = useState({
         first_name: '',
@@ -22,7 +22,7 @@ const SignUpPageEmployee = (props) => {
         email: '',
         identification: '',
         bank: '',
-        bank_account: '',
+        bankAccount: '',
         password: '',
         confirm_password: '',
     });
@@ -74,23 +74,53 @@ const SignUpPageEmployee = (props) => {
     );
 
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
         if (validator.allValid()) {
-            setValue({
-                first_name: '',
-                last_name: '',
-                phone: '',
-                email: '',
-                identification: '',
-                bank: '',
-                bank_account: '',
-                password: '',
-                confirm_password: '',
-            });
-            validator.hideMessages();
-            toast.success('Bạn đã đăng ký thành công!');
-            push('/login');
+            try {
+                const response = await fetch('/Authen/registeremployee', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': '*/*',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fullName: `${value.first_name} ${value.last_name}`,
+                        email: value.email,
+                        phoneNumber: value.phone,
+                        identification: value.identification,
+                        bank: value.bank,
+                        bankAccount: value.bankAccount,
+                        password: value.password,
+                        confirmPassword: value.confirm_password,
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    if (data.errors && Array.isArray(data.errors)) {
+                        throw new Error(data.errors.join('\n'));
+                    }
+                    throw new Error(data.message || 'Đăng ký thất bại.');
+                }
+
+                setValue({
+                    first_name: '',
+                    last_name: '',
+                    phone: '',
+                    email: '',
+                    identification: '',
+                    bank: '',
+                    bankAccount: '',
+                    password: '',
+                    confirm_password: '',
+                });
+                validator.hideMessages();
+                toast.success('Bạn đã đăng ký thành công! Hãy xác thực Email của bạn');
+                navigate('/login'); // Changed from push to navigate for consistency
+            } catch (error) {
+                toast.error(error.message);
+            }
         } else {
             validator.showMessages();
             toast.error('Các mục không được để trống!');
@@ -211,7 +241,7 @@ const SignUpPageEmployee = (props) => {
                                         Chọn ngân hàng
                                     </MenuItem>
                                     {banks.map((bank) => (
-                                        <MenuItem key={bank.bin} value={bank.shortName}>
+                                        <MenuItem key={bank.bin} value={bank.name}>
                                             {bank.shortName}
                                         </MenuItem>
                                     ))}
@@ -223,9 +253,9 @@ const SignUpPageEmployee = (props) => {
                                 className="inputOutline"
                                 fullWidth
                                 placeholder="Số tài khoản"
-                                value={value.bank_account}
+                                value={value.bankAccount}
                                 variant="outlined"
-                                name="bank_account"
+                                name="bankAccount"
                                 label="Số tài khoản"
                                 InputLabelProps={{
                                     shrink: true,
@@ -233,7 +263,7 @@ const SignUpPageEmployee = (props) => {
                                 onBlur={(e) => changeHandler(e)}
                                 onChange={(e) => changeHandler(e)}
                             />
-                            {validator.message('bank account', value.bank_account, 'required')}
+                            {validator.message('bank account', value.bankAccount, 'required')}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField

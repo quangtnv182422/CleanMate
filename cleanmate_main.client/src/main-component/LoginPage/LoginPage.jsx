@@ -82,6 +82,7 @@ const LoginPage = (props) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include', // <-- rất quan trọng để gửi cookie đi
                     body: JSON.stringify({
                         email: value.email,
                         password: value.password,
@@ -89,16 +90,11 @@ const LoginPage = (props) => {
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    const token = data.token;
-
-                    localStorage.setItem('token', token);
-
                     toast.success('Bạn đã đăng nhập thành công vào CleanMate !');
                     push('/home');
                 } else {
-                    const error = await response.text();
-                    toast.error(`Đăng nhập thất bại: ${error}`);
+                    const error = await response.json();
+                    toast.error(`Đăng nhập thất bại: ${error.message}`);
                 }
             } catch (err) {
                 console.error(err);
@@ -109,6 +105,7 @@ const LoginPage = (props) => {
             toast.error('Các mục không được để trống!');
         }
     };
+
 
     return (
         <Grid className="loginWrapper">

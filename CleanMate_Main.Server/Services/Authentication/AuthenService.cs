@@ -83,7 +83,98 @@ namespace CleanMate_Main.Server.Services.Authentication
             return (true, null);
         }
 
+        public async Task<(bool Success, IEnumerable<string> Errors)> RegisterEmployeeAsync(RegisterModel model)
+        {
+            var errors = new List<string>();
 
+            // Check email
+            var existingEmailUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingEmailUser != null)
+            {
+                errors.Add("Email đã được sử dụng.");
+            }
+
+            // Check phone
+            var existingPhoneUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber == model.PhoneNumber);
+            if (existingPhoneUser != null)
+            {
+                errors.Add("Số điện thoại đã được sử dụng.");
+            }
+
+            // Check identification
+            var existingIdentificationUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.CCCD == model.Identification);
+            if (existingIdentificationUser != null)
+            {
+                errors.Add("Số định danh đã được sử dụng.");
+            }
+
+            // Check bank (optional: validate against VietQR API or a list)
+            if (string.IsNullOrEmpty(model.Bank))
+            {
+                errors.Add("Mã ngân hàng không hợp lệ.");
+            }
+
+            // Proceed with user creation only if no validation errors so far
+            if (!errors.Any())
+            {
+                var user = new AspNetUser
+                {
+                    UserName = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    FullName = model.FullName, 
+                    Email = model.Email,
+                    CCCD = model.Identification,
+                    CreatedDate = DateTime.Now
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                {
+                    errors.AddRange(result.Errors.Select(e => e.Description));
+                }
+                else
+                {
+                    // Assign role "Cleaner"
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Cleaner");
+                    if (!roleResult.Succeeded)
+                    {
+                        errors.AddRange(roleResult.Errors.Select(e => e.Description));
+                    }
+                    else
+                    {
+                        user.BankName = model.Bank;
+                        user.BankNo = model.BankAccount;
+                        var updateResult = await _userManager.UpdateAsync(user);
+                        if (!updateResult.Succeeded)
+                        {
+                            errors.AddRange(updateResult.Errors.Select(e => e.Description));
+                        }
+                        else
+                        {
+                            // Generate email confirmation token
+                            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+                            // Generate confirmation link (hardcoded for now, same as RegisterCustomerAsync)
+                            var confirmationLink = $"https://localhost:60391/email-confirmation?userId={user.Id}&token={encodedToken}";
+
+                            // Send confirmation email
+                            await _emailService.SendConfirmEmail(user.Email, confirmationLink);
+                        }
+                    }
+                }
+            }
+
+            if (errors.Any())
+            {
+                return (false, errors);
+            }
+
+            return (true, null);
+        }
 
         public async Task<(bool Success, string Token, string Error)> LoginAsync(LoginModel model)
         {
@@ -97,12 +188,25 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                var claims = new[]
-                {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                // Lấy roles
+                var roles = await _userManager.GetRolesAsync(user);
 
+                // Tạo danh sách claim
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+
+                // Thêm từng role vào claim
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+
+                // Tạo token
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -110,7 +214,7 @@ namespace CleanMate_Main.Server.Services.Authentication
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddDays(1),
+                    expires: DateTime.Now.AddDays(7),
                     signingCredentials: creds
                 );
 
@@ -120,6 +224,7 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             return (false, null, "Sai mật khẩu.");
         }
+
 
 
 

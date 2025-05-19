@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import HeaderTopbar from '../HeaderTopbar/HeaderTopbar'
 import MobileMenu from '../MobileMenu/MobileMenu'
 import Logo from '../../images/logo.svg'
-import LogoTransparent from '../../images/logo-transparent.png'
+import LogoTransparent from '../../images/header-logo-transparent.png'
 
 
 
@@ -71,23 +71,22 @@ const Header = (props) => {
                                         {/*</li>*/}
                                         <li className="menu-item-has-children">
                                             <Link onClick={ClickHandler} to="/blog">Blog</Link>
-                                            <ul className="sub-menu">
-                                                {/*<li><Link onClick={ClickHandler} to="/blog">Blog right sidebar</Link></li>*/}
-                                                {/*<li><Link onClick={ClickHandler} to="/blog-left-sidebar">Blog left sidebar</Link></li>*/}
-                                                {/*<li><Link onClick={ClickHandler} to="/blog-fullwidth">Blog fullwidth</Link></li>*/}
-                                                {/*<li className="menu-item-has-children">*/}
-                                                {/*    <Link onClick={ClickHandler} to="/">Blog details</Link>*/}
-                                                {/*    <ul className="sub-menu">*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single/1">Blog details right sidebar</Link>*/}
-                                                {/*        </li>*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single-left-sidebar/1">Blog details left*/}
-                                                {/*            sidebar</Link></li>*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single-fullwidth/1">Blog details*/}
-                                                {/*            fullwidth</Link></li>*/}
-                                                {/*    </ul>*/}
-                                                {/*</li>*/}
-                                                
-                                            </ul>
+                                            {/*<ul className="sub-menu">*/}
+                                            {/*    <li><Link onClick={ClickHandler} to="/blog">Blog right sidebar</Link></li>*/}
+                                            {/*    <li><Link onClick={ClickHandler} to="/blog-left-sidebar">Blog left sidebar</Link></li>*/}
+                                            {/*    <li><Link onClick={ClickHandler} to="/blog-fullwidth">Blog fullwidth</Link></li>*/}
+                                            {/*    <li className="menu-item-has-children">*/}
+                                            {/*        <Link onClick={ClickHandler} to="/">Blog details</Link>*/}
+                                            {/*        <ul className="sub-menu">*/}
+                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single/1">Blog details right sidebar</Link>*/}
+                                            {/*            </li>*/}
+                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single-left-sidebar/1">Blog details left*/}
+                                            {/*                sidebar</Link></li>*/}
+                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single-fullwidth/1">Blog details*/}
+                                            {/*                fullwidth</Link></li>*/}
+                                            {/*        </ul>*/}
+                                            {/*    </li>*/}
+                                            {/*</ul>*/}
                                         </li>
                                         <li className="menu-item-has-children">
                                             <Link to="/contact">Liên hệ</Link>

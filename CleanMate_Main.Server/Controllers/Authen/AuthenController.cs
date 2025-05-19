@@ -56,7 +56,7 @@ namespace CleanMate_Main.Server.Controllers.Authen
             return Ok(new { token });
         }
 
-
+        //confirm email
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {

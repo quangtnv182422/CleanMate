@@ -4,15 +4,30 @@ import userImage from '../../images/user-image.png'
 
 
 const HeaderTopbar = () => {
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
+
     const navigateTo = (path) => {
         setShowDropdown(false);
         navigate(path);
     };
+
+    const handleClickOutside = (event) => {
+        if (!event.target.closest('.user-avatar')) {
+            setShowDropdown(false);
+        }
+    };
+
+    React.useEffect(() => {
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className="topbar">
             <div className="container">
@@ -34,12 +49,24 @@ const HeaderTopbar = () => {
                             </div>
                             {isLogin ?
                                 (
-
-                                    <div className="user-avatar col col-lg-6 col-md-5 col-sm-12 col-12" onClick={() => navigate('/profile')}>
+                                    <div className="user-avatar col col-lg-6 col-md-5 col-sm-12 col-12" onClick={toggleDropdown}>
                                         <img src={userImage} alt="Ảnh của bạn" />
                                         <div className="user-avatar-information">
                                             <p>Hoang Tien Dung</p>
                                         </div>
+                                        {showDropdown && (
+                                            <div className="user-dropdown-menu">
+                                                <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
+                                                    Hồ sơ cá nhân
+                                                </div>
+                                                <div className="dropdown-item" onClick={() => navigateTo("/history")}>
+                                                    Lịch sử giao dịch
+                                                </div>
+                                                <div className="dropdown-item">
+                                                    Đăng xuất
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                 ) : (

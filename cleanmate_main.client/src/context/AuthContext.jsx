@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
     }, [])
 
 
-    return <AuthContext.Provider value={{ banks } }>{ children }</AuthContext.Provider>
+    return <AuthContext.Provider value={{ banks }}>{ children }</AuthContext.Provider>
 }
 
 export default AuthProvider;

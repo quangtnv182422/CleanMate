@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+﻿import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import userImage from '../../images/user-image.png'
 import useAuth from '../../hooks/useAuth';
@@ -6,8 +6,10 @@ import useAuth from '../../hooks/useAuth';
 
 const HeaderTopbar = () => {
     const { user, loading } = useAuth();
+console.log(user)
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
 
@@ -26,7 +28,7 @@ const HeaderTopbar = () => {
     };
 
     const handleClickOutside = (event) => {
-        if (!event.target.closest('.user-avatar')) {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
             setShowDropdown(false);
         }
     };
@@ -60,13 +62,13 @@ const HeaderTopbar = () => {
                                 </ul>
                             </div>
                             {user ? (
-                                <div className="user-avatar col col-lg-6 col-md-5 col-sm-12 col-12" onClick={toggleDropdown}>
+                                <div className="user-avatar col col-lg-6 col-md-5 col-sm-12 col-12" onClick={toggleDropdown} ref={dropdownRef}>
                                     <img src={userImage} alt="Ảnh của bạn" />
                                     <div className="user-avatar-information">
                                         <p>{user.fullName}</p> {/* hoặc user.name nếu backend trả về */}
                                     </div>
                                     {showDropdown && (
-                                        <div className="user-dropdown-menu">
+                                        <div className="user-dropdown-menu" >
                                             <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
                                                 Hồ sơ cá nhân
                                             </div>
@@ -81,8 +83,8 @@ const HeaderTopbar = () => {
                                 </div>
                             ) : (
                                 <div className="login-cta col col-lg-6 col-md-5 col-sm-12 col-12 ">
-                                    <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
-                                    <div className="dropdown-container">
+                                        <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
+                                        <div className="dropdown-container" ref={dropdownRef}>
                                         <button className="btn sign-up-btn" onClick={toggleDropdown}>
                                             Đăng ký
                                         </button>

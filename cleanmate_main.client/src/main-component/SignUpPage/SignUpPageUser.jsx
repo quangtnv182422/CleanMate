@@ -76,7 +76,7 @@ const SignUpPageUser = () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        fullName: `${value.first_name}${value.last_name}`, // Combine first_name and last_name with a space
+                        fullName: `${value.first_name} ${value.last_name}`, // Combine first_name and last_name with a space
                         email: value.email,
                         phoneNumber: value.phone, // Include phone number
                         password: value.password,

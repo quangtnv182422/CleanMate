@@ -2,7 +2,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import HeaderTopbar from '../HeaderTopbar/HeaderTopbar'
 import MobileMenu from '../MobileMenu/MobileMenu'
-import Logo from '../../images/logo.svg'
 import LogoTransparent from '../../images/header-logo-transparent.png'
 
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250518173931_UpdateFieldFullName")]
-    partial class UpdateFieldFullName
+    [Migration("20250520012146_AddNewDB")]
+    partial class AddNewDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,6 +79,9 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BankNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CCCD")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")

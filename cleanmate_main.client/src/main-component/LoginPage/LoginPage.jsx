@@ -90,8 +90,21 @@ const LoginPage = (props) => {
                 });
 
                 if (response.ok) {
-                    toast.success('Bạn đã đăng nhập thành công vào CleanMate !');
-                    push('/home');
+                    toast.success('Bạn đã đăng nhập thành công vào CleanMate!');
+
+                    // Lấy thông tin người dùng
+                    const userInfoRes = await fetch('/Authen/me', { credentials: 'include' });
+                    const userInfo = await userInfoRes.json();
+
+                    const roles = userInfo.roles || [];
+
+                    if (roles.includes("Cleaner")) {
+                        push("/work-list");
+                    } else if (roles.includes("Customer")) {
+                        push("/home");
+                    } else {
+                        push("/"); 
+                    }
                 } else {
                     const error = await response.json();
                     toast.error(`Đăng nhập thất bại: ${error.message}`);

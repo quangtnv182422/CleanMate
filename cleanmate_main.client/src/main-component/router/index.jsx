@@ -28,7 +28,8 @@ import SignUpPageEmployee from '../SignUpPage/SignUpPageEmployee'
 import ForgotPassword from '../ForgotPassword/ForgotPassword'
 import PricingPage from '../PricingPage/PricingPage';
 import EmailConfirmation from '../ConfirmMail/EmailConfirmation';
-
+import Profile from '../Profile/Profile';
+import WorkList from '../WorkList/WorkList';
 const AllRoute = () => {
 
     return (
@@ -60,6 +61,8 @@ const AllRoute = () => {
                     <Route path='/register/employee' element={<SignUpPageEmployee />} />
                     <Route path='/forgot-password' element={<ForgotPassword />} />
                     <Route path="/email-confirmation" element={<EmailConfirmation />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/work-list" element={<WorkList />} />
                 </Routes>
             </BrowserRouter>
         </div>

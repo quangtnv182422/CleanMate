@@ -47,11 +47,6 @@ const Header = (props) => {
                                         <li><Link onClick={ClickHandler} to="/about">Về chúng tôi</Link></li>
                                         <li className="menu-item-has-children">
                                             <Link to="/service">Dịch vụ</Link>
-                                            {/*<ul className="sub-menu">*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service">Service</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service-s2">Service style 2</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service-single/1">Service Single</Link></li>*/}
-                                            {/*</ul>*/}
                                         </li>
                                         {/*<li className="menu-item-has-children">*/}
                                         {/*    <Link to="/project">Pages</Link>*/}
@@ -70,22 +65,6 @@ const Header = (props) => {
                                         {/*</li>*/}
                                         <li className="menu-item-has-children">
                                             <Link onClick={ClickHandler} to="/blog">Blog</Link>
-                                            {/*<ul className="sub-menu">*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/blog">Blog right sidebar</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/blog-left-sidebar">Blog left sidebar</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/blog-fullwidth">Blog fullwidth</Link></li>*/}
-                                            {/*    <li className="menu-item-has-children">*/}
-                                            {/*        <Link onClick={ClickHandler} to="/">Blog details</Link>*/}
-                                            {/*        <ul className="sub-menu">*/}
-                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single/1">Blog details right sidebar</Link>*/}
-                                            {/*            </li>*/}
-                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single-left-sidebar/1">Blog details left*/}
-                                            {/*                sidebar</Link></li>*/}
-                                            {/*            <li><Link onClick={ClickHandler} to="/blog-single-fullwidth/1">Blog details*/}
-                                            {/*                fullwidth</Link></li>*/}
-                                            {/*        </ul>*/}
-                                            {/*    </li>*/}
-                                            {/*</ul>*/}
                                         </li>
                                         <li className="menu-item-has-children">
                                             <Link to="/contact">Liên hệ</Link>

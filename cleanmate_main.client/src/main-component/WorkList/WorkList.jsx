@@ -132,11 +132,11 @@ const WorkList = () => {
     
     const keyMapping = {
         'tên': 'name',
-        'giờ làm': 'startDate', 
+        'giờ làm': 'startTime', 
         'làm trong (tiếng)': 'duration', 
-        'địa chỉ': 'company', 
+        'địa chỉ': 'address', 
         'ghi chú': 'notes', 
-        'số tiền (VND)': 'salary',
+        'số tiền (VND)': 'payment',
     };
 
     const handleSort = (vietnameseKey) => {
@@ -157,6 +157,7 @@ const WorkList = () => {
                 valueB = parseFloat(valueB.replace(/[^0-9.-]+/g, ''));
             } else if (englishKey === 'startDate') {
                 valueA = new Date(valueA).getTime(); 
+                console.log(valueA);
                 valueB = new Date(valueB).getTime();
             } else if (typeof valueA === 'string') {
                 valueA = valueA.toLowerCase(); 
@@ -255,8 +256,8 @@ const WorkList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedData.map((row) => (
-                            <TableRow key={row.name}>
+                        {paginatedData.map((row, index) => (
+                            <TableRow key={index}>
                                 <TableCell>{row.name}</TableCell>
                                 <TableCell>{row.startTime}</TableCell>
                                 <TableCell>{row.duration}</TableCell>

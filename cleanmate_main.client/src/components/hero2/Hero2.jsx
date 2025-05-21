@@ -32,7 +32,7 @@ const Hero2 = () => {
                                 <div className="container">
                                     <div className="slide-content">
                                         <div className="slide-title">
-                                            <h2>Dịch vụ dọn dẹp chuyên nghiệp được tin tưởng.</h2>
+                                            <h2>Dịch Vụ Dọn Dẹp Chuyên Nghiệp Được Tin Tưởng.</h2>
                                         </div>
                                         <div className="slide-text">
                                             <p>Chúng tôi chăm sóc không gian của bạn như chính ngôi nhà của mình – sạch sẽ, gọn gàng với tất cả sự tận tâm</p>
@@ -52,7 +52,7 @@ const Hero2 = () => {
                                 <div className="container">
                                     <div className="slide-content">
                                         <div className="slide-title">
-                                            <h2>Dịch Vụ Vệ Sinh Nhanh Chóng và Hiệu Quả Tận Nơi.</h2>
+                                            <h2>Dịch Vụ Vệ Sinh Nhanh Chóng Và Hiệu Quả.</h2>
                                         </div>
                                         <div className="slide-text">
                                             <p>Giúp ngôi nhà hoặc văn phòng bạn luôn sạch bóng mà không tốn công sức — dịch vụ tin cậy, tiết kiệm thời gian.</p>

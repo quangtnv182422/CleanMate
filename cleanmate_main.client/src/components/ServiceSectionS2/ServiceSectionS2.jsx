@@ -24,37 +24,8 @@ const ServiceSectionS2 = (props) => {
                             <p>Chúng tôi cung cấp giải pháp vệ sinh chuyên nghiệp, linh hoạt và phù hợp với mọi nhu cầu của bạn.</p>
                         </div>
                     </div>
-                    <div className="col-lg-7">
-                        <div className="wpo-service-tabs">
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink
-                                        className={`theme-btn ${classnames({ active: activeTab === '1' })}`}
-                                        onClick={() => { toggle('1'); }}
-                                    >
-                                        <i className="ti-home"></i> Residential
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink
-                                        className={`theme-btn ${classnames({ active: activeTab === '2' })}`}
-                                        onClick={() => { toggle('2'); }}
-                                    >
-                                        <i className="ti-brush-alt"></i> Commercial
-                                    </NavLink>
-                                </NavItem>
-                            </Nav>
-                        </div>
-                    </div>
                 </div>
-                <TabContent activeTab={activeTab}>
-                    <TabPane tabId="1">
-                        <Residential/>
-                    </TabPane>
-                    <TabPane tabId="2">
-                        <Commercial/>
-                    </TabPane>
-                </TabContent>
+                <Residential />
             </div>
         </section>
 

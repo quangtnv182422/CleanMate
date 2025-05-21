@@ -84,6 +84,19 @@ const style = {
         justifyContent: 'space-between',
         alignItems: 'center',
         zIndex: 1000,
+    },
+    durationSelectionButton: {
+        whiteSpace: "pre-line",
+        height: "70px",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontSize: '14px',
+    },
+    durationSelectionButtonText: {
+        fontSize: '14px',
+        color: '#1565C0',
     }
 };
 
@@ -92,7 +105,6 @@ const BookingService = ({ open, handleClose }) => {
     const [selectedTime, setSelectedTime] = useState(30);
     const [selectedDay, setSelectedDay] = useState('');
     const [days, setDays] = useState([]);
-
 
     useEffect(() => {
         const today = new Date();
@@ -103,11 +115,11 @@ const BookingService = ({ open, handleClose }) => {
             const currentDate = new Date(today);
             currentDate.setDate(today.getDate() + i);
             const dayLabel = dayLabels[currentDate.getDay()];
-            const dateStr = currentDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            const dateStr = currentDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
             let subLabel = dateStr;
-            if (i === 0) subLabel = 'H.Nay';
-            else if (i === 1) subLabel = 'N.Mai';
+            if (i === 0) subLabel = 'Hôm Nay';
+            else if (i === 1) subLabel = 'Ngày Mai';
 
             newDays.push({
                 label: dayLabel,
@@ -117,7 +129,7 @@ const BookingService = ({ open, handleClose }) => {
             });
         }
         setDays(newDays);
-        setSelectedDay(newDays[0].label);
+        setSelectedDay(newDays[0].date);
     }, []);
 
     const handleDaySelect = (day) => setSelectedDay(day);
@@ -126,7 +138,6 @@ const BookingService = ({ open, handleClose }) => {
         { label: "2 Giờ\nTối đa 15m² tổng sàn", value: 15 },
         { label: "2 Giờ\nTối đa 20m² tổng sàn", value: 20 },
         { label: "2 Giờ\nTối đa 30m² tổng sàn", value: 30 },
-        { label: "Tùy chọn khác", value: "custom" },
     ];
 
     return (
@@ -170,6 +181,7 @@ const BookingService = ({ open, handleClose }) => {
                                     1 x Nhân viên
                                 </Button>
                                 <Button
+                                    disabled
                                     sx={{ width: '100%' }}
                                     variant={selectedEmployee === 2 ? "contained" : "outlined"}
                                     onClick={() => setSelectedEmployee(2)}
@@ -187,7 +199,7 @@ const BookingService = ({ open, handleClose }) => {
                             </Typography>
                             <Grid container spacing={1}>
                                 {timeOptions.map((opt, index) => (
-                                    <Grid item xs={6} sm={3} key={index}>
+                                    <Grid item xs={6} sm={4} key={index}>
                                         <Button
                                             fullWidth
                                             variant={selectedTime === opt.value ? "contained" : "outlined"}
@@ -210,9 +222,9 @@ const BookingService = ({ open, handleClose }) => {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', mt: 1, width: '100%' }}>
                                 {days.map((day) => (
                                     <Button
-                                        key={day.label}
-                                        variant={selectedDay === day.label ? 'contained' : 'outlined'}
-                                        onClick={() => handleDaySelect(day.label)}
+                                        key={day.date}
+                                        variant={selectedDay === day.date ? 'contained' : 'outlined'}
+                                        onClick={() => handleDaySelect(day.date)}
                                         sx={{
                                             flex: '1 1 calc(14.28% - 8px)',
                                             minWidth: 72,
@@ -223,7 +235,7 @@ const BookingService = ({ open, handleClose }) => {
                                             borderWidth: 2,
                                         }}
                                     >
-                                        {selectedDay === day.label ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
+                                        {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
                                         <Typography variant="caption">{day.sub}</Typography>
                                     </Button>
                                 ))}

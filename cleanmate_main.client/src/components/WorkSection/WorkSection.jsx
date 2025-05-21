@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 
-import wImg1 from '../../images/work/1.jpg'
+import wImg1 from '../../images/work/booking-step-1.jpg'
 import wImg2 from '../../images/work/cleaning-image-step-2.jfif'
 import wImg3 from '../../images/work/a-man-enjoying-after-cleaning.jfif'
 

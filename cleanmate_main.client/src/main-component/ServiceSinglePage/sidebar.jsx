@@ -18,14 +18,6 @@ const ServiceSidebar = () => {
     return (
         <div className="col-lg-4 col-md-8">
             <div className="wpo-single-sidebar">
-                <div className="wpo-service-widget widget">
-                    <h2>Tất cả dịch vụ</h2>
-                    <ul>
-                        {Services.slice(0, 6).map((service, Sitem) => (
-                            <li key={Sitem}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
-                        ))}
-                    </ul>
-                </div>
                 <div className="wpo-newsletter-widget widget">
                     <h2>Hãy đặt dịch vụ</h2>
                     <p>Bấm đăng ký dịch vụ để hoàn thiện thông tin</p>
@@ -33,6 +25,14 @@ const ServiceSidebar = () => {
                         <button type="submit" style={{ fontSize: "18px" }} onClick={handleOpen}>Đăng ký dịch vụ</button>
                         {open && <BookingService open={open} handleClose={handleClose} />}
                     </form>
+                </div>
+                <div className="wpo-service-widget widget">
+                    <h2>Tất cả dịch vụ</h2>
+                    <ul>
+                        {Services.slice(0, 6).map((service, Sitem) => (
+                            <li key={Sitem}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
+                        ))}
+                    </ul>
                 </div>
                 <div className="wpo-contact-widget widget">
                     <h2>Chúng Tôi Có Thể <br /> Giúp Bạn Như Nào!</h2>

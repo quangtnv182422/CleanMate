@@ -8,6 +8,9 @@ import {Link} from  'react-router-dom'
 import Benefits from './benefits'
 import ServiceSidebar from './sidebar'
 import Footer from '../../components/footer/Footer'
+import MainImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
+import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
+import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 
 const ServiceSinglePage =(props) => {
     const {id} = useParams()
@@ -29,7 +32,7 @@ const ServiceSinglePage =(props) => {
                         <div className="col-lg-8 col-md-12">
                             <div className="wpo-service-single-wrap">
                                 <div className="wpo-service-single-img">
-                                    <img src={serviceDetails.sImg} alt="" />
+                                    <img src={MainImage} alt="" />
                                 </div>
                                 <div className="wpo-service-single-content">
                                     <div className="wpo-service-single-content-des">
@@ -38,8 +41,8 @@ const ServiceSinglePage =(props) => {
                                         <p>Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise.</p>
                                         <div className="wpo-service-single-sub-img">
                                             <ul>
-                                                <li><img src={serviceDetails.ssImg1} alt="" /></li>
-                                                <li><img src={serviceDetails.ssImg2} alt="" /></li>
+                                                <li><img src={SubImage1} alt="" /></li>
+                                                <li><img src={SubImage2} alt="" /></li>
                                             </ul>
                                         </div>
                                     </div>

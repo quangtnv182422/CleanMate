@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250520012146_AddNewDB")]
+    [Migration("20250520134014_AddNewDB")]
     partial class AddNewDB
     {
         /// <inheritdoc />

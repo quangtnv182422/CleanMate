@@ -6,7 +6,6 @@ import useAuth from '../../hooks/useAuth';
 
 const HeaderTopbar = () => {
     const { user, loading } = useAuth();
-console.log(user)
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
@@ -62,29 +61,31 @@ console.log(user)
                                 </ul>
                             </div>
                             {user ? (
-                                <div className="user-avatar col col-lg-6 col-md-5 col-sm-12 col-12" onClick={toggleDropdown} ref={dropdownRef}>
-                                    <img src={userImage} alt="Ảnh của bạn" />
-                                    <div className="user-avatar-information">
-                                        <p>{user.fullName}</p> {/* hoặc user.name nếu backend trả về */}
-                                    </div>
-                                    {showDropdown && (
-                                        <div className="user-dropdown-menu" >
-                                            <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
-                                                Hồ sơ cá nhân
-                                            </div>
-                                            <div className="dropdown-item" onClick={() => navigateTo("/history")}>
-                                                Lịch sử giao dịch
-                                            </div>
-                                            <div className="dropdown-item" onClick={handleLogout}>
-                                                Đăng xuất
-                                            </div>
+                                <div className="user-avatar-container col col-lg-6 col-md-5 col-sm-12 col-12">
+                                    <div className="user-avatar" onClick={toggleDropdown} ref={dropdownRef}>
+                                        <img src={userImage} alt="Ảnh của bạn" />
+                                        <div className="user-avatar-information">
+                                            <p>{user.fullName}</p>
                                         </div>
-                                    )}
+                                        {showDropdown && (
+                                            <div className="user-dropdown-menu" >
+                                                <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
+                                                    Hồ sơ cá nhân
+                                                </div>
+                                                <div className="dropdown-item" onClick={() => navigateTo("/history")}>
+                                                    Lịch sử giao dịch
+                                                </div>
+                                                <div className="dropdown-item" onClick={handleLogout}>
+                                                    Đăng xuất
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="login-cta col col-lg-6 col-md-5 col-sm-12 col-12 ">
-                                        <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
-                                        <div className="dropdown-container" ref={dropdownRef}>
+                                    <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
+                                    <div className="dropdown-container" ref={dropdownRef}>
                                         <button className="btn sign-up-btn" onClick={toggleDropdown}>
                                             Đăng ký
                                         </button>

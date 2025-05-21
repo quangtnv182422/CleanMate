@@ -17,8 +17,8 @@ const LoginPage = (props) => {
     const push = useNavigate()
 
     const [value, setValue] = useState({
-        email: 'user@gmail.com',
-        password: '123456',
+        email: '',
+        password: '',
         remember: false,
     });
 

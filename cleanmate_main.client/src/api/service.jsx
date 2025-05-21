@@ -38,7 +38,8 @@ const Services = [
         sTitle: 'Carpet',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: true
     },
     {
         Id: '2',
@@ -47,7 +48,8 @@ const Services = [
         sTitle: 'Seasonal',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '3',
@@ -56,7 +58,8 @@ const Services = [
         sTitle: 'Express',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '4',
@@ -65,7 +68,8 @@ const Services = [
         sTitle: 'Kitchen',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '5',
@@ -74,7 +78,8 @@ const Services = [
         sTitle: 'Bathroom',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '6',
@@ -83,7 +88,8 @@ const Services = [
         sTitle: 'Windows',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '7',
@@ -92,7 +98,8 @@ const Services = [
         sTitle: 'Carpet',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '8',
@@ -101,7 +108,8 @@ const Services = [
         sTitle: 'Glass',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '9',
@@ -110,7 +118,8 @@ const Services = [
         sTitle: 'Table',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '10',
@@ -119,7 +128,8 @@ const Services = [
         sTitle: 'Computer',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '11',
@@ -128,7 +138,8 @@ const Services = [
         sTitle: 'Bathroom',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
     {
         Id: '12',
@@ -137,7 +148,8 @@ const Services = [
         sTitle: 'Chair',
         description:'We are certified company. We provide best cleaning services for you and your company Home services and your Car.',
         ssImg1:sSingleimg1,
-        ssImg2:sSingleimg2,
+        ssImg2: sSingleimg2,
+        isAvailable: false
     },
 ]
 export default Services;

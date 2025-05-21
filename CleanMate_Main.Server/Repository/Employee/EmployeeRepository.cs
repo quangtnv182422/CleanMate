@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models;
+﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using Microsoft.EntityFrameworkCore;
@@ -12,19 +13,18 @@ namespace CleanMate_Main.Server.Repository.Employee
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task<IEnumerable<WorkListViewModel>> FindAllWorkAsync(string? status = null, string? employeeId = null)
+        public async Task<IEnumerable<WorkListViewModel>> FindAllWorkAsync(int? status = null, string? employeeId = null)
         {
             var query = from booking in _context.Bookings
                         join servicePrice in _context.ServicePrices on booking.ServicePriceId equals servicePrice.PriceId
                         join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
-                        join statusEntity in _context.BookingStatuses on booking.BookingStatusId equals statusEntity.BookingStatusId
-                        where (status == null || statusEntity.Status == status)
+                        where (status == null || booking.BookingStatusId == status)
                            && (employeeId == null || booking.CleanerId == employeeId)
                         select new WorkListViewModel
                         {
                             BookingId = booking.BookingId,
                             ServiceName = service.Name,
-                            Status = statusEntity.Status,
+                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
                             Date = booking.Date,
                             StartTime = booking.StartTime,
                             TotalPrice = booking.TotalPrice ?? 0m
@@ -39,7 +39,6 @@ namespace CleanMate_Main.Server.Repository.Employee
                         join servicePrice in _context.ServicePrices on booking.ServicePriceId equals servicePrice.PriceId
                         join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
                         join duration in _context.Durations on servicePrice.DurationId equals duration.DurationId
-                        join status in _context.BookingStatuses on booking.BookingStatusId equals status.BookingStatusId
                         join customer in _context.Users on booking.UserId equals customer.Id
                         where booking.BookingId == bookingId
                         select new WorkDetailsViewModel
@@ -53,7 +52,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             StartTime = booking.StartTime,
                             Address = booking.Address,
                             Note = booking.Note,
-                            Status = status.Status,
+                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,
                             CustomerFullName = customer.FullName,
                             CustomerPhoneNumber = customer.PhoneNumber
@@ -93,44 +92,22 @@ namespace CleanMate_Main.Server.Repository.Employee
             await _context.SaveChangesAsync();
         }
 
-        public async Task AcceptWorkAsync(int bookingId, string employeeId)
+        public async Task ChangeWorkAsync(int bookingId, int status, string? employeeId = null)
         {
             var booking = await _context.Bookings.FindAsync(bookingId)
                 ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
-            booking.CleanerId = employeeId;
-            booking.BookingStatusId = await _context.BookingStatuses
-                .Where(s => s.Status == "Confirmed")
-                .Select(s => s.BookingStatusId)
-                .FirstOrDefaultAsync();
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task CancelWorkAsync(int bookingId)
-        {
-            var booking = await _context.Bookings.FindAsync(bookingId)
-                ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
-            booking.BookingStatusId = await _context.BookingStatuses
-                .Where(s => s.Status == "Canceled")
-                .Select(s => s.BookingStatusId)
-                .FirstOrDefaultAsync();
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task CompleteWorkAsync(int bookingId)
-        {
-            var booking = await _context.Bookings.FindAsync(bookingId)
-                ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
-            booking.BookingStatusId = await _context.BookingStatuses
-                .Where(s => s.Status == "Completed")
-                .Select(s => s.BookingStatusId)
-                .FirstOrDefaultAsync();
+            booking.BookingStatusId = status;
+            if (employeeId != null)
+            {
+                booking.CleanerId = employeeId;
+            }
             await _context.SaveChangesAsync();
         }
 
         public async Task<AcceptWorkNotificationViewModel> GetCustomerDetailsAsync(int bookingId)
         {
             var query = from booking in _context.Bookings
-                        join customer in _context.AspNetUsers on booking.UserId equals customer.Id
+                        join customer in _context.Users on booking.UserId equals customer.Id
                         where booking.BookingId == bookingId
                         select new AcceptWorkNotificationViewModel
                         {
@@ -143,14 +120,10 @@ namespace CleanMate_Main.Server.Repository.Employee
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
         }
 
-        public async Task<int> GetWorkCountByStatusAsync(string status)
+        public async Task<int> GetWorkCountByStatusAsync(int status)
         {
             return await _context.Bookings
-                .Join(_context.BookingStatuses,
-                    b => b.BookingStatusId,
-                    s => s.BookingStatusId,
-                    (b, s) => new { Booking = b, Status = s })
-                .CountAsync(x => x.Status.Status == status);
+                .CountAsync(b => b.BookingStatusId == status);
         }
 
         public async Task UpdateWorkReadStatusAsync(int bookingId, bool isRead)

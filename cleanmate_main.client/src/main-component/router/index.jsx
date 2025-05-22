@@ -29,7 +29,7 @@ import ForgotPassword from '../ForgotPassword/ForgotPassword'
 import PricingPage from '../PricingPage/PricingPage';
 import EmailConfirmation from '../ConfirmMail/EmailConfirmation';
 import Profile from '../Profile/Profile';
-import WorkList from '../WorkList/WorkList';
+import WorkList from '../Worklist/WorkList';
 const AllRoute = () => {
 
     return (

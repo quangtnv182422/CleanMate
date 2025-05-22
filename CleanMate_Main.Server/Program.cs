@@ -1,8 +1,10 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +23,8 @@ builder.Services.AddSwaggerGen();
 //Kết nối DB
 builder.Services.AddDbContext<CleanMateMainDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
-
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 //Cấu hình Identity DB
 builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {

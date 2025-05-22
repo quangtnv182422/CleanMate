@@ -18,16 +18,23 @@ namespace CleanMate_Main.Server.Repository.Employee
             var query = from booking in _context.Bookings
                         join servicePrice in _context.ServicePrices on booking.ServicePriceId equals servicePrice.PriceId
                         join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
+                        join duration in _context.Durations on servicePrice.DurationId equals duration.DurationId
+                        join customer in _context.Users on booking.UserId equals customer.Id
+                        join address in _context.CustomerAddresses on booking.AddressId equals address.AddressId
                         where (status == null || booking.BookingStatusId == status)
                            && (employeeId == null || booking.CleanerId == employeeId)
                         select new WorkListViewModel
                         {
                             BookingId = booking.BookingId,
                             ServiceName = service.Name,
-                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
+                            CustomerFullName = customer.FullName,
                             Date = booking.Date,
                             StartTime = booking.StartTime,
-                            TotalPrice = booking.TotalPrice ?? 0m
+                            Duration = duration.Duration1,
+                            Address = address.AddressTitle,
+                            Note = booking.Note,
+                            TotalPrice = booking.TotalPrice ?? 0m,
+                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId)
                         };
 
             return await query.ToListAsync();
@@ -53,7 +60,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             StartTime = booking.StartTime,
                             Address = address.AddressTitle,
                             Note = booking.Note,
-                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
+                            Status = CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,
                             CustomerFullName = customer.FullName,
                             CustomerPhoneNumber = customer.PhoneNumber
@@ -67,16 +74,22 @@ namespace CleanMate_Main.Server.Repository.Employee
             var query = from booking in _context.Bookings
                         join servicePrice in _context.ServicePrices on booking.ServicePriceId equals servicePrice.PriceId
                         join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
-                        join status in _context.BookingStatuses on booking.BookingStatusId equals status.BookingStatusId
+                        join duration in _context.Durations on servicePrice.DurationId equals duration.DurationId
+                        join customer in _context.Users on booking.UserId equals customer.Id
+                        join address in _context.CustomerAddresses on booking.AddressId equals address.AddressId
                         where booking.CleanerId == employeeId
                         select new WorkListViewModel
                         {
                             BookingId = booking.BookingId,
                             ServiceName = service.Name,
-                            Status = status.Status,
+                            CustomerFullName = customer.FullName,
                             Date = booking.Date,
                             StartTime = booking.StartTime,
-                            TotalPrice = booking.TotalPrice ?? 0m
+                            Duration = duration.Duration1,
+                            Address = address.AddressTitle,
+                            Note = booking.Note,
+                            TotalPrice = booking.TotalPrice ?? 0m,
+                            Status = CommonConstants.GetStatusString(booking.BookingStatusId)
                         };
 
             return await query.ToListAsync();
@@ -129,12 +142,8 @@ namespace CleanMate_Main.Server.Repository.Employee
 
         public async Task UpdateWorkReadStatusAsync(int bookingId, bool isRead)
         {
-            // Assuming a separate table or property for read status (e.g., Booking.ReadStatus)
-            // For simplicity, we'll add a property to Booking entity if not exists
             var booking = await _context.Bookings.FindAsync(bookingId)
                 ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
-            // If Booking entity doesn't have IsRead, you might need to add it or use a separate table
-            // booking.IsRead = isRead; // Uncomment and add to Booking entity if needed
             await _context.SaveChangesAsync();
         }
     }

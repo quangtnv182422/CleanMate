@@ -54,6 +54,10 @@ export default defineConfig({
             '^/Authen': { 
                 target,
                 secure: false
+            },
+            '^/cleanservice': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

@@ -31,7 +31,7 @@ namespace CleanMate_Main.Server.Controllers.CleanService.AllService
             return Ok(result);
         }
 
-       /* [HttpGet("serviceId/{serviceId}")]
+        [HttpGet("serviceId/{serviceId}")]
         public async Task<ActionResult<List<ServicePriceDTO>>> GetServicePriceByServiceId(int serviceId)
         {
             var result = await _allService.GetServicePriceByServiceIdAsync(serviceId);
@@ -46,13 +46,14 @@ namespace CleanMate_Main.Server.Controllers.CleanService.AllService
                 PriceId = sp.PriceId,
                 Price = sp.Price,
                 DurationId = sp.DurationId,
-                DurationName = sp.Duration?.Name ?? "",
+                DurationTime = sp.Duration?.DurationTime ?? 0,
+                SquareMeterSpecific = sp.Duration.SquareMeterSpecific ?? "",
                 ServiceId = sp.ServiceId,
-                ServiceName = sp.Service?.Name ?? ""
+
             }).ToList();
 
             return Ok(dtoResult);
-        }*/
+        }
 
     }
 }

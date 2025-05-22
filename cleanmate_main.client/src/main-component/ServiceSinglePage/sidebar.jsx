@@ -26,14 +26,6 @@ const ServiceSidebar = () => {
                         {open && <BookingService open={open} handleClose={handleClose} />}
                     </form>
                 </div>
-                <div className="wpo-service-widget widget">
-                    <h2>Tất cả dịch vụ</h2>
-                    <ul>
-                        {Services.slice(0, 6).map((service, Sitem) => (
-                            <li key={Sitem}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
-                        ))}
-                    </ul>
-                </div>
                 <div className="wpo-contact-widget widget">
                     <h2>Chúng Tôi Có Thể <br /> Giúp Bạn Như Nào!</h2>
                     <p>Hãy liên hệ với chúng tôi để chúng tôi có thể giải đáp những thắc mắc của bạn. </p>

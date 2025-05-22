@@ -13,7 +13,10 @@ import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.j
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 
 const ServiceSinglePage =(props) => {
-    const {id} = useParams()
+    const { id } = useParams()
+    //use params to get the id from the url
+    //use id to get the service details from the api
+    //use context to store the service details object
 
     const serviceDetails = Services.find( item => item.Id === id)
 

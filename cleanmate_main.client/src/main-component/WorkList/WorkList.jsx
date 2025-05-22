@@ -23,6 +23,7 @@ import {
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import userImage from '../../images/user-image.png';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -40,103 +41,125 @@ const SettingsPage = () => (
 );
 
 const WorkList = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [data, setData] = useState([
         {
-            name: 'Dọn dẹp theo giờ', 
-            startTime: '2025-05-20 08:00', 
-            duration: 2, 
+            name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
+            startTime: '2025-05-20 08:00',
+            duration: 2,
             address: 'Số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội',
-            notes: 'Mang theo dụng cụ lau kính', 
-            payment: 169200, 
+            notes: 'Mang theo dụng cụ lau kính',
+            payment: 169200,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-20 14:00',
             duration: 3,
             address: 'Số 15 Nguyễn Văn Cừ, Long Biên, Hà Nội',
             notes: 'Chú ý lau sạch bếp',
             payment: 240000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-21 09:00',
             duration: 2.5,
             address: 'Số 45 Ngọc Lâm, Long Biên, Hà Nội',
             notes: 'Không cần hút bụi',
             payment: 200000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-21 13:00',
             duration: 2,
             address: 'Số 10 Gia Thụy, Long Biên, Hà Nội',
             notes: 'Ưu tiên dọn phòng khách',
             payment: 180000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-22 10:00',
             duration: 4,
             address: 'Số 22 Nguyễn Sơn, Long Biên, Hà Nội',
             notes: 'Cần giặt thảm',
             payment: 320000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-22 15:00',
             duration: 2,
             address: 'Số 78 Phúc Lợi, Long Biên, Hà Nội',
             notes: 'Chỉ lau sàn',
             payment: 150000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-23 08:30',
             duration: 3,
             address: 'Số 33 Thạch Bàn, Long Biên, Hà Nội',
             notes: 'Mang thêm chổi mềm',
             payment: 250000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-23 11:00',
             duration: 2.5,
             address: 'Số 56 Cổ Linh, Long Biên, Hà Nội',
             notes: 'Dọn kỹ phòng ngủ',
             payment: 200000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-24 09:00',
             duration: 3.5,
             address: 'Số 19 Sài Đồng, Long Biên, Hà Nội',
             notes: 'Chú ý cửa sổ',
             payment: 280000,
+            status: 'Đang làm',
         },
         {
             name: 'Dọn dẹp theo giờ',
+            customer: 'Nguyễn Văn A',
             startTime: '2025-05-24 14:00',
             duration: 2,
             address: 'Số 88 Việt Hưng, Long Biên, Hà Nội',
             notes: 'Không cần lau bếp',
             payment: 160000,
+            status: 'Đang làm',
         },
     ]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
-    const [tabValue, setTabValue] = useState(0); 
+    const [tabValue, setTabValue] = useState(0);
 
-    
+
     const keyMapping = {
         'tên': 'name',
-        'giờ làm': 'startTime', 
-        'làm trong (tiếng)': 'duration', 
-        'địa chỉ': 'address', 
-        'ghi chú': 'notes', 
+        'khách hàng': 'customer',
+        'giờ làm': 'startTime',
+        'làm trong (tiếng)': 'duration',
+        'địa chỉ': 'address',
+        'ghi chú': 'notes',
         'số tiền (VND)': 'payment',
+        'trạng thái': 'status',
     };
 
     const handleSort = (vietnameseKey) => {
@@ -146,21 +169,21 @@ const WorkList = () => {
         }
         setSortConfig({ key: vietnameseKey, direction });
 
-        const englishKey = keyMapping[vietnameseKey] || vietnameseKey; 
+        const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
 
         const sortedData = [...data].sort((a, b) => {
             let valueA = a[englishKey];
             let valueB = b[englishKey];
 
             if (englishKey === 'salary') {
-                valueA = parseFloat(valueA.replace(/[^0-9.-]+/g, '')); 
+                valueA = parseFloat(valueA.replace(/[^0-9.-]+/g, ''));
                 valueB = parseFloat(valueB.replace(/[^0-9.-]+/g, ''));
             } else if (englishKey === 'startDate') {
-                valueA = new Date(valueA).getTime(); 
+                valueA = new Date(valueA).getTime();
                 console.log(valueA);
                 valueB = new Date(valueB).getTime();
             } else if (typeof valueA === 'string') {
-                valueA = valueA.toLowerCase(); 
+                valueA = valueA.toLowerCase();
                 valueB = valueB.toLowerCase();
             }
 
@@ -169,8 +192,8 @@ const WorkList = () => {
             return 0;
         });
 
-        
-        setData(sortedData); 
+
+        setData(sortedData);
     };
 
     // Filter data by search
@@ -234,7 +257,7 @@ const WorkList = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
                         <TableRow>
-                            {['tên', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)'].map((key) => (
+                            {['tên', 'khách hàng', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)', 'trạng thái'].map((key) => (
                                 <TableCell key={key}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -259,12 +282,16 @@ const WorkList = () => {
                         {paginatedData.map((row, index) => (
                             <TableRow key={index}>
                                 <TableCell>{row.name}</TableCell>
+                                <TableCell>{row.customer}</TableCell>
                                 <TableCell>{row.startTime}</TableCell>
                                 <TableCell>{row.duration}</TableCell>
                                 <TableCell>{row.address}</TableCell>
                                 <TableCell>{row.notes}</TableCell>
                                 <TableCell>{row.payment}</TableCell>
-                                <TableCell sx={{textAlign: 'center', cursor: 'pointer'} }><VisibilityOutlinedIcon /></TableCell>
+                                <TableCell>{row.status}</TableCell>
+                                <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
+                                    <VisibilityOutlinedIcon />
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -308,29 +335,23 @@ const WorkList = () => {
                     flexShrink: 0,
                     '& .MuiDrawer-paper': {
                         width: 240,
-                        boxSizing: 'border-box',
                         backgroundColor: '#f8f9fa',
                     },
                 }}
             >
-                <Box sx={{ p: 2 }}>
-                    <Typography variant="h6" className="text-primary">
-                        Bảng công việc
-                    </Typography>
-                </Box>
                 <Tabs
                     orientation="vertical"
                     value={tabValue}
                     onChange={handleTabChange}
                 >
-                    <Tab label="Danh sách công việc" className="border-bottom" />
-                    <Tab label="Báo cáo" className="border-bottom" />
-                    <Tab label="Settings" className="border-bottom" />
+                    <Tab label="Danh sách công việc"/>
+                    <Tab label="Thu nhập"/>
+                    <Tab label="Settings"/>
                 </Tabs>
-                <Button variant="outlined" onClick={handleLogout}>Đăng xuất</Button>
+                {/*<Button variant="outlined" onClick={handleLogout}>Đăng xuất</Button>*/}
             </Drawer>
 
-            <Box sx={{ flexGrow: 1, p: 3 }}>
+            <Box sx={{ flexGrow: 1, p: 2 }}>
                 {renderPage()}
             </Box>
         </Box>

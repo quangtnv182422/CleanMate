@@ -27,8 +27,7 @@ builder.Services.AddSwaggerGen();
 //Kết nối DB
 builder.Services.AddDbContext<CleanMateMainDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 //Cấu hình Identity DB
 builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {
@@ -58,6 +57,9 @@ builder.Services.AddScoped<ICleanPerHourService, CleanPerHourService>();
 //All Clean Service
 builder.Services.AddScoped<IAllServiceRepository, AllServiceRepository>();
 builder.Services.AddScoped<IAllService_Service, AllService_Service>();
+//All Employee Service
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

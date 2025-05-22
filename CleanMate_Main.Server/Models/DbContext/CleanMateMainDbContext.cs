@@ -142,8 +142,8 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Duration");
 
-                entity.Property(e => e.Description).HasMaxLength(255);
-                entity.Property(e => e.Duration1).HasColumnName("Duration");
+                entity.Property(e => e.SquareMeterSpecific).HasMaxLength(255);
+                entity.Property(e => e.DurationTime).HasColumnName("DurationTime");
             });
 
             modelBuilder.Entity<Feedback>(entity =>

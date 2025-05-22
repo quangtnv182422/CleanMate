@@ -54,7 +54,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             BookingId = booking.BookingId,
                             ServiceName = service.Name,
                             ServiceDescription = service.Description,
-                            Duration = duration.Duration1,
+                           // Duration = duration.Duration1,
                             Price = servicePrice.Price,
                             Date = booking.Date,
                             StartTime = booking.StartTime,

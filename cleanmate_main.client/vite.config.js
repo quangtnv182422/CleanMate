@@ -55,6 +55,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/cleanservice': {
+                target,
+                secure: false
+            },
             '^/Worklist': {
                 target,
                 secure: false

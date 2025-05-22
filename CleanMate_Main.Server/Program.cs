@@ -1,9 +1,13 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Repository.CleanService.AllService;
+using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.CleanService.AllService;
+using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -48,6 +52,12 @@ builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 
 //AuthenService
 builder.Services.AddScoped<IAuthenService, AuthenService>();
+//CleanPerHour
+builder.Services.AddScoped<ICleanPerHourRepo, CleanPerHourRepo>();
+builder.Services.AddScoped<ICleanPerHourService, CleanPerHourService>();
+//All Clean Service
+builder.Services.AddScoped<IAllServiceRepository, AllServiceRepository>();
+builder.Services.AddScoped<IAllService_Service, AllService_Service>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

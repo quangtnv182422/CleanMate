@@ -121,6 +121,9 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.ToTable("Customer_Address");
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
+                entity.Property(e => e.AddressTitle)
+                        .HasMaxLength(450) 
+                        .IsUnicode(true);
                 entity.Property(e => e.IsInUse).HasDefaultValue(false);
                 entity.Property(e => e.IsDefault).HasDefaultValue(false);
                 entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");

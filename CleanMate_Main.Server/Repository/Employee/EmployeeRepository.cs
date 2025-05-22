@@ -50,7 +50,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Price = servicePrice.Price,
                             Date = booking.Date,
                             StartTime = booking.StartTime,
-                            Address = booking.Address,
+                            //Address = booking.Address,   // nhớ sửa lại phần này theo DB mới
                             Note = booking.Note,
                             Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,

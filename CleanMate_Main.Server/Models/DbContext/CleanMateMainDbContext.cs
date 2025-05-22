@@ -47,7 +47,7 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Booking");
 
-                entity.Property(e => e.Address).HasMaxLength(255);
+                entity.Property(e => e.AddressId).HasColumnName("AddressId");
                 entity.Property(e => e.CleanerId).HasMaxLength(450);
                 entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("(getdate())")
@@ -79,6 +79,12 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Booking__UserId__0A9D95DB");
+
+                entity.HasOne(d => d.Address)
+                    .WithMany(p => p.Bookings)
+                    .HasForeignKey(d => d.AddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Booking_CustomerAddress");
             });
 
             modelBuilder.Entity<BookingStatus>(entity =>
@@ -115,6 +121,11 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.ToTable("Customer_Address");
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
+                entity.Property(e => e.IsInUse).HasDefaultValue(false);
+                entity.Property(e => e.IsDefault).HasDefaultValue(false);
+                entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
+
 
                 entity.HasOne(d => d.User).WithMany(p => p.CustomerAddresses)
                     .HasForeignKey(d => d.UserId)

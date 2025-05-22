@@ -204,7 +204,7 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Service");
 
-                entity.Property(e => e.Description).HasMaxLength(255);
+                entity.Property(e => e.Description);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 

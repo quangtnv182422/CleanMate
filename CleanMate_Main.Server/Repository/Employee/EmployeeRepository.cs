@@ -40,6 +40,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                         join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
                         join duration in _context.Durations on servicePrice.DurationId equals duration.DurationId
                         join customer in _context.Users on booking.UserId equals customer.Id
+                        join address in _context.CustomerAddresses on booking.AddressId equals address.AddressId
                         where booking.BookingId == bookingId
                         select new WorkDetailsViewModel
                         {
@@ -50,7 +51,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Price = servicePrice.Price,
                             Date = booking.Date,
                             StartTime = booking.StartTime,
-                            //Address = booking.Address,   // nhớ sửa lại phần này theo DB mới
+                            Address = address.AddressTitle,
                             Note = booking.Note,
                             Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,

@@ -71,7 +71,7 @@ namespace CleanMate_Main.Server.Services.Employee
         public async Task<bool> ValidateWorkAcceptanceAsync(int bookingId, string employeeId)
         {
             var workDetails = await _employeeRepository.FindWorkByIdAsync(bookingId);
-            if (workDetails == null || workDetails.Status == CommonConstants.GetStatusString(CommonConstants.BookingStatus.ACCEPT) || workDetails.Status == CommonConstants.GetStatusString(CommonConstants.BookingStatus.DONE))
+            if (workDetails == null || workDetails.Status != CommonConstants.GetStatusString(CommonConstants.BookingStatus.NEW))
             {
                 return false;
             }

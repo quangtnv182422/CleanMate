@@ -10,7 +10,7 @@
         public DateOnly Date { get; set; }
         public TimeOnly StartTime { get; set; }
         public string Address { get; set; } = null!;
-        public string Note { get; set; }
+        public string? Note { get; set; }
         public string Status { get; set; } = null!;
         public bool IsRead { get; set; }
         public string CustomerFullName { get; set; }

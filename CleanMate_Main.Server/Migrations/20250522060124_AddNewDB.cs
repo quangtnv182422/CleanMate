@@ -274,7 +274,11 @@ namespace CleanMate_Main.Server.Migrations
                 {
                     AddressId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    IsInUse = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),
+                    Longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -347,7 +351,7 @@ namespace CleanMate_Main.Server.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     BookingStatusId = table.Column<int>(type: "int", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    AddressId = table.Column<int>(type: "int", nullable: true),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
@@ -357,6 +361,11 @@ namespace CleanMate_Main.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Booking__73951AED83D6EF22", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_Booking_CustomerAddress",
+                        column: x => x.AddressId,
+                        principalTable: "Customer_Address",
+                        principalColumn: "AddressId");
                     table.ForeignKey(
                         name: "FK__Booking__Booking__0B91BA14",
                         column: x => x.BookingStatusId,
@@ -481,6 +490,11 @@ namespace CleanMate_Main.Server.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Booking_AddressId",
+                table: "Booking",
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Booking_BookingStatusId",
                 table: "Booking",
                 column: "BookingStatusId");
@@ -576,9 +590,6 @@ namespace CleanMate_Main.Server.Migrations
                 name: "Cleaner_Profile");
 
             migrationBuilder.DropTable(
-                name: "Customer_Address");
-
-            migrationBuilder.DropTable(
                 name: "Feedback");
 
             migrationBuilder.DropTable(
@@ -597,13 +608,16 @@ namespace CleanMate_Main.Server.Migrations
                 name: "Voucher");
 
             migrationBuilder.DropTable(
+                name: "Customer_Address");
+
+            migrationBuilder.DropTable(
                 name: "Booking_Status");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Service_Price");
 
             migrationBuilder.DropTable(
-                name: "Service_Price");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Duration");

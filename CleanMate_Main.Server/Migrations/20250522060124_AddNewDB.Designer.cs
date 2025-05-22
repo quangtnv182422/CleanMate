@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250520134014_AddNewDB")]
+    [Migration("20250522060124_AddNewDB")]
     partial class AddNewDB
     {
         /// <inheritdoc />
@@ -164,9 +164,9 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"));
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int")
+                        .HasColumnName("AddressId");
 
                     b.Property<int>("BookingStatusId")
                         .HasColumnType("int");
@@ -210,6 +210,8 @@ namespace CleanMate_Main.Server.Migrations
 
                     b.HasKey("BookingId")
                         .HasName("PK__Booking__73951AED83D6EF22");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("BookingStatusId");
 
@@ -289,6 +291,22 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsInUse")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(9, 6)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(9, 6)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -647,6 +665,11 @@ namespace CleanMate_Main.Server.Migrations
 
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Booking", b =>
                 {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.CustomerAddress", "Address")
+                        .WithMany("Bookings")
+                        .HasForeignKey("AddressId")
+                        .HasConstraintName("FK_Booking_CustomerAddress");
+
                     b.HasOne("CleanMate_Main.Server.Models.Entities.BookingStatus", "BookingStatus")
                         .WithMany("Bookings")
                         .HasForeignKey("BookingStatusId")
@@ -670,6 +693,8 @@ namespace CleanMate_Main.Server.Migrations
                         .HasForeignKey("UserId")
                         .IsRequired()
                         .HasConstraintName("FK__Booking__UserId__0A9D95DB");
+
+                    b.Navigation("Address");
 
                     b.Navigation("BookingStatus");
 
@@ -852,6 +877,11 @@ namespace CleanMate_Main.Server.Migrations
                 });
 
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.BookingStatus", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CustomerAddress", b =>
                 {
                     b.Navigation("Bookings");
                 });

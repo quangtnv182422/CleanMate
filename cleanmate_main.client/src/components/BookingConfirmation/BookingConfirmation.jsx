@@ -1,20 +1,43 @@
-﻿import { useParams } from 'react-router-dom';
+﻿import { useParams, useNavigate } from 'react-router-dom';
+import WestIcon from '@mui/icons-material/West';
+import { Box, Typography } from '@mui/material';
 
+const primaryColor = '#1565C0';
+const styles = {
+    header: {
+        width: '100%',
+        height: '50px',
+        borderBottom: '1px solid #000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'relative', 
+        marginBottom: '20px', 
+    },
+    headerTitle: {
+        position: 'absolute',
+        left: '50%',
+        transform: 'translateX(-50%)', 
+        fontSize: '20px',
+        color: primaryColor,
+        fontWeight: 'bold',
+    },
+    backIcon: {
+        cursor: 'pointer',
+        color: primaryColor,
+    },
+}
 const BookingConfirmation = () => {
     const { id } = useParams();
-
-    const primaryColor = '#1565C0';
-
+    const navigate = useNavigate();
     return (
         <div className="container mt-5" style={{ maxWidth: '600px' }}>
             <div className="card shadow">
                 <div className="card-body">
-                    <h4
-                        className="card-title text-center fw-bold mb-4"
-                        style={{ color: primaryColor }}
-                    >
-                        Xác nhận dịch vụ
-                    </h4>
+                    <Box sx={styles.header}>
+                        <WestIcon sx={styles.backIcon} onClick={() => navigate(-1)} />
+                        <Typography sx={styles.headerTitle}>Dọn dẹp theo giờ</Typography>
+                    </Box>
 
                     {/* Thông tin ca làm */}
                     <div className="mb-4">

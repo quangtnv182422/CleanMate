@@ -1,6 +1,6 @@
-﻿import React from "react";
-import Services from '../../api/service'
+﻿import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { BookingContext } from '../../context/BookingProvider';
 
 
 const ClickHandler = () => {
@@ -8,26 +8,27 @@ const ClickHandler = () => {
 }
 
 const Commercial = () => {
+    const { services } = useContext(BookingContext);
 
     return (
         <div className="wpo-service-wrap wpo-service-slide">
             <div className="row">
-                {Services.slice(0, 3).map((service, srv) => {
-                    const isAvailable = service.isAvailable;
+                {services.map((service, srv) => {
+                    const isDisabled = service.serviceId !== 1;
                     return (
                         <div className="col-lg-4 col-md-6 col-12" key={srv}>
-                            <div className={`wpo-service-item ${isAvailable ? '' : 'disable'}`}>
-                                <div className="wpo-service-icon">
-                                    <div className="icon">
-                                        <img src={service.sIcon} alt="" />
-                                    </div>
-                                </div>
+                            <div className={`wpo-service-item ${isDisabled ? 'disable' : ''}`}>
+                                {/*<div className="wpo-service-icon">*/}
+                                {/*    <div className="icon">*/}
+                                {/*        <img src={service.sIcon} alt="" />*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
                                 <div className="wpo-service-text">
-                                    {isAvailable ?
+                                    {isDisabled ?
                                         (
-                                            <h2><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></h2>
+                                            <h2 onClick={() => alert("Chưa hoàn thiện chức năng")}>{service.name}</h2>
                                         ) : (
-                                            <h2 onClick={() => alert("Chưa hoàn thiện chức năng")}>{service.sTitle}</h2>
+                                            <h2><Link onClick={ClickHandler} to={`/service-single/${service.serviceId}`}>{service.name}</Link></h2>
                                         )
                                     }
                                     <p>{service.description}</p>

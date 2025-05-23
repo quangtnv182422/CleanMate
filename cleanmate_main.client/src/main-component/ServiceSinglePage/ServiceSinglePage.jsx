@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
+﻿import React, { Fragment, useState, useEffect, useContext } from 'react';
 import Navbar from '../../components/Navbar/Navbar'
-import PageTitle from '../../components/pagetitle/PageTitle'
 import Scrollbar from '../../components/scrollbar/scrollbar'
 import { useParams } from 'react-router-dom'
 import Services from '../../api/service';
@@ -11,24 +10,28 @@ import Footer from '../../components/footer/Footer'
 import MainImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
 import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
+import axios from 'axios';
+import { BookingContext } from '../../context/BookingProvider';
 
-const ServiceSinglePage = (props) => {
-    const { id } = useParams()
+const ServiceSinglePage = () => {
+    const { id } = useParams();
+    const [service, setService] = useState({});
+    const { services } = useContext(BookingContext);
     //use params to get the id from the url
     //use id to get the service details from the api
     //use context to store the service details object
 
-    const serviceDetails = Services.find(item => item.Id === id)
+    const serviceDetails = services.find(item => item.serviceId === Number(id))
+
+    const relatedServices = services.filter(item => item.serviceId !== Number(id));
 
     const ClickHandler = () => {
         window.scrollTo(10, 0);
     }
 
-
     return (
         <Fragment>
             <Navbar hclass={'wpo-header-style-5'} />
-            <PageTitle pageTitle={`${serviceDetails.sTitle} Cleaning `} pagesub={`${serviceDetails.sTitle} Cleaning`} />
             <section className="wpo-service-single-section section-padding">
                 <div className="container">
                     <div className="row">
@@ -39,9 +42,8 @@ const ServiceSinglePage = (props) => {
                                 </div>
                                 <div className="wpo-service-single-content">
                                     <div className="wpo-service-single-content-des">
-                                        <h2>{`${serviceDetails.sTitle} Cleaning `}</h2>
-                                        <p>{serviceDetails.description}</p>
-                                        <p>Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise.</p>
+                                        <h2>{serviceDetails?.name}</h2>
+                                        <p>{serviceDetails?.description}</p>
                                         <div className="wpo-service-single-sub-img">
                                             <ul>
                                                 <li><img src={SubImage1} alt="" /></li>
@@ -51,19 +53,19 @@ const ServiceSinglePage = (props) => {
                                     </div>
                                 </div>
                                 <div className="wpo-related-section">
-                                    <h2>Related Service</h2>
+                                    <h2>Dịch vụ bạn có thể quan tâm</h2>
                                     <div className="row">
-                                        {Services.slice(0, 3).map((service, Sitem) => (
-                                            <div className="col-lg-4 col-md-6 col-12" key={Sitem}>
-                                                <div className="wpo-related-item">
-                                                    <div className="wpo-related-icon">
-                                                        <div className="icon">
-                                                            <i><img src={service.sIcon} alt="" /></i>
-                                                        </div>
-                                                    </div>
+                                        {relatedServices.map((service, Sitem) => (
+                                            <div className="col-lg-6 col-md-6 col-12" key={Sitem}>
+                                                <div className="wpo-related-item disable">
+                                                    {/*<div className="wpo-related-icon">*/}
+                                                    {/*    <div className="icon">*/}
+                                                    {/*        <i><img src={service.sIcon} alt="" /></i>*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
                                                     <div className="wpo-related-text">
-                                                        <h3><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></h3>
-                                                        <p>{service.description.slice(41)}</p>
+                                                        <h3><Link onClick={ClickHandler} to={`/service-single/${service.serviceId}`}>{service.name}</Link></h3>
+                                                        <p className="description">{service.description}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -73,7 +75,7 @@ const ServiceSinglePage = (props) => {
                                 <Benefits />
                             </div>
                         </div>
-                        <ServiceSidebar id={id} />
+                        <ServiceSidebar id={serviceDetails.serviceId} />
                     </div>
                 </div>
             </section>

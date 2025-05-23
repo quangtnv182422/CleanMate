@@ -33,6 +33,7 @@ import WorkList from '../WorkList/WorkList';
 import BookingSuccess from '../../components/BookingComplete/BookingSuccess';
 import BookingFail from '../../components/BookingComplete/BookingFail';
 import BookingConfirmation from '../../components/BookingConfirmation/BookingConfirmation';
+import BookingService from '../../components/BookingService/BookingService';
 const AllRoute = () => {
 
     return (
@@ -69,6 +70,7 @@ const AllRoute = () => {
                     <Route path="booking-confirmation/:id" element={<BookingConfirmation />} />
                     <Route path="/booking-success" element={<BookingSuccess />} />
                     <Route path="/booking-fail" element={<BookingFail />} />
+                    <Route path="/booking-service" element={<BookingService />} />
                 </Routes>
             </BrowserRouter>
         </div>

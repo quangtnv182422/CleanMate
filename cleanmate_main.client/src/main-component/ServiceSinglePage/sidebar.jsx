@@ -1,4 +1,5 @@
 ﻿import React, { useContext } from 'react'
+import {useNavigate} from 'react-router-dom';
 import Services from '../../api/service';
 import { Link } from 'react-router-dom'
 import { BookingContext } from '../../context/BookingProvider';
@@ -6,6 +7,7 @@ import BookingService from '../../components/BookingService/BookingService';
 
 const ServiceSidebar = ({ id }) => {
     const { open, handleOpen, handleClose } = useContext(BookingContext);
+    const navigate = useNavigate();
 
     const SubmitHandler = (e) => {
         e.preventDefault()
@@ -22,8 +24,7 @@ const ServiceSidebar = ({ id }) => {
                     <h2>Hãy đặt dịch vụ</h2>
                     <p>Bấm đăng ký dịch vụ để hoàn thiện thông tin</p>
                     <form className="form" onSubmit={SubmitHandler}>
-                        <button type="submit" style={{ fontSize: "18px" }} onClick={handleOpen}>Đăng ký dịch vụ</button>
-                        {open && <BookingService open={open} handleClose={handleClose} id={id} />}
+                        <button type="submit" style={{ fontSize: "18px" }} onClick={() => navigate(`/booking-service?service=${id}`)}>Đăng ký dịch vụ</button>
                     </form>
                 </div>
                 <div className="wpo-contact-widget widget">

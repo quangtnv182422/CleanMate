@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -42,123 +42,49 @@ const SettingsPage = () => (
 
 const WorkList = () => {
     const navigate = useNavigate();
-    const [data, setData] = useState([
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-20 08:00',
-            duration: 2,
-            address: 'Số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội',
-            notes: 'Mang theo dụng cụ lau kính',
-            payment: 169200,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-20 14:00',
-            duration: 3,
-            address: 'Số 15 Nguyễn Văn Cừ, Long Biên, Hà Nội',
-            notes: 'Chú ý lau sạch bếp',
-            payment: 240000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-21 09:00',
-            duration: 2.5,
-            address: 'Số 45 Ngọc Lâm, Long Biên, Hà Nội',
-            notes: 'Không cần hút bụi',
-            payment: 200000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-21 13:00',
-            duration: 2,
-            address: 'Số 10 Gia Thụy, Long Biên, Hà Nội',
-            notes: 'Ưu tiên dọn phòng khách',
-            payment: 180000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-22 10:00',
-            duration: 4,
-            address: 'Số 22 Nguyễn Sơn, Long Biên, Hà Nội',
-            notes: 'Cần giặt thảm',
-            payment: 320000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-22 15:00',
-            duration: 2,
-            address: 'Số 78 Phúc Lợi, Long Biên, Hà Nội',
-            notes: 'Chỉ lau sàn',
-            payment: 150000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-23 08:30',
-            duration: 3,
-            address: 'Số 33 Thạch Bàn, Long Biên, Hà Nội',
-            notes: 'Mang thêm chổi mềm',
-            payment: 250000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-23 11:00',
-            duration: 2.5,
-            address: 'Số 56 Cổ Linh, Long Biên, Hà Nội',
-            notes: 'Dọn kỹ phòng ngủ',
-            payment: 200000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-24 09:00',
-            duration: 3.5,
-            address: 'Số 19 Sài Đồng, Long Biên, Hà Nội',
-            notes: 'Chú ý cửa sổ',
-            payment: 280000,
-            status: 'Đang làm',
-        },
-        {
-            name: 'Dọn dẹp theo giờ',
-            customer: 'Nguyễn Văn A',
-            startTime: '2025-05-24 14:00',
-            duration: 2,
-            address: 'Số 88 Việt Hưng, Long Biên, Hà Nội',
-            notes: 'Không cần lau bếp',
-            payment: 160000,
-            status: 'Đang làm',
-        },
-    ]);
+    const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
     const [tabValue, setTabValue] = useState(0);
 
+    useEffect(() => {
+        const fetchWorkList = async () => {
+            try {
+                const response = await fetch('/Worklist', {
+                    method: 'GET',
+                    credentials: 'include', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch work list');
+                }
+
+                const workItems = await response.json();
+                setData(workItems);
+            } catch (error) {
+                console.error('Error fetching work list:', error);
+                if (error.message.includes('401')) {
+                    navigate('/login');
+                }
+            }
+        };
+
+        fetchWorkList();
+    }, [navigate]);
 
     const keyMapping = {
-        'tên': 'name',
-        'khách hàng': 'customer',
+        'tên': 'serviceName',
+        'khách hàng': 'customerFullName',
         'giờ làm': 'startTime',
         'làm trong (tiếng)': 'duration',
         'địa chỉ': 'address',
-        'ghi chú': 'notes',
-        'số tiền (VND)': 'payment',
+        'ghi chú': 'note',
+        'số tiền (VND)': 'totalPrice',
         'trạng thái': 'status',
     };
 
@@ -175,13 +101,21 @@ const WorkList = () => {
             let valueA = a[englishKey];
             let valueB = b[englishKey];
 
-            if (englishKey === 'salary') {
-                valueA = parseFloat(valueA.replace(/[^0-9.-]+/g, ''));
-                valueB = parseFloat(valueB.replace(/[^0-9.-]+/g, ''));
-            } else if (englishKey === 'startDate') {
-                valueA = new Date(valueA).getTime();
-                console.log(valueA);
-                valueB = new Date(valueB).getTime();
+            // Special handling for startTime (combine Date and StartTime)
+            if (englishKey === 'startTime') {
+                const dateA = new Date(a.date);
+                const timeA = a.startTime.split(':').map(Number);
+                dateA.setHours(timeA[0], timeA[1], timeA[2]);
+
+                const dateB = new Date(b.date);
+                const timeB = b.startTime.split(':').map(Number);
+                dateB.setHours(timeB[0], timeB[1], timeB[2]);
+
+                valueA = dateA.getTime();
+                valueB = dateB.getTime();
+            } else if (englishKey === 'totalPrice') {
+                valueA = Number(valueA);
+                valueB = Number(valueB);
             } else if (typeof valueA === 'string') {
                 valueA = valueA.toLowerCase();
                 valueB = valueB.toLowerCase();
@@ -192,13 +126,12 @@ const WorkList = () => {
             return 0;
         });
 
-
         setData(sortedData);
     };
 
     // Filter data by search
     const filteredData = data.filter((row) =>
-        row.name.toLowerCase().includes(search.toLowerCase())
+        row.serviceName.toLowerCase().includes(search.toLowerCase())
     );
 
     // Pagination
@@ -213,11 +146,11 @@ const WorkList = () => {
     };
 
     const handleLogout = () => {
-        fetch('/Authen/logout', {
+        fetch('/api/authen/logout', {
             method: 'POST',
-            credentials: 'include'
+            credentials: 'include',
         }).then(() => {
-            navigate('/home'); // hoặc gọi lại API /me
+            navigate('/login');
         });
     };
 
@@ -279,18 +212,18 @@ const WorkList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedData.map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{row.name}</TableCell>
-                                <TableCell>{row.customer}</TableCell>
-                                <TableCell>{row.startTime}</TableCell>
+                        {paginatedData.map((row) => (
+                            <TableRow key={row.bookingId}>
+                                <TableCell>{row.serviceName}</TableCell>
+                                <TableCell>{row.customerFullName}</TableCell>
+                                <TableCell>{`${row.date.split('T')[0]} ${row.startTime}`}</TableCell>
                                 <TableCell>{row.duration}</TableCell>
                                 <TableCell>{row.address}</TableCell>
-                                <TableCell>{row.notes}</TableCell>
-                                <TableCell>{row.payment}</TableCell>
+                                <TableCell>{row.note}</TableCell>
+                                <TableCell>{row.totalPrice}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                    <VisibilityOutlinedIcon />
+                                    <VisibilityOutlinedIcon onClick={() => navigate(`/work-details/${row.bookingId}`)} />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -344,11 +277,13 @@ const WorkList = () => {
                     value={tabValue}
                     onChange={handleTabChange}
                 >
-                    <Tab label="Danh sách công việc"/>
-                    <Tab label="Thu nhập"/>
-                    <Tab label="Settings"/>
+                    <Tab label="Danh sách công việc" />
+                    <Tab label="Thu nhập" />
+                    <Tab label="Settings" />
                 </Tabs>
-                {/*<Button variant="outlined" onClick={handleLogout}>Đăng xuất</Button>*/}
+                <Button variant="outlined" onClick={handleLogout} sx={{ mt: 2, mx: 2 }}>
+                    Đăng xuất
+                </Button>
             </Drawer>
 
             <Box sx={{ flexGrow: 1, p: 2 }}>

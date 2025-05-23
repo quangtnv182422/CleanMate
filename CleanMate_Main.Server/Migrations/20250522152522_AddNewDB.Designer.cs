@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250522061358_UpdateFieldAddressTitle")]
-    partial class UpdateFieldAddressTitle
+    [Migration("20250522152522_AddNewDB")]
+    partial class AddNewDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -335,13 +335,13 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DurationId"));
 
-                    b.Property<string>("Description")
+                    b.Property<int>("DurationTime")
+                        .HasColumnType("int")
+                        .HasColumnName("DurationTime");
+
+                    b.Property<string>("SquareMeterSpecific")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("Duration1")
-                        .HasColumnType("int")
-                        .HasColumnName("Duration");
 
                     b.HasKey("DurationId")
                         .HasName("PK__Duration__AF77E836629F8EB9");
@@ -448,8 +448,7 @@ namespace CleanMate_Main.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceId"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

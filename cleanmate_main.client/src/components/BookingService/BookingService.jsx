@@ -13,7 +13,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import TextField from '@mui/material/TextField';
-
+import { useNavigate } from 'react-router-dom'; 
 
 const style = {
     container: {
@@ -100,11 +100,12 @@ const style = {
     }
 };
 
-const BookingService = ({ open, handleClose }) => {
+const BookingService = ({ open, handleClose, id }) => {
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedTime, setSelectedTime] = useState(30);
     const [selectedDay, setSelectedDay] = useState('');
     const [days, setDays] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const today = new Date();
@@ -310,6 +311,7 @@ const BookingService = ({ open, handleClose }) => {
                                     color: '#425398',
                                     fontWeight: 'bold',
                                 }}
+                                onClick={() => navigate(`/booking-confirmation/${id}`)}
                             >
                                 Tiếp tục
                             </Button>

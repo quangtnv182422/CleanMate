@@ -58,6 +58,10 @@ export default defineConfig({
             '^/cleanservice': {
                 target,
                 secure: false
+            },
+            '^/Worklist': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

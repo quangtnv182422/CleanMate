@@ -1,10 +1,10 @@
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import Scrollbar from '../../components/scrollbar/scrollbar'
-import {useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Services from '../../api/service';
-import {Link} from  'react-router-dom'
+import { Link } from 'react-router-dom'
 import Benefits from './benefits'
 import ServiceSidebar from './sidebar'
 import Footer from '../../components/footer/Footer'
@@ -12,23 +12,23 @@ import MainImage from '../../images/service-single/hourly-cleaning-main-image.jp
 import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 
-const ServiceSinglePage =(props) => {
+const ServiceSinglePage = (props) => {
     const { id } = useParams()
     //use params to get the id from the url
     //use id to get the service details from the api
     //use context to store the service details object
 
-    const serviceDetails = Services.find( item => item.Id === id)
+    const serviceDetails = Services.find(item => item.Id === id)
 
-    const ClickHandler = () =>{
+    const ClickHandler = () => {
         window.scrollTo(10, 0);
-     }
+    }
 
 
-    return(
+    return (
         <Fragment>
-            <Navbar hclass={'wpo-header-style-5'}/>
-            <PageTitle pageTitle={`${serviceDetails.sTitle} Cleaning `} pagesub={`${serviceDetails.sTitle} Cleaning`}/> 
+            <Navbar hclass={'wpo-header-style-5'} />
+            <PageTitle pageTitle={`${serviceDetails.sTitle} Cleaning `} pagesub={`${serviceDetails.sTitle} Cleaning`} />
             <section className="wpo-service-single-section section-padding">
                 <div className="container">
                     <div className="row">
@@ -70,15 +70,15 @@ const ServiceSinglePage =(props) => {
                                         ))}
                                     </div>
                                 </div>
-                                <Benefits/>
+                                <Benefits />
                             </div>
                         </div>
-                        <ServiceSidebar/>
+                        <ServiceSidebar id={id} />
                     </div>
                 </div>
             </section>
-            <Footer/>
-            <Scrollbar/>
+            <Footer />
+            <Scrollbar />
         </Fragment>
     )
 };

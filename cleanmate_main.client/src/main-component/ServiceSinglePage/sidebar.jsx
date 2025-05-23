@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { BookingContext } from '../../context/BookingProvider';
 import BookingService from '../../components/BookingService/BookingService';
 
-const ServiceSidebar = () => {
+const ServiceSidebar = ({ id }) => {
     const { open, handleOpen, handleClose } = useContext(BookingContext);
 
     const SubmitHandler = (e) => {
@@ -23,7 +23,7 @@ const ServiceSidebar = () => {
                     <p>Bấm đăng ký dịch vụ để hoàn thiện thông tin</p>
                     <form className="form" onSubmit={SubmitHandler}>
                         <button type="submit" style={{ fontSize: "18px" }} onClick={handleOpen}>Đăng ký dịch vụ</button>
-                        {open && <BookingService open={open} handleClose={handleClose} />}
+                        {open && <BookingService open={open} handleClose={handleClose} id={id} />}
                     </form>
                 </div>
                 <div className="wpo-contact-widget widget">

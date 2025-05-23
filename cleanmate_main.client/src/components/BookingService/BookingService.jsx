@@ -109,7 +109,7 @@ const BookingService = ({ open, handleClose, id }) => {
 
     useEffect(() => {
         const today = new Date();
-        const dayLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+        const dayLabels = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
         const newDays = [];
 
         for (let i = 0; i < 7; i++) {

@@ -34,6 +34,7 @@ import BookingSuccess from '../../components/BookingComplete/BookingSuccess';
 import BookingFail from '../../components/BookingComplete/BookingFail';
 import BookingConfirmation from '../../components/BookingConfirmation/BookingConfirmation';
 import BookingService from '../../components/BookingService/BookingService';
+import Payment from '../../components/Payment/Payment';
 const AllRoute = () => {
 
     return (
@@ -67,10 +68,11 @@ const AllRoute = () => {
                     <Route path="/email-confirmation" element={<EmailConfirmation />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/work-list" element={<WorkList />} />
-                    <Route path="booking-confirmation/:id" element={<BookingConfirmation />} />
+                    <Route path="/order/booking-confirmation/:id" element={<BookingConfirmation />} />
                     <Route path="/booking-success" element={<BookingSuccess />} />
                     <Route path="/booking-fail" element={<BookingFail />} />
                     <Route path="/booking-service" element={<BookingService />} />
+                    <Route path="/order/payment" element={<Payment />} />
                 </Routes>
             </BrowserRouter>
         </div>

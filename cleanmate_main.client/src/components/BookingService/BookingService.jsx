@@ -13,10 +13,6 @@ import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
 import TextField from '@mui/material/TextField';
-import {
-    Select,
-    MenuItem,
-} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -151,14 +147,6 @@ const BookingService = () => {
         { label: "2 Giờ\nTối đa 30m² tổng sàn", value: 30 },
     ];
 
-    const timeSlots = [
-        '8:00 - 10:00',
-        '10:00 - 12:00',
-        '13:00 - 15:00',
-        '15:00 - 17:00',
-        '17:00 - 19:00',
-    ];
-
     return (
         <div>
             <Box sx={style.container}>
@@ -262,37 +250,14 @@ const BookingService = () => {
                             Giờ làm việc
                         </Typography>
                         <Box>
-                            <Select
-                                value={selectedTimes}
-                                onChange={(e) => setSelectedTimes(e.target.value)}
-                                fullWidth
-                                variant="outlined"
-                                sx={{
-                                    mt: 1,
-                                    border: '1px solid #00bcd4',
-                                    borderRadius: 1,
-                                    color: '#333',
-                                    fontSize: 16,
-                                    fontWeight: 500,
-                                    //'& .MuiSelect-select': {
-                                    //    padding: '10px 14px',
-                                    //    backgroundColor: '#e0f7fa',
-                                    //},
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: 'transparent',
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#00bcd4',
-                                    },
-                                    '& .MuiSvgIcon-root': {
-                                        color: '#1565C0',
-                                    },
-                                }}
-                            >
-                                <MenuItem value={2}>8:00 - 10:00</MenuItem>
-                                <MenuItem value={2}>10:00 - 12:00</MenuItem>
-                                <MenuItem value={2}>13:00 - 15:00</MenuItem>
-                            </Select>
+                            {/*<LocalizationProvider dateAdapter={AdapterDateFns}>*/}
+                            {/*    <TimePicker*/}
+                            {/*        label="Chọn giờ"*/}
+                            {/*        value={value}*/}
+                            {/*        onChange={(newValue) => setValue(newValue)}*/}
+                            {/*        renderInput={(params) => <TextField {...params} fullWidth />}*/}
+                            {/*    />*/}
+                            {/*</LocalizationProvider>*/}
                         </Box>
                     </Box>
 

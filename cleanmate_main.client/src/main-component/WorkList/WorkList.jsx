@@ -1,4 +1,4 @@
-﻿import React, { useState,useEffect } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -18,7 +18,10 @@ import {
     MenuItem,
     IconButton,
     Pagination,
-    Button
+    Button,
+    Modal,
+    InputLabel,
+    FormControl
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -39,22 +42,28 @@ const SettingsPage = () => (
         <Typography>This is a placeholder for the Settings page.</Typography>
     </Box>
 );
-
 const WorkList = () => {
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
     const [tabValue, setTabValue] = useState(0);
+    const [status, setStatus] = useState('');
 
+    const handleStatusChange = (event) => {
+        setStatus(event.target.value);
+    };
     useEffect(() => {
         const fetchWorkList = async () => {
             try {
                 const response = await fetch('/Worklist', {
                     method: 'GET',
-                    credentials: 'include', 
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -77,31 +86,28 @@ const WorkList = () => {
         fetchWorkList();
     }, [navigate]);
 
-    const keyMapping = {
-        'tên': 'serviceName',
-        'khách hàng': 'customerFullName',
-        'giờ làm': 'startTime',
-        'làm trong (tiếng)': 'duration',
-        'địa chỉ': 'address',
-        'ghi chú': 'note',
-        'số tiền (VND)': 'totalPrice',
-        'trạng thái': 'status',
-    };
+    const handleSort = useCallback((vietnameseKey) => {
+        const keyMapping = {
+            'tên': 'serviceName',
+            'khách hàng': 'customerFullName',
+            'giờ làm': 'startTime',
+            'làm trong (tiếng)': 'duration',
+            'địa chỉ': 'address',
+            'ghi chú': 'note',
+            'số tiền (VND)': 'totalPrice',
+            'trạng thái': 'status',
+        };
 
-    const handleSort = (vietnameseKey) => {
         let direction = 'asc';
         if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
             direction = 'desc';
         }
-        setSortConfig({ key: vietnameseKey, direction });
-
         const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
 
         const sortedData = [...data].sort((a, b) => {
             let valueA = a[englishKey];
             let valueB = b[englishKey];
 
-            // Special handling for startTime (combine Date and StartTime)
             if (englishKey === 'startTime') {
                 const dateA = new Date(a.date);
                 const timeA = a.startTime.split(':').map(Number);
@@ -126,19 +132,21 @@ const WorkList = () => {
             return 0;
         });
 
+        setSortConfig({ key: vietnameseKey, direction });
         setData(sortedData);
-    };
+    }, [data, sortConfig]);
 
-    // Filter data by search
-    const filteredData = data.filter((row) =>
-        row.serviceName.toLowerCase().includes(search.toLowerCase())
-    );
 
-    // Pagination
-    const paginatedData = filteredData.slice(
-        (page - 1) * rowsPerPage,
-        page * rowsPerPage
-    );
+    const filteredData = useMemo(() => {
+        return data.filter((row) =>
+            row.serviceName.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [data, search]);
+
+    const paginatedData = useMemo(() => {
+        const startIndex = (page - 1) * rowsPerPage;
+        return filteredData.slice(startIndex, startIndex + rowsPerPage);
+    }, [filteredData, page, rowsPerPage]);
 
     // Handle tab change
     const handleTabChange = (event, newValue) => {
@@ -157,14 +165,31 @@ const WorkList = () => {
     const WorkListPage = () => (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <TextField
-                    label="Tìm công việc theo tên"
-                    variant="outlined"
-                    size="small"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    sx={{ width: 200 }}
-                />
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <TextField
+                        label="Tìm công việc theo tên"
+                        variant="outlined"
+                        size="small"
+                        value={search ?? ''}
+                        onChange={(e) => setSearch(e.target.value)}
+                        sx={{ width: 200 }}
+                    />
+                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                        <InputLabel id="status-select-label">Trạng thái</InputLabel>
+                        <Select
+                            labelId="status-select-label"
+                            value={status}
+                            onChange={handleStatusChange}
+                            label="Trạng thái"
+                        >
+                            <MenuItem value="">Tất cả</MenuItem>
+                            <MenuItem value="Hoàn thành">Hoàn thành</MenuItem>
+                            <MenuItem value="Đang thực hiện">Đang thực hiện</MenuItem>
+                            <MenuItem value="Chưa bắt đầu">Chưa bắt đầu</MenuItem>
+                            <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
                 <Box>
                     <IconButton>
                         <FileDownload />
@@ -223,8 +248,41 @@ const WorkList = () => {
                                 <TableCell>{row.totalPrice}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                    <VisibilityOutlinedIcon onClick={() => navigate(`/work-details/${row.bookingId}`)} />
+                                    {/*<VisibilityOutlinedIcon onClick={() => navigate(`/work-details/${row.bookingId}`)} />*/}
+                                    <VisibilityOutlinedIcon onClick={handleOpen} />
                                 </TableCell>
+                                <Modal
+                                    open={open}
+                                    onClose={handleClose}
+                                    disableAutoFocus
+                                >
+                                    <Box sx={style.modal}>
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography variant="h5">Dọn dẹp nhà theo giờ</Typography>
+                                            <Typography variant="body2" sx={style.lightGray}>Bắt đầu lúc: <span style={style.time}> Thứ 7 - 10:00 sáng</span></Typography>
+                                        </Box>
+                                        <Box sx={style.mainContent}>
+                                            <Box sx={{ textAlign: 'center' }}>
+                                                <Typography variant="body1" sx={style.lightGray}>Làm trong:</Typography>
+                                                <Typography variant="h5" sx={{ color: '#FBA500' }}>2 giờ</Typography>
+                                                <Typography variant="body1">2m² làm trong 2h</Typography>
+                                            </Box>
+                                            <Box sx={{ textAlign: 'center' }}>
+                                                <Typography variant="body1" sx={style.lightGray}>Số tiền (VND):</Typography>
+                                                <Typography variant="h5" sx={{ color: '#FBA500' }}>100,000</Typography>
+                                            </Box>
+                                        </Box>
+                                        <Box sx={{ mb: 2 }}>
+                                            <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>Số nhà 30, Nguyễn Sơn, Long Biên, Hà Nội</strong></Typography>
+                                            <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>Chú ý nhà có mèo, dọn kỹ lông mèo</strong></Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Button variant="outlined" color='error'>Từ chối</Button>
+                                            <Button variant="outlined">Google Maps</Button>
+                                            <Button variant="contained" sx={style.confirmButton}>Nhận việc</Button>
+                                        </Box>
+                                    </Box>
+                                </Modal>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -243,6 +301,7 @@ const WorkList = () => {
                     {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
                 </Typography>
             </Box>
+
         </Box>
     );
 
@@ -291,6 +350,46 @@ const WorkList = () => {
             </Box>
         </Box>
     );
+};
+
+const style = {
+    modal: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        borderRadius: '5px',
+        p: 2,
+    },
+    mainContent: {
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'flex-start',
+        border: '1px solid #ccc',
+        borderRadius: '5px',
+        marginBottom: '16px',
+        p: 1,
+    },
+    confirmButton: {
+        backgroundColor: '#1565C0',
+        color: '#fff',
+        '&:hover': {
+            backgroundColor: '#1565C0',
+            color: '#fff',
+        },
+    },
+    time: {
+        color: '#FBA500',
+        fontSize: '18px'
+    },
+    lightGray: {
+        color: "#969495"
+    },
+    fontBlack: {
+        color: '#000',
+    },
 };
 
 export default WorkList;

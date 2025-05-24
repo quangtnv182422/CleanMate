@@ -46,6 +46,8 @@ namespace CleanMate_Main.Server.Controllers.Authen
 
             return Ok(new { message = "Hãy xác thực tài khoản của ban qua Email!" });
         }
+
+        //đăng kí dành cho người dọn
         [HttpPost("registeremployee")]
         public async Task<IActionResult> RegisterEmployee([FromBody] RegisterModel model)
         {

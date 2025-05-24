@@ -32,7 +32,7 @@ namespace CleanMate_Main.Server.Controllers.CleanService.AllService
         }
 
         [HttpGet("serviceId/{serviceId}")]
-        public async Task<ActionResult<List<ServicePriceDTO>>> GetServicePriceByServiceId([FromBody]int serviceId)
+        public async Task<ActionResult<List<ServicePriceDTO>>> GetServicePriceByServiceId(int serviceId)
         {
             var result = await _allService.GetServicePriceByServiceIdAsync(serviceId);
 

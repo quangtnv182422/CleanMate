@@ -2,6 +2,9 @@
 import { Link, useNavigate } from 'react-router-dom'
 import userImage from '../../images/user-image.png'
 import useAuth from '../../hooks/useAuth';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import CleaningServicesOutlinedIcon from '@mui/icons-material/CleaningServicesOutlined';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
 
 const HeaderTopbar = () => {
@@ -68,17 +71,35 @@ const HeaderTopbar = () => {
                                             <p>{user.fullName}</p>
                                         </div>
                                         {showDropdown && (
-                                            <div className="user-dropdown-menu" >
-                                                <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
-                                                    Hồ sơ cá nhân
+                                            <div className="user-dropdown-menu">
+                                                <div className="user-profile">
+                                                    <div className="avatar">
+                                                        <img src={userImage} alt="Avatar" />
+                                                    </div>
+                                                    <div className="user-info">
+                                                        <div className="name-row">
+                                                            <span className="user-name">{user.fullName}</span>
+                                                        </div>
+                                                        <span className="user-email">{user.email}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="dropdown-item" onClick={() => navigateTo("/history")}>
-                                                    Lịch sử giao dịch
+
+                                                <div className="user-personal-page">
+                                                    <div className="dropdown-item" onClick={() => navigateTo("/profile")}>
+                                                        <AccountCircleOutlinedIcon size="small" />
+                                                        Hồ sơ cá nhân
+                                                    </div>
+                                                    <div className="dropdown-item" onClick={() => navigateTo("/history")}>
+                                                        <CleaningServicesOutlinedIcon size="small" />
+                                                        Lịch sử giao dịch
+                                                    </div>
                                                 </div>
-                                                <div className="dropdown-item" onClick={handleLogout}>
+                                                <div className="dropdown-item logout-btn" onClick={handleLogout}>
+                                                    <LogoutOutlinedIcon size="small" />
                                                     Đăng xuất
                                                 </div>
                                             </div>
+
                                         )}
                                     </div>
                                 </div>

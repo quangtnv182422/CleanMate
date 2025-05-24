@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250522152522_AddNewDB")]
+    [Migration("20250524025932_AddNewDB")]
     partial class AddNewDB
     {
         /// <inheritdoc />
@@ -172,7 +172,6 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CleanerId")
-                        .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
@@ -684,7 +683,6 @@ namespace CleanMate_Main.Server.Migrations
                     b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "Cleaner")
                         .WithMany("BookingCleaners")
                         .HasForeignKey("CleanerId")
-                        .IsRequired()
                         .HasConstraintName("FK__Booking__Cleaner__09A971A2");
 
                     b.HasOne("CleanMate_Main.Server.Models.Entities.ServicePrice", "ServicePrice")

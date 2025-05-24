@@ -8,7 +8,7 @@ public partial class Booking
 
     public int ServicePriceId { get; set; }
 
-    public string CleanerId { get; set; } = null!;
+    public string? CleanerId { get; set; } 
 
     public string UserId { get; set; } = null!;
 
@@ -31,7 +31,7 @@ public partial class Booking
 
     public virtual BookingStatus BookingStatus { get; set; } = null!;
 
-    public virtual AspNetUser Cleaner { get; set; } = null!;
+    public virtual AspNetUser ?Cleaner { get; set; } 
 
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 

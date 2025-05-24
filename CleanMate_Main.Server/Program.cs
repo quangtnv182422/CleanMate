@@ -1,11 +1,13 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.Bookings;
 using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Employee;
@@ -60,6 +62,9 @@ builder.Services.AddScoped<IAllService_Service, AllService_Service>();
 //All Employee Service
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+//Booking
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

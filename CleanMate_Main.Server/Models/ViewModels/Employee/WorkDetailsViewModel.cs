@@ -5,10 +5,11 @@
         public int BookingId { get; set; }
         public string ServiceName { get; set; } = null!;
         public string ServiceDescription { get; set; }
-        public int Duration { get; set; }
-        public decimal Price { get; set; }
-        public DateOnly Date { get; set; }
-        public TimeOnly StartTime { get; set; }
+        public string Duration { get; set; }
+        public string Price { get; set; }
+        public string Commission { get; set; }
+        public string Date { get; set; }
+        public string StartTime { get; set; }
         public string Address { get; set; } = null!;
         public string? Note { get; set; }
         public string Status { get; set; } = null!;

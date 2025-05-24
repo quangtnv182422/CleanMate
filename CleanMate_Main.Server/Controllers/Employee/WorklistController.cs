@@ -51,5 +51,35 @@ namespace CleanMate_Main.Server.Controllers.Employee
 
             return Ok(workItems);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWorkDetail(int id)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { message = "User email not found." });
+                }
+
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null)
+                {
+                    return Unauthorized(new { message = "User not found." });
+                }
+
+                string employeeId = user.Id;
+                var workDetail = await _employeeService.GetWorkDetailsAsync(id);
+                return Ok(workDetail);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred while fetching work detail." });
+            }
+        }
     }
 }

@@ -47,8 +47,7 @@ const SettingsPage = () => (
 const WorkList = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+
     const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -57,8 +56,7 @@ const WorkList = () => {
     const [tabValue, setTabValue] = useState(0);
     const [status, setStatus] = useState('');
     const { statusList, loading } = useContext(BookingStatusContext);
-
-    // Map frontend status strings to backend status IDs
+    const [selectedWork, setSelectedWork] = useState(null);
     const statusMapping = {
         "Việc mới": 1, // BOOKING_STATUS_NEW
         "Đã huỷ": 2, // CANCEL
@@ -71,6 +69,35 @@ const WorkList = () => {
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
         setPage(1); // Reset to first page when status changes
+    };
+    const handleOpen = async (bookingId) => {
+        try {
+            const response = await fetch(`/worklist/${bookingId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error(`HTTP error! status: ${response.status}, response: ${text}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const workDetail = await response.json();
+            setSelectedWork(workDetail);
+            setOpen(true);
+        } catch (error) {
+            console.error('Error fetching work detail:', error);
+        }
+    };
+    console.log(selectedWork)
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedWork(null);
     };
 
     useEffect(() => {
@@ -259,47 +286,52 @@ const WorkList = () => {
                                 <TableCell>{row.totalPrice}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                    <VisibilityOutlinedIcon onClick={handleOpen} />
+                                    <VisibilityOutlinedIcon onClick={() => handleOpen(row.bookingId)} />
                                 </TableCell>
-                                <Modal
-                                    open={open}
-                                    onClose={handleClose}
-                                    disableAutoFocus
-                                >
-                                    <Box sx={style.modal}>
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="h5">Dọn dẹp nhà theo giờ</Typography>
-                                            <Typography variant="body2" sx={style.lightGray}>Bắt đầu lúc: <span style={style.time}> Thứ 7 - 10:00 sáng</span></Typography>
-                                        </Box>
-                                        <Box sx={style.mainContent}>
-                                            <Box sx={{ textAlign: 'center' }}>
-                                                <Typography variant="body1" sx={style.lightGray}>Làm trong:</Typography>
-                                                <Typography variant="h5" sx={{ color: '#FBA500' }}>2 giờ</Typography>
-                                                <Typography variant="body1">2m² làm trong 2h</Typography>
-                                            </Box>
-                                            <Box sx={{ textAlign: 'center' }}>
-                                                <Typography variant="body1" sx={style.lightGray}>Số tiền (VND):</Typography>
-                                                <Typography variant="h5" sx={{ color: '#FBA500' }}>100,000</Typography>
-                                            </Box>
-                                        </Box>
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>Số nhà 30, Nguyễn Sơn, Long Biên, Hà Nội</strong></Typography>
-                                            <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>Chú ý nhà có mèo, dọn kỹ lông mèo</strong></Typography>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Button variant="outlined" color='error'>Từ chối</Button>
-                                            <Button variant="outlined">Google Maps</Button>
-                                            <Button variant="contained" sx={style.confirmButton}>Nhận việc</Button>
-                                        </Box>
-                                    </Box>
-                                </Modal>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Pagination */}
+            {selectedWork && (
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    disableAutoFocus
+                >
+                    <Box sx={style.modal}>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="h5">{selectedWork.serviceName}</Typography>
+                            <Typography variant="body2" sx={style.lightGray}>
+                                Bắt đầu lúc: <span style={style.time}>{selectedWork.startTime} </span>ngày<span style={style.time}>  {selectedWork.date}</span>
+                            </Typography>
+                        </Box>
+                        <Box sx={style.mainContent}>
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Typography variant="body1" sx={style.lightGray}>Làm trong:</Typography>
+                                <Typography variant="h5" sx={{ color: '#FBA500' }}>{selectedWork.duration}</Typography>
+                                <Typography variant="body1">{selectedWork.serviceDescription}</Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Typography variant="body1" sx={style.lightGray}>Số tiền:</Typography>
+                                <Typography variant="h5" sx={{ color: '#FBA500' }}>{selectedWork.price}</Typography>
+                                <Typography variant="body1"> Hoa hồng: {selectedWork.commission}</Typography>
+                            </Box>
+                        </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>{selectedWork.address}</strong></Typography>
+                            <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork.note}</strong></Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Button variant="outlined" color='error'>Từ chối</Button>
+                            <Button variant="outlined">Google Maps</Button>
+                            <Button variant="contained" sx={style.confirmButton}>Nhận việc</Button>
+                        </Box>
+                    </Box>
+                </Modal>
+            )}
+
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                 <Pagination
                     count={Math.ceil(filteredData.length / rowsPerPage)}

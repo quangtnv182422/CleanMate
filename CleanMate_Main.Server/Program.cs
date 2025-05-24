@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Proxy.vnPay;
 using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
@@ -68,6 +69,8 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+//vnPay
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 
 // Cấu hình JWT (dành cho API)

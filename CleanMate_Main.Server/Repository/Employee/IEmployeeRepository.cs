@@ -17,6 +17,8 @@ namespace CleanMate_Main.Server.Repository.Employee
 
         Task<int> GetWorkCountByStatusAsync(int status);
 
+
         Task UpdateWorkReadStatusAsync(int bookingId, bool isRead);
+        Task<IEnumerable<object>> GetBookingStatusesAsync();
     }
 }

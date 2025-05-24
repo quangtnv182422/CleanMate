@@ -146,5 +146,12 @@ namespace CleanMate_Main.Server.Repository.Employee
                 ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<object>> GetBookingStatusesAsync()
+        {
+            return await _context.BookingStatuses
+                .Select(s => new { id = s.BookingStatusId, name = s.Status })
+                .OrderBy(s => s.id)
+                .ToListAsync();
+        }
     }
 }

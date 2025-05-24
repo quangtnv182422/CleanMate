@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../../sass/style.scss';
 import AuthProvider from '../../../src/context/AuthContext';
 import BookingProvider from '../../context/BookingProvider';
-
+import BookingStatusProvider from '../../context/BookingStatusProvider';
 
 const App = () => {
 
@@ -13,8 +13,10 @@ const App = () => {
         <div className="App" id='scrool'>
             <AuthProvider>
                 <BookingProvider>
-                    <AllRoute />
-                    <ToastContainer />
+                    <BookingStatusProvider>
+                        <AllRoute />
+                        <ToastContainer />
+                    </BookingStatusProvider>
                 </BookingProvider>
             </AuthProvider>
         </div>

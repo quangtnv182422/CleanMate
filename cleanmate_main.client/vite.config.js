@@ -59,7 +59,11 @@ export default defineConfig({
                 target,
                 secure: false
             },
-            '^/Worklist': {
+            '^/worklist': {
+                target,
+                secure: false
+            },
+            '^/bookingstatus': {
                 target,
                 secure: false
             }

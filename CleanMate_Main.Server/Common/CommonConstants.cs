@@ -16,13 +16,13 @@
         {
             return statusId switch
             {
-                CommonConstants.BookingStatus.NEW => "New",
-                CommonConstants.BookingStatus.CANCEL => "Canceled",
-                CommonConstants.BookingStatus.ACCEPT => "Accepted",
-                CommonConstants.BookingStatus.IN_PROGRESS => "In Progress",
-                CommonConstants.BookingStatus.PENDING_DONE => "Pending Done",
-                CommonConstants.BookingStatus.DONE => "Done",
-                _ => "Unknown"
+                CommonConstants.BookingStatus.NEW => "Việc mới",
+                CommonConstants.BookingStatus.CANCEL => "Đã huỷ",
+                CommonConstants.BookingStatus.ACCEPT => "Đã nhận",
+                CommonConstants.BookingStatus.IN_PROGRESS => "Đang thực hiện",
+                CommonConstants.BookingStatus.PENDING_DONE => "Chờ xác nhận",
+                CommonConstants.BookingStatus.DONE => "Hoàn thành",
+                _ => "Không xác định"
             };
         }
 

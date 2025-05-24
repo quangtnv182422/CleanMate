@@ -82,5 +82,9 @@ namespace CleanMate_Main.Server.Services.Employee
         {
             await _employeeRepository.UpdateWorkReadStatusAsync(bookingId, isRead);
         }
+        public async Task<IEnumerable<object>> GetBookingStatusesAsync()
+        {
+            return await _employeeRepository.GetBookingStatusesAsync();
+        }
     }
 }

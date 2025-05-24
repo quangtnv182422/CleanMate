@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -27,6 +27,7 @@ import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import userImage from '../../images/user-image.png';
+import { BookingStatusContext } from '../../context/BookingStatusProvider'
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -42,6 +43,7 @@ const SettingsPage = () => (
         <Typography>This is a placeholder for the Settings page.</Typography>
     </Box>
 );
+
 const WorkList = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
@@ -54,14 +56,31 @@ const WorkList = () => {
     const [page, setPage] = useState(1);
     const [tabValue, setTabValue] = useState(0);
     const [status, setStatus] = useState('');
+    const { statusList, loading } = useContext(BookingStatusContext);
+
+    // Map frontend status strings to backend status IDs
+    const statusMapping = {
+        "Việc mới": 1, // BOOKING_STATUS_NEW
+        "Đã huỷ": 2, // CANCEL
+        "Đã nhận": 3, // ACCEPT
+        "Đang thực hiện": 4, // IN_PROGRESS
+        "Chờ xác nhận": 5, // PENDING_DONE
+        "Hoàn thành": 6, // DONE
+    };
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
+        setPage(1); // Reset to first page when status changes
     };
+
     useEffect(() => {
         const fetchWorkList = async () => {
             try {
-                const response = await fetch('/Worklist', {
+                const url = status
+                    ? `/worklist?status=${status}`
+                    : '/worklist';
+
+                const response = await fetch(url, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
@@ -70,7 +89,7 @@ const WorkList = () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch work list');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const workItems = await response.json();
@@ -84,7 +103,7 @@ const WorkList = () => {
         };
 
         fetchWorkList();
-    }, [navigate]);
+    }, [navigate, status]);
 
     const handleSort = useCallback((vietnameseKey) => {
         const keyMapping = {
@@ -109,16 +128,10 @@ const WorkList = () => {
             let valueB = b[englishKey];
 
             if (englishKey === 'startTime') {
-                const dateA = new Date(a.date);
-                const timeA = a.startTime.split(':').map(Number);
-                dateA.setHours(timeA[0], timeA[1], timeA[2]);
-
-                const dateB = new Date(b.date);
-                const timeB = b.startTime.split(':').map(Number);
-                dateB.setHours(timeB[0], timeB[1], timeB[2]);
-
-                valueA = dateA.getTime();
-                valueB = dateB.getTime();
+                const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+                const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+                valueA = dateTimeA.getTime();
+                valueB = dateTimeB.getTime();
             } else if (englishKey === 'totalPrice') {
                 valueA = Number(valueA);
                 valueB = Number(valueB);
@@ -136,7 +149,6 @@ const WorkList = () => {
         setData(sortedData);
     }, [data, sortConfig]);
 
-
     const filteredData = useMemo(() => {
         return data.filter((row) =>
             row.serviceName.toLowerCase().includes(search.toLowerCase())
@@ -148,7 +160,6 @@ const WorkList = () => {
         return filteredData.slice(startIndex, startIndex + rowsPerPage);
     }, [filteredData, page, rowsPerPage]);
 
-    // Handle tab change
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
@@ -182,11 +193,11 @@ const WorkList = () => {
                             onChange={handleStatusChange}
                             label="Trạng thái"
                         >
-                            <MenuItem value="">Tất cả</MenuItem>
-                            <MenuItem value="Hoàn thành">Hoàn thành</MenuItem>
-                            <MenuItem value="Đang thực hiện">Đang thực hiện</MenuItem>
-                            <MenuItem value="Chưa bắt đầu">Chưa bắt đầu</MenuItem>
-                            <MenuItem value="Đã huỷ">Đã huỷ</MenuItem>
+                            {statusList.map((statusItem) => (
+                                <MenuItem key={statusItem.id} value={statusItem.id}>
+                                    {statusItem.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Box>
@@ -241,14 +252,13 @@ const WorkList = () => {
                             <TableRow key={row.bookingId}>
                                 <TableCell>{row.serviceName}</TableCell>
                                 <TableCell>{row.customerFullName}</TableCell>
-                                <TableCell>{`${row.date.split('T')[0]} ${row.startTime}`}</TableCell>
+                                <TableCell>{`${row.date} ${row.startTime}`}</TableCell>
                                 <TableCell>{row.duration}</TableCell>
                                 <TableCell>{row.address}</TableCell>
                                 <TableCell>{row.note}</TableCell>
                                 <TableCell>{row.totalPrice}</TableCell>
                                 <TableCell>{row.status}</TableCell>
                                 <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                    {/*<VisibilityOutlinedIcon onClick={() => navigate(`/work-details/${row.bookingId}`)} />*/}
                                     <VisibilityOutlinedIcon onClick={handleOpen} />
                                 </TableCell>
                                 <Modal
@@ -301,7 +311,6 @@ const WorkList = () => {
                     {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
                 </Typography>
             </Box>
-
         </Box>
     );
 

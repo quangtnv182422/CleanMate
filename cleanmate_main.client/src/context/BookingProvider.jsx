@@ -8,6 +8,7 @@ const BookingProvider = ({ children }) => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+
     useEffect(() => {
         const fetchServices = async () => {
             try {

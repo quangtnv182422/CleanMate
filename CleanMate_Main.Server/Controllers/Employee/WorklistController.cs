@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Services.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,18 +25,30 @@ namespace CleanMate_Main.Server.Controllers.Employee
         [HttpGet]
         public async Task<IActionResult> GetWorkList([FromQuery] int? status = null)
         {
-            //var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            //if (string.IsNullOrEmpty(userEmail))
-            //    return Unauthorized();
+            if (string.IsNullOrEmpty(userEmail))
+                return Unauthorized(new { message = "User email not found." });
 
-            //var user = await _userManager.FindByEmailAsync(userEmail);
+            var user = await _userManager.FindByEmailAsync(userEmail);
 
-            //if (user == null)
-            //    return Unauthorized();
+            if (user == null)
+                return Unauthorized(new { message = "User not found." });
 
-            //string employeeId = user.Id;
-            var workItems = await _employeeService.GetAllWorkAsync(Common.CommonConstants.BookingStatus.NEW);
+            string employeeId = user.Id;
+            IEnumerable<WorkListViewModel> workItems;
+
+            if (status == Common.CommonConstants.BookingStatus.NEW || status == null)
+            {
+                // Return only NEW status work items for the employee
+                workItems = await _employeeService.GetAllWorkAsync(Common.CommonConstants.BookingStatus.NEW);
+            }
+            else
+            {
+                // Return work items for the specified status and employee
+                workItems = await _employeeService.GetAllWorkAsync(status, employeeId);
+            }
+
             return Ok(workItems);
         }
     }

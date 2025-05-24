@@ -24,5 +24,6 @@ namespace CleanMate_Main.Server.Services.Employee
         Task<bool> ValidateWorkAcceptanceAsync(int bookingId, string employeeId);
 
         Task CheckWorkReadStatusAsync(int bookingId, bool isRead);
+        Task<IEnumerable<object>> GetBookingStatusesAsync();
     }
 }

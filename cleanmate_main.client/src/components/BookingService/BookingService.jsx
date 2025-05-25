@@ -76,6 +76,10 @@ const style = {
         alignItems: 'center',
         fontSize: '14px',
     },
+    durationSelectionText: {
+        margin: '0', 
+        fontSize: '14px',
+    },
     durationSelectionButtonText: {
         fontSize: '14px',
         color: '#1565C0',
@@ -125,7 +129,7 @@ const style = {
 
 const BookingService = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(1);
-    const [selectedTime, setSelectedTime] = useState(30);
+    const [selectedTime, setSelectedTime] = useState(1);
     const [selectedDay, setSelectedDay] = useState('');
     const [days, setDays] = useState([]);
     const [houseType, setHouseType] = useState('house');
@@ -190,12 +194,6 @@ const BookingService = () => {
 
     const handleDaySelect = (day) => setSelectedDay(day);
 
-    const timeOptions = [
-        { label: "2 Giờ\nTối đa 15m² tổng sàn", value: 15 },
-        { label: "2 Giờ\nTối đa 20m² tổng sàn", value: 20 },
-        { label: "2 Giờ\nTối đa 30m² tổng sàn", value: 30 },
-    ];
-
     return (
         <div>
             <Box sx={style.container}>
@@ -221,7 +219,7 @@ const BookingService = () => {
                         >
                             <Box sx={style.modal}>
                                 <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h5" sx={{textAlign: 'center'} }>Vui lòng chọn địa điểm</Typography>
+                                    <Typography variant="h5" sx={{ textAlign: 'center' }}>Vui lòng chọn địa điểm</Typography>
                                 </Box>
                                 <Box sx={style.houseType}>
                                     <HomeOutlinedIcon />
@@ -309,15 +307,27 @@ const BookingService = () => {
                             Thời gian dọn dẹp
                         </Typography>
                         <Grid container spacing={1}>
-                            {timeOptions.map((opt, index) => (
+                            {service.map((opt, index) => (
                                 <Grid item xs={6} sm={4} key={index}>
                                     <Button
                                         fullWidth
-                                        variant={selectedTime === opt.value ? "contained" : "outlined"}
-                                        onClick={() => setSelectedTime(opt.value)}
-                                        sx={{ whiteSpace: "pre-line", height: "70px" }}
+                                        variant={selectedTime === opt.durationTime ? "contained" : "outlined"}
+                                        onClick={() => setSelectedTime(opt.durationTime)}
+                                        sx={{ whiteSpace: "pre-line", height: "70px", display: 'flex', flexDirection: 'column' }}
                                     >
-                                        {opt.label}
+                                        <p style={{
+                                            ...style.durationSelectionText,
+                                            color: selectedTime === opt.durationTime ? '#fff' : '#1976D2'
+                                        }}>
+                                            {opt.durationTime} giờ
+                                        </p>
+
+                                        <p style={{
+                                            ...style.durationSelectionText,
+                                            color: selectedTime === opt.durationTime ? '#fff' : '#1976D2'
+                                        }}>
+                                            Tối đa {opt.squareMeterSpecific}m² tổng sàn
+                                        </p>
                                     </Button>
                                 </Grid>
                             ))}

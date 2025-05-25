@@ -5,13 +5,13 @@
 namespace CleanMate_Main.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateCustomerAddressTable : Migration
+    public partial class UpdateDispalyNameAddress : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "AddressNo",
+                name: "GG_DispalyName",
                 table: "Customer_Address",
                 type: "nvarchar(450)",
                 maxLength: 450,
@@ -23,7 +23,7 @@ namespace CleanMate_Main.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AddressNo",
+                name: "GG_DispalyName",
                 table: "Customer_Address");
         }
     }

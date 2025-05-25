@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250525041233_AddNewDB")]
-    partial class AddNewDB
+    [Migration("20250525094040_UpdateDispalyNameAddress")]
+    partial class UpdateDispalyNameAddress
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -291,6 +291,18 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
 
+                    b.Property<string>("AddressNo")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_DispalyName")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("GG_FormattedAddress")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -313,10 +325,10 @@ namespace CleanMate_Main.Server.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<string>("UserId")
                         .IsRequired()

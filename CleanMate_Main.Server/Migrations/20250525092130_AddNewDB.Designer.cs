@@ -4,6 +4,7 @@ using CleanMate_Main.Server.Models.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    partial class CleanMateMainDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250525092130_AddNewDB")]
+    partial class AddNewDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -294,12 +297,6 @@ namespace CleanMate_Main.Server.Migrations
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("GG_DispalyName")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("GG_FormattedAddress")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -321,11 +318,11 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(20, 17)");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
 
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(20, 17)");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("UserId")
                         .IsRequired()

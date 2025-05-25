@@ -5,7 +5,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanMate_Main.Server.Controllers.Bookings
+namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]

@@ -124,6 +124,9 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.GG_FormattedAddress)
                         .HasMaxLength(450) 
                         .IsUnicode(true);
+                entity.Property(e => e.GG_DispalyName)
+                        .HasMaxLength(450)
+                        .IsUnicode(true);
                 entity.Property(e => e.GG_PlaceId)
                         .HasMaxLength(450);
                 entity.Property(e => e.AddressNo)
@@ -131,8 +134,8 @@ namespace CleanMate_Main.Server.Models.DbContext
                         .IsUnicode(true);
                 entity.Property(e => e.IsInUse).HasDefaultValue(false);
                 entity.Property(e => e.IsDefault).HasDefaultValue(false);
-                entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
-                entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(20, 17)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(20, 17)");
 
 
                 entity.HasOne(d => d.User).WithMany(p => p.CustomerAddresses)

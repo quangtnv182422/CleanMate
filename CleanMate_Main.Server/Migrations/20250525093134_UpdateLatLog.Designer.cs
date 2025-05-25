@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250525042151_UpdateCustomerAddressTable")]
-    partial class UpdateCustomerAddressTable
+    [Migration("20250525093134_UpdateLatLog")]
+    partial class UpdateLatLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,10 +319,10 @@ namespace CleanMate_Main.Server.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<string>("UserId")
                         .IsRequired()

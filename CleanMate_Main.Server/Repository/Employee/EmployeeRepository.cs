@@ -60,7 +60,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * 0.35m / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
                             StartTime = Common.CommonConstants.ChangeTimeType(booking.StartTime),
-                            //Address = address.AddressTitle,
+                            Address = address.GG_FormattedAddress,
                             Note = booking.Note,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,

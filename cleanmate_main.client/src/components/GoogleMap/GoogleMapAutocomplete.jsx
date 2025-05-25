@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Helmet } from 'react-helmet';
 import { BookingContext } from '../../context/BookingProvider';
@@ -6,8 +7,12 @@ import { Modal, Box, Typography, Button, TextField } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
 
 const GoogleMapAutocomplete = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const {
         selectedPlace,
@@ -17,16 +22,48 @@ const GoogleMapAutocomplete = () => {
         setHouseType,
         setHouseNumber
     } = useContext(BookingContext);
+
+    const { user, loading } = useAuth();
+
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    console.log({
-        houseType: houseType,
-        houseNumber: houseNumber,
-        selectedPlace: selectedPlace
-    })
+
+    const queryParams = new URLSearchParams(location.search);
+    const serviceId = queryParams.get('service');
+
+    const handleSubmitAddress = async () => {
+        if (!selectedPlace || !houseNumber || !user) return;
+
+        try {
+            const response = await axios.post(
+                `/address/add-address`,
+                {
+                    userId: user.id,
+                    gg_DispalyName: selectedPlace.displayName,
+                    gg_FormattedAddress: selectedPlace.formattedAddress,
+                    gg_PlaceId: selectedPlace.id,
+                    addressNo: houseNumber,
+                    latitude: selectedPlace.location.lat,
+                    longitude: selectedPlace.location.lng,
+                    isInUse: true,
+                    isDefault: false
+                },
+                { withCredentials: true }
+            );
+
+
+            console.log("✅ Địa chỉ đã được thêm:", response.data);
+            setTimeout(() => {
+                navigate(`/booking-service?service=${serviceId}`);
+            }, 200); 
+            handleClose();
+        } catch (error) {
+            console.error("❌ Lỗi khi thêm địa chỉ:", error);
+        }
+    };
+
     useEffect(() => {
-        // Dùng flag để tránh load lại nhiều lần trong dev (Hot Reload)
         if (window._googleMapAutocompleteInitialized) return;
         window._googleMapAutocompleteInitialized = true;
 
@@ -61,8 +98,6 @@ const GoogleMapAutocomplete = () => {
             placeAutocomplete.id = "place-autocomplete-input";
 
             const card = document.getElementById("place-autocomplete-card");
-
-            // ✅ Tránh duplicate input
             if (!document.getElementById("place-autocomplete-input")) {
                 card.appendChild(placeAutocomplete);
                 map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
@@ -107,8 +142,8 @@ const GoogleMapAutocomplete = () => {
                 };
                 setSelectedPlace(placeData);
 
-                title.textContent = "Selected Place:";
-                info.textContent = JSON.stringify(place.toJSON(), null, 2);
+                if (title) title.textContent = "Selected Place:";
+                if (info) info.textContent = JSON.stringify(place.toJSON(), null, 2);
             });
         });
     }, [apiKey]);
@@ -121,42 +156,25 @@ const GoogleMapAutocomplete = () => {
 
             <div id="map" style={{ height: "60vh", width: "100%" }}></div>
 
-            <div id="place-autocomplete-card" style={{
-                background: 'white',
-                padding: '10px',
-                borderRadius: '8px',
-                margin: '10px',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
-            }}></div>
+            <div id="place-autocomplete-card" style={style.autocompleteCard}></div>
 
             <div style={style.selectAddressButton}>
                 <Button
                     variant={selectedPlace ? 'contained' : 'disabled'}
                     onClick={handleOpen}
-                    sx={{
-                        bgcolor: '#1565C0',
-                        color: '#fff',
-                        '&:hover': {
-                            bgcolor: '#0d47a1',
-                        },
-                    }}
+                    sx={style.selectButtonMain}
                 >
                     Chọn loại nhà và số nhà
                 </Button>
             </div>
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                disableAutoFocus
-            >
+            <Modal open={open} onClose={handleClose} disableAutoFocus>
                 <Box sx={style.modal}>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="h5" sx={{ textAlign: 'center' }}>Vui lòng chọn địa điểm</Typography>
-                    </Box>
+                    <Typography variant="h5" textAlign="center" mb={2}>Vui lòng chọn địa điểm</Typography>
+
                     <Box sx={style.houseType}>
                         <HomeOutlinedIcon />
-                        <Typography sx={{ fontFamily: 'arial' }}>Loại nhà</Typography>
+                        <Typography>Loại nhà</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, mb: 2 }}>
                         <Button
@@ -164,7 +182,7 @@ const GoogleMapAutocomplete = () => {
                             onClick={() => setHouseType('house')}
                             sx={style.selectButton}
                         >
-                            <Typography sx={houseType === 'house' ? { color: '#1565C0' } : { color: '#000' }}>
+                            <Typography sx={houseType === 'house' ? { color: '#1565C0' } : {}}>
                                 Nhà / nhà phố
                             </Typography>
                         </Button>
@@ -173,16 +191,17 @@ const GoogleMapAutocomplete = () => {
                             onClick={() => setHouseType('apartment')}
                             sx={style.selectButton}
                         >
-                            <Typography sx={houseType === 'apartment' ? { color: '#1565C0' } : { color: '#000' }}>
+                            <Typography sx={houseType === 'apartment' ? { color: '#1565C0' } : {}}>
                                 Căn hộ
                             </Typography>
                         </Button>
                     </Box>
+
                     <Box sx={style.houseType}>
                         {houseType === 'house' ? <HouseOutlinedIcon /> : <ApartmentOutlinedIcon />}
-                        <Typography sx={{ fontFamily: 'arial' }}>{houseType === 'house' ? 'Số nhà, hẻm (ngõ)' : 'Căn hộ'}</Typography>
+                        <Typography>{houseType === 'house' ? 'Số nhà, hẻm (ngõ)' : 'Căn hộ'}</Typography>
                     </Box>
-                    <Box sx={{ mt: 2 }}>
+                    <Box mt={2}>
                         <TextField
                             fullWidth
                             variant="outlined"
@@ -191,15 +210,15 @@ const GoogleMapAutocomplete = () => {
                             placeholder={houseType === 'house' ? 'Số nhà 1, hẻm 2' : 'Lầu 1, phòng 2, block A'}
                         />
                     </Box>
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" mt={1}>
                         *Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.
                     </Typography>
 
-                    <Box sx={{ mt: 2 }}>
+                    <Box mt={2}>
                         <Button
-                            variant={houseNumber.length > 0 ? 'contained' : 'disabled'}
+                            variant={houseNumber.length > 0 && !loading && user ? 'contained' : 'disabled'}
                             sx={style.confirmButton}
+                            onClick={handleSubmitAddress}
                         >
                             Đồng ý
                         </Button>
@@ -209,9 +228,17 @@ const GoogleMapAutocomplete = () => {
         </>
     );
 };
+
 const primaryColor = '#1565C0';
 
 const style = {
+    autocompleteCard: {
+        background: 'white',
+        padding: '10px',
+        borderRadius: '8px',
+        margin: '10px',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+    },
     selectAddressButton: {
         padding: '10px',
         background: '#f3f3f3',
@@ -227,47 +254,49 @@ const style = {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: { xs: '90vw', sm: '80vw', md: 400 }, 
-        maxWidth: '100%', 
+        width: { xs: '90vw', sm: '80vw', md: 400 },
+        maxWidth: '100%',
         bgcolor: 'background.paper',
         borderRadius: 2,
         boxShadow: 24,
-        p: { xs: 2, sm: 3, md: 4 }, 
-        maxHeight: '90vh', 
-        overflowY: 'auto', 
+        p: { xs: 2, sm: 3, md: 4 },
+        maxHeight: '90vh',
+        overflowY: 'auto',
     },
     houseType: {
         display: 'flex',
         alignItems: 'center',
-        gap: { xs: '8px', sm: '10px' }, 
+        gap: 1,
         borderRadius: 2,
-    },
-    houseTypeSelection: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: { xs: '8px', sm: '10px' }, 
     },
     selectButton: {
         justifyContent: 'flex-start',
         textTransform: 'none',
-        fontSize: { xs: '14px', sm: '16px' }, 
+        fontSize: 14,
         borderColor: '#1565C0',
         color: 'inherit',
-        p: { xs: 0.5, sm: 1 }, 
+        padding: '8px 12px',
         '&.MuiButton-outlined': {
             borderWidth: 2,
+        },
+    },
+    selectButtonMain: {
+        bgcolor: '#1565C0',
+        color: '#fff',
+        '&:hover': {
+            bgcolor: '#0d47a1',
         },
     },
     confirmButton: {
         width: '100%',
         backgroundColor: primaryColor,
         color: '#fff',
-        fontSize: { xs: '14px', sm: '16px' }, 
-        py: { xs: 1, sm: 1.5 }, 
+        fontSize: 14,
+        py: 1.5,
         '&:hover': {
             backgroundColor: '#005cbf',
         },
     },
-}
+};
 
 export default GoogleMapAutocomplete;

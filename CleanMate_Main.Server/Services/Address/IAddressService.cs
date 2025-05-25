@@ -7,5 +7,6 @@ namespace CleanMate_Main.Server.Services.Address
     {
         Task<CustomerAddress> AddNewAddressAsync(CustomerAddressDTO dto);
         Task<CustomerAddress> EditAddressAsync(CustomerAddressDTO dto);
+        Task<List<CustomerAddress?>> GetAddressInUseByCustomerId(string userId);
     }
 }

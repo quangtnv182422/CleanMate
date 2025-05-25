@@ -107,19 +107,19 @@ const BookingService = () => {
     const serviceId = queryParams.get('service');
 
     useEffect(() => {
-        const fetchDetailService = async () => {
-            try {
-                const res = await axios.get(`/cleanservice/serviceId/${Number(serviceId)}`);
-                setService(res.data);
-            } catch (error) {
-                console.error('Error fetching service details:', error);
-            }
-        };
+        if (!serviceId) return;
 
-        if (serviceId) {
-            fetchDetailService();
-        }
+        fetchDetailService(serviceId)
     }, [serviceId]);
+
+    const fetchDetailService = async (serviceId) => {
+        try {
+            const res = await axios.get(`/cleanservice/serviceId/${Number(serviceId)}`);
+            setService(res.data);
+        } catch (error) {
+            console.error('Error fetching service details:', error);
+        }
+    };
 
     useEffect(() => {
         const today = new Date();
@@ -188,7 +188,7 @@ const BookingService = () => {
                             Địa điểm làm việc
                         </Typography>
                         <Typography ml={4}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</Typography>
-                        <Button variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }} onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`) }>
+                        <Button variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }} onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`) }>
                             Thay đổi
                         </Button>
                     </Box>

@@ -3,6 +3,7 @@ using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Repository.Address;
 using CleanMate_Main.Server.Repository.Bookings;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Services.Address
 {
@@ -57,7 +58,10 @@ namespace CleanMate_Main.Server.Services.Address
             return await _addressRepo.AddAddressAsync(newAddress);
         }
 
-
+        public async Task<List<CustomerAddress?>> GetAddressInUseByCustomerId(string userId)
+        {
+            return await _addressRepo.GetAddressInUseByCustomerId(userId);
+        }
 
     }
 }

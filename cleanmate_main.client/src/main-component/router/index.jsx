@@ -73,7 +73,7 @@ const AllRoute = () => {
                     <Route path="/order/booking-confirmation/:id" element={<BookingConfirmation />} />
                     <Route path="/booking-success" element={<BookingSuccess />} />
                     <Route path="/booking-fail" element={<BookingFail />} />
-                    <Route path="/booking-service" element={<BookingService />} />
+                    <Route path="/booking-service" element={<BookingService key={location.search} />} />
                     <Route path="/order/payment" element={<Payment />} />
                     <Route path="/booking-service/choose-address" element={<GoogleMapAutocomplete />} />
 

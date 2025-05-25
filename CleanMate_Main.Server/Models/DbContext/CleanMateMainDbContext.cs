@@ -126,6 +126,9 @@ namespace CleanMate_Main.Server.Models.DbContext
                         .IsUnicode(true);
                 entity.Property(e => e.GG_PlaceId)
                         .HasMaxLength(450);
+                entity.Property(e => e.AddressNo)
+                        .HasMaxLength(450)
+                        .IsUnicode(true);
                 entity.Property(e => e.IsInUse).HasDefaultValue(false);
                 entity.Property(e => e.IsDefault).HasDefaultValue(false);
                 entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");

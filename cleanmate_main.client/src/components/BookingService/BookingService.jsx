@@ -1,19 +1,15 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import AccessTime from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import GroupIcon from '@mui/icons-material/Group';
 import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
-import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
 import TextField from '@mui/material/TextField';
@@ -24,6 +20,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import axios from 'axios';
+import { BookingContext } from '../../context/BookingProvider';
 
 const primaryColor = '#1565C0';
 const style = {
@@ -89,47 +86,6 @@ const style = {
         fontSize: '14px',
         color: '#1565C0',
     },
-    modal: {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 24,
-        p: 1,
-    },
-    houseType: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        borderRadius: 2,
-    },
-    houseTypeSelection: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-    },
-    selectButton: {
-        justifyContent: 'flex-start',
-        textTransform: 'none',
-        fontSize: '16px',
-        borderColor: '#1565C0',
-        color: 'inherit',
-        p: 1,
-        '&.MuiButton-outlined': {
-            borderWidth: 2,
-        },
-    },
-    confirmButton: {
-        width: '100%',
-        backgroundColor: primaryColor,
-        color: '#fff',
-        '&:hover': {
-            backgroundColor: '#005cbf',
-        },
-    }
 };
 
 const BookingService = () => {
@@ -138,14 +94,11 @@ const BookingService = () => {
     const [selectedDay, setSelectedDay] = useState(null);
     const [days, setDays] = useState([]);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
-    const [houseType, setHouseType] = useState('house');
-    const [houseNumber, setHouseNumber] = useState('');
+    //const [houseType, setHouseType] = useState('house');
+    //const [houseNumber, setHouseNumber] = useState('');
     const [service, setService] = useState([])
     const navigate = useNavigate();
     const location = useLocation();
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
     const isToday = selectedDay === todayStr;
@@ -235,70 +188,9 @@ const BookingService = () => {
                             Địa điểm làm việc
                         </Typography>
                         <Typography ml={4}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</Typography>
-                        <Button variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }} onClick={handleOpen}>
+                        <Button variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }} onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`) }>
                             Thay đổi
                         </Button>
-                        <Modal
-                            open={open}
-                            onClose={handleClose}
-                            disableAutoFocus
-                        >
-                            <Box sx={style.modal}>
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h5" sx={{ textAlign: 'center' }}>Vui lòng chọn địa điểm</Typography>
-                                </Box>
-                                <Box sx={style.houseType}>
-                                    <HomeOutlinedIcon />
-                                    <Typography sx={{ fontFamily: 'arial' }}>Loại nhà</Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, mb: 2 }}>
-                                    <Button
-                                        variant='outlined'
-                                        onClick={() => setHouseType('house')}
-                                        sx={style.selectButton}
-                                    >
-                                        <Typography sx={houseType === 'house' ? { color: '#1565C0' } : { color: '#000' }}>
-                                            Nhà / nhà phố
-                                        </Typography>
-                                    </Button>
-                                    <Button
-                                        variant='outlined'
-                                        onClick={() => setHouseType('apartment')}
-                                        sx={style.selectButton}
-                                    >
-                                        <Typography sx={houseType === 'apartment' ? { color: '#1565C0' } : { color: '#000' }}>
-                                            Căn hộ
-                                        </Typography>
-                                    </Button>
-                                </Box>
-                                <Box sx={style.houseType}>
-                                    {houseType === 'house' ? <HouseOutlinedIcon /> : <ApartmentOutlinedIcon />}
-                                    <Typography sx={{ fontFamily: 'arial' }}>{houseType === 'house' ? 'Số nhà, hẻm (ngõ)' : 'Căn hộ'}</Typography>
-                                </Box>
-                                <Box sx={{ mt: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        value={houseNumber}
-                                        onChange={(e) => setHouseNumber(e.target.value)}
-                                        placeholder={houseType === 'house' ? 'Số nhà 1, hẻm 2' : 'Lầu 1, phòng 2, block A'}
-                                    />
-                                </Box>
-
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                    *Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.
-                                </Typography>
-
-                                <Box sx={{ mt: 2 }}>
-                                    <Button
-                                        variant={houseNumber.length > 0 ? 'contained' : 'disabled'}
-                                        sx={style.confirmButton}
-                                    >
-                                        Đồng ý
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Modal>
                     </Box>
 
                     {/* Số lượng nhân viên */}

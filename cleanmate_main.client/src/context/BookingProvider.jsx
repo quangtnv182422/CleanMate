@@ -7,7 +7,9 @@ const BookingProvider = ({ children }) => {
     const [services, setServices] = useState([]);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [houseType, setHouseType] = useState('house');
+    const [houseNumber, setHouseNumber] = useState('');
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -26,7 +28,18 @@ const BookingProvider = ({ children }) => {
         fetchServices();
     }, []);
 
-    return <BookingContext.Provider value={{ open, handleOpen, handleClose, services }}>{children}</BookingContext.Provider>
+    return <BookingContext.Provider value={{
+        open,
+        handleOpen,
+        handleClose,
+        services,
+        selectedPlace,
+        setSelectedPlace,
+        houseType,
+        setHouseType,
+        houseNumber,
+        setHouseNumber
+    }}>{children}</BookingContext.Provider>
 }
 
 export default BookingProvider;

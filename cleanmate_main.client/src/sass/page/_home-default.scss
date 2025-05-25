@@ -185,7 +185,7 @@
 
             p {
                 display: -webkit-box;
-                -webkit-line-clamp: 5; 
+                -webkit-line-clamp: 5;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -203,6 +203,7 @@
 
         &:hover {
             background-color: $theme-primary-color-s2;
+            cursor: pointer;
 
             .wpo-service-icon {
                 &:before {
@@ -219,12 +220,8 @@
                 h2 {
                     color: $white;
 
-                    a {
-                        color: $white;
-
-                        &:hover {
-                            color: $theme-primary-color;
-                        }
+                    &:hover {
+                        color: $theme-primary-color;
                     }
                 }
 

@@ -1,10 +1,30 @@
-﻿import React, { useEffect } from 'react';
+﻿import React, { useEffect, useState, useContext } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Helmet } from 'react-helmet';
+import { BookingContext } from '../../context/BookingProvider';
+import { Modal, Box, Typography, Button, TextField } from '@mui/material';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 
 const GoogleMapAutocomplete = () => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
+    const {
+        selectedPlace,
+        setSelectedPlace,
+        houseType,
+        houseNumber,
+        setHouseType,
+        setHouseNumber
+    } = useContext(BookingContext);
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    console.log({
+        houseType: houseType,
+        houseNumber: houseNumber,
+        selectedPlace: selectedPlace
+    })
     useEffect(() => {
         // Dùng flag để tránh load lại nhiều lần trong dev (Hot Reload)
         if (window._googleMapAutocompleteInitialized) return;
@@ -75,6 +95,18 @@ const GoogleMapAutocomplete = () => {
                 infoWindow.setPosition(place.location);
                 infoWindow.open({ map, anchor: marker });
 
+                const placeData = {
+                    id: place.id,
+                    displayName: place.displayName,
+                    formattedAddress: place.formattedAddress,
+                    location: {
+                        lat: place.location.lat(),
+                        lng: place.location.lng(),
+                    },
+                    viewport: place.viewport,
+                };
+                setSelectedPlace(placeData);
+
                 title.textContent = "Selected Place:";
                 info.textContent = JSON.stringify(place.toJSON(), null, 2);
             });
@@ -90,19 +122,152 @@ const GoogleMapAutocomplete = () => {
             <div id="map" style={{ height: "60vh", width: "100%" }}></div>
 
             <div id="place-autocomplete-card" style={{
-                background: 'white', padding: '10px', borderRadius: '8px',
-                margin: '10px', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+                background: 'white',
+                padding: '10px',
+                borderRadius: '8px',
+                margin: '10px',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
             }}></div>
 
-            <div id="info-panel" style={{
-                padding: '10px', background: '#f3f3f3',
-                height: '40vh', overflowY: 'auto', fontSize: '14px'
-            }}>
-                <h3 id="place-title">Selected Place:</h3>
-                <pre id="place-info">None</pre>
+            <div style={style.selectAddressButton}>
+                <Button
+                    variant={selectedPlace ? 'contained' : 'disabled'}
+                    onClick={handleOpen}
+                    sx={{
+                        bgcolor: '#1565C0',
+                        color: '#fff',
+                        '&:hover': {
+                            bgcolor: '#0d47a1',
+                        },
+                    }}
+                >
+                    Chọn loại nhà và số nhà
+                </Button>
             </div>
+
+            <Modal
+                open={open}
+                onClose={handleClose}
+                disableAutoFocus
+            >
+                <Box sx={style.modal}>
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="h5" sx={{ textAlign: 'center' }}>Vui lòng chọn địa điểm</Typography>
+                    </Box>
+                    <Box sx={style.houseType}>
+                        <HomeOutlinedIcon />
+                        <Typography sx={{ fontFamily: 'arial' }}>Loại nhà</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, mb: 2 }}>
+                        <Button
+                            variant='outlined'
+                            onClick={() => setHouseType('house')}
+                            sx={style.selectButton}
+                        >
+                            <Typography sx={houseType === 'house' ? { color: '#1565C0' } : { color: '#000' }}>
+                                Nhà / nhà phố
+                            </Typography>
+                        </Button>
+                        <Button
+                            variant='outlined'
+                            onClick={() => setHouseType('apartment')}
+                            sx={style.selectButton}
+                        >
+                            <Typography sx={houseType === 'apartment' ? { color: '#1565C0' } : { color: '#000' }}>
+                                Căn hộ
+                            </Typography>
+                        </Button>
+                    </Box>
+                    <Box sx={style.houseType}>
+                        {houseType === 'house' ? <HouseOutlinedIcon /> : <ApartmentOutlinedIcon />}
+                        <Typography sx={{ fontFamily: 'arial' }}>{houseType === 'house' ? 'Số nhà, hẻm (ngõ)' : 'Căn hộ'}</Typography>
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            value={houseNumber}
+                            onChange={(e) => setHouseNumber(e.target.value)}
+                            placeholder={houseType === 'house' ? 'Số nhà 1, hẻm 2' : 'Lầu 1, phòng 2, block A'}
+                        />
+                    </Box>
+
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        *Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.
+                    </Typography>
+
+                    <Box sx={{ mt: 2 }}>
+                        <Button
+                            variant={houseNumber.length > 0 ? 'contained' : 'disabled'}
+                            sx={style.confirmButton}
+                        >
+                            Đồng ý
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </>
     );
 };
+const primaryColor = '#1565C0';
+
+const style = {
+    selectAddressButton: {
+        padding: '10px',
+        background: '#f3f3f3',
+        height: '40vh',
+        overflowY: 'auto',
+        fontSize: '14px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modal: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: { xs: '90vw', sm: '80vw', md: 400 }, 
+        maxWidth: '100%', 
+        bgcolor: 'background.paper',
+        borderRadius: 2,
+        boxShadow: 24,
+        p: { xs: 2, sm: 3, md: 4 }, 
+        maxHeight: '90vh', 
+        overflowY: 'auto', 
+    },
+    houseType: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: { xs: '8px', sm: '10px' }, 
+        borderRadius: 2,
+    },
+    houseTypeSelection: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: { xs: '8px', sm: '10px' }, 
+    },
+    selectButton: {
+        justifyContent: 'flex-start',
+        textTransform: 'none',
+        fontSize: { xs: '14px', sm: '16px' }, 
+        borderColor: '#1565C0',
+        color: 'inherit',
+        p: { xs: 0.5, sm: 1 }, 
+        '&.MuiButton-outlined': {
+            borderWidth: 2,
+        },
+    },
+    confirmButton: {
+        width: '100%',
+        backgroundColor: primaryColor,
+        color: '#fff',
+        fontSize: { xs: '14px', sm: '16px' }, 
+        py: { xs: 1, sm: 1.5 }, 
+        '&:hover': {
+            backgroundColor: '#005cbf',
+        },
+    },
+}
 
 export default GoogleMapAutocomplete;

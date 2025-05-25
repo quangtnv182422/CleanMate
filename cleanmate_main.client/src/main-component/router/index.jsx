@@ -75,7 +75,7 @@ const AllRoute = () => {
                     <Route path="/booking-fail" element={<BookingFail />} />
                     <Route path="/booking-service" element={<BookingService />} />
                     <Route path="/order/payment" element={<Payment />} />
-                    <Route path="/test-map" element={<GoogleMapAutocomplete />} />
+                    <Route path="/booking-service/choose-address" element={<GoogleMapAutocomplete />} />
 
                 </Routes>
             </BrowserRouter>

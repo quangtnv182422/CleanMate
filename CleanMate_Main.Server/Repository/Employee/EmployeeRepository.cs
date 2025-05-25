@@ -32,7 +32,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Date = booking.Date,
                             StartTime = booking.StartTime,
                             Duration = duration.DurationTime,
-                            Address = address.AddressTitle,
+                            //Address = address.AddressTitle,
                             Note = booking.Note,
                             TotalPrice = booking.TotalPrice ?? 0m,
                             Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId)
@@ -60,7 +60,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * 0.35m / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
                             StartTime = Common.CommonConstants.ChangeTimeType(booking.StartTime),
-                            Address = address.AddressTitle,
+                            //Address = address.AddressTitle,
                             Note = booking.Note,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,
@@ -88,7 +88,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Date = booking.Date,
                             StartTime = booking.StartTime,
                             Duration = duration.DurationTime,
-                            Address = address.AddressTitle,
+                            //Address = address.AddressTitle,
                             Note = booking.Note,
                             TotalPrice = booking.TotalPrice ?? 0m,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId)

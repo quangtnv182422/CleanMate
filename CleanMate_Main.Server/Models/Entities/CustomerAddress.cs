@@ -8,8 +8,8 @@ public partial class CustomerAddress
     public int AddressId { get; set; }
 
     public string UserId { get; set; } = null!;
-    public string AddressTitle { get; set; } = null!;
-
+    public string GG_FormattedAddress { get; set; } = null!;
+    public string GG_PlaceId { get; set; } = null!;
     public bool IsInUse { get; set; }
 
     public bool IsDefault { get; set; }

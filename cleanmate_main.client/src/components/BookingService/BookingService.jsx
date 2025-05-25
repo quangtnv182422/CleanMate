@@ -18,6 +18,11 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
 import TextField from '@mui/material/TextField';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from 'dayjs';
 import axios from 'axios';
 
 const primaryColor = '#1565C0';
@@ -77,7 +82,7 @@ const style = {
         fontSize: '14px',
     },
     durationSelectionText: {
-        margin: '0', 
+        margin: '0',
         fontSize: '14px',
     },
     durationSelectionButtonText: {
@@ -129,9 +134,10 @@ const style = {
 
 const BookingService = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(1);
-    const [selectedTime, setSelectedTime] = useState(1);
-    const [selectedDay, setSelectedDay] = useState('');
+    const [selectedDuration, setSelectedTime] = useState(1);
+    const [selectedDay, setSelectedDay] = useState(null);
     const [days, setDays] = useState([]);
+    const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
     const [service, setService] = useState([])
@@ -140,14 +146,12 @@ const BookingService = () => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const now = dayjs();
+    const todayStr = now.format('DD/MM/YYYY');
+    const isToday = selectedDay === todayStr;
 
     const queryParams = new URLSearchParams(location.search);
     const serviceId = queryParams.get('service');
-    const [selectedTimes, setSelectedTimes] = useState('');
-
-    const handleChange = (event) => {
-        setSelectedTimes(event.target.value);
-    };
 
     useEffect(() => {
         const fetchDetailService = async () => {
@@ -163,8 +167,6 @@ const BookingService = () => {
             fetchDetailService();
         }
     }, [serviceId]);
-
-    console.log(service)
 
     useEffect(() => {
         const today = new Date();
@@ -193,6 +195,30 @@ const BookingService = () => {
     }, []);
 
     const handleDaySelect = (day) => setSelectedDay(day);
+    const minTime = isToday ? now : dayjs(selectedDay, 'DD/MM/YYYY').startOf('day');
+
+    const roundToNearest15Minutes = (time) => {
+        const minutes = time.minute();
+        const roundedMinutes = Math.round(minutes / 15) * 15;
+        return time.minute(roundedMinutes).second(0);
+    };
+
+    const handleTimeChange = (newValue) => {
+        if (newValue) {
+            const roundedTime = roundToNearest15Minutes(newValue);
+            setSelectedSpecificTimes(roundedTime);
+        } else {
+            setSelectedSpecificTimes(null);
+        }
+    };
+
+    const shouldDisableTime = (timeValue, clockType) => {
+        if (clockType === 'minutes') {
+            const minutes = timeValue;
+            return minutes % 15 !== 0; // Vô hiệu hóa nếu phút không phải 0, 15, 30, 45
+        }
+        return false;
+    };
 
     return (
         <div>
@@ -311,20 +337,20 @@ const BookingService = () => {
                                 <Grid item xs={6} sm={4} key={index}>
                                     <Button
                                         fullWidth
-                                        variant={selectedTime === opt.durationTime ? "contained" : "outlined"}
+                                        variant={selectedDuration === opt.durationTime ? "contained" : "outlined"}
                                         onClick={() => setSelectedTime(opt.durationTime)}
                                         sx={{ whiteSpace: "pre-line", height: "70px", display: 'flex', flexDirection: 'column' }}
                                     >
                                         <p style={{
                                             ...style.durationSelectionText,
-                                            color: selectedTime === opt.durationTime ? '#fff' : '#1976D2'
+                                            color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2'
                                         }}>
                                             {opt.durationTime} giờ
                                         </p>
 
                                         <p style={{
                                             ...style.durationSelectionText,
-                                            color: selectedTime === opt.durationTime ? '#fff' : '#1976D2'
+                                            color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2'
                                         }}>
                                             Tối đa {opt.squareMeterSpecific}m² tổng sàn
                                         </p>
@@ -370,14 +396,19 @@ const BookingService = () => {
                             Giờ làm việc
                         </Typography>
                         <Box>
-                            {/*<LocalizationProvider dateAdapter={AdapterDateFns}>*/}
-                            {/*    <TimePicker*/}
-                            {/*        label="Chọn giờ"*/}
-                            {/*        value={value}*/}
-                            {/*        onChange={(newValue) => setValue(newValue)}*/}
-                            {/*        renderInput={(params) => <TextField {...params} fullWidth />}*/}
-                            {/*    />*/}
-                            {/*</LocalizationProvider>*/}
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DemoContainer components={['TimePicker']}>
+                                    <TimePicker
+                                        label="Hãy chọn giờ cụ thể"
+                                        value={selectedSpecificTimes}
+                                        onChange={handleTimeChange}
+                                        minutesStep={15}
+                                        slotProps={{ textField: { fullWidth: true } }}
+                                        minTime={minTime}
+                                        shouldDisableTime={shouldDisableTime}
+                                    />
+                                </DemoContainer>
+                            </LocalizationProvider>
                         </Box>
                     </Box>
 

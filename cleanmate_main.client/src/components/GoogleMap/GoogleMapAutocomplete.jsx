@@ -1,22 +1,35 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
 import { Helmet } from 'react-helmet';
 
 const GoogleMapAutocomplete = () => {
-    const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
     useEffect(() => {
-        // Ensure the map initializes only once script is ready
-        window.initMap = async function () {
+        // Dùng flag để tránh load lại nhiều lần trong dev (Hot Reload)
+        if (window._googleMapAutocompleteInitialized) return;
+        window._googleMapAutocompleteInitialized = true;
+
+        const loader = new Loader({
+            apiKey: apiKey,
+            version: "weekly",
+            libraries: ["places"],
+        });
+
+        loader.load().then(async () => {
             const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
                 google.maps.importLibrary("maps"),
                 google.maps.importLibrary("marker"),
             ]);
+
             await google.maps.importLibrary("places");
 
             const center = { lat: 21.0278, lng: 105.8342 };
+
             const map = new Map(document.getElementById("map"), {
                 center,
                 zoom: 13,
+                mapId: "4504f8b37365c3d0",
                 mapTypeControl: false,
             });
 
@@ -26,9 +39,14 @@ const GoogleMapAutocomplete = () => {
             });
 
             placeAutocomplete.id = "place-autocomplete-input";
+
             const card = document.getElementById("place-autocomplete-card");
-            card.appendChild(placeAutocomplete);
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+
+            // ✅ Tránh duplicate input
+            if (!document.getElementById("place-autocomplete-input")) {
+                card.appendChild(placeAutocomplete);
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+            }
 
             const marker = new AdvancedMarkerElement({ map });
             const infoWindow = new google.maps.InfoWindow({});
@@ -60,14 +78,7 @@ const GoogleMapAutocomplete = () => {
                 title.textContent = "Selected Place:";
                 info.textContent = JSON.stringify(place.toJSON(), null, 2);
             });
-        };
-
-        // Load script manually
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&v=weekly&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        document.body.appendChild(script);
+        });
     }, [apiKey]);
 
     return (
@@ -75,14 +86,17 @@ const GoogleMapAutocomplete = () => {
             <Helmet>
                 <title>Google Maps + Place Autocomplete</title>
             </Helmet>
-            <div id="map" style={{ height: "60%", width: "100%" }}></div>
+
+            <div id="map" style={{ height: "60vh", width: "100%" }}></div>
+
             <div id="place-autocomplete-card" style={{
                 background: 'white', padding: '10px', borderRadius: '8px',
                 margin: '10px', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
             }}></div>
+
             <div id="info-panel" style={{
                 padding: '10px', background: '#f3f3f3',
-                height: '40%', overflowY: 'auto', fontSize: '14px'
+                height: '40vh', overflowY: 'auto', fontSize: '14px'
             }}>
                 <h3 id="place-title">Selected Place:</h3>
                 <pre id="place-info">None</pre>

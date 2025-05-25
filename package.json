@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
     "react-helmet": "^6.1.0"
   }
 }

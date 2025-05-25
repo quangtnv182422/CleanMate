@@ -35,6 +35,8 @@ import BookingFail from '../../components/BookingComplete/BookingFail';
 import BookingConfirmation from '../../components/BookingConfirmation/BookingConfirmation';
 import BookingService from '../../components/BookingService/BookingService';
 import Payment from '../../components/Payment/Payment';
+import GoogleMapAutocomplete from '../../components/GoogleMap/GoogleMapAutocomplete';
+
 const AllRoute = () => {
 
     return (
@@ -73,6 +75,8 @@ const AllRoute = () => {
                     <Route path="/booking-fail" element={<BookingFail />} />
                     <Route path="/booking-service" element={<BookingService />} />
                     <Route path="/order/payment" element={<Payment />} />
+                    <Route path="/test-map" element={<GoogleMapAutocomplete />} />
+
                 </Routes>
             </BrowserRouter>
         </div>

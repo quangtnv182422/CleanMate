@@ -5,7 +5,8 @@ namespace CleanMate_Main.Server.Common
     public class CommonConstants
     {
         public const int DefaultPageSize = 9;
-        public const int TIME_INTERVAL = 20; // time interval between each work shift calculated in minutes
+        public static readonly TimeSpan TIME_INTERVAL = TimeSpan.FromMinutes(20);
+        // time interval between each work shift calculated in minutes
         public static class BookingStatus
         {
             public const int NEW = 1;

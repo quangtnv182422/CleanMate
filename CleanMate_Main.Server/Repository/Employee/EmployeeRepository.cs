@@ -3,6 +3,7 @@ using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 namespace CleanMate_Main.Server.Repository.Employee
 {
     public class EmployeeRepository : IEmployeeRepository
@@ -154,5 +155,77 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .OrderBy(s => s.id)
                 .ToListAsync();
         }
+        public async Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId)
+        {
+            // Step 1: Lấy thông tin công việc mới
+            var newWork = await _context.Bookings
+                .Join(_context.ServicePrices, b => b.ServicePriceId, sp => sp.PriceId, (b, sp) => new { b, sp })
+                .Join(_context.Durations, bsp => bsp.sp.DurationId, d => d.DurationId, (bsp, d) => new
+                {
+                    BookingId = bsp.b.BookingId,
+                    Date = bsp.b.Date,
+                    StartTime = bsp.b.StartTime,
+                    Duration = d.DurationTime,
+                    CleanerId = bsp.b.CleanerId
+                })
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (newWork == null)
+                throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
+
+            if (newWork.CleanerId != null && newWork.CleanerId != employeeId)
+                return false; // Công việc đã có người nhận
+
+            if (newWork.Date == default || newWork.StartTime == default)
+                return false; // Thiếu ngày hoặc giờ bắt đầu
+
+            DateTime newWorkStart = newWork.Date.ToDateTime(newWork.StartTime);
+            DateTime newWorkEnd = newWorkStart.AddHours(newWork.Duration);
+
+            // Step 2: Lấy các công việc khác của cleaner
+            var existingWorks = await _context.Bookings
+                .Join(_context.ServicePrices, b => b.ServicePriceId, sp => sp.PriceId, (b, sp) => new { b, sp })
+                .Join(_context.Durations, bsp => bsp.sp.DurationId, d => d.DurationId, (bsp, d) => new
+                {
+                    BookingId = bsp.b.BookingId,
+                    Date = bsp.b.Date,
+                    StartTime = bsp.b.StartTime,
+                    Duration = d.DurationTime,
+                    CleanerId = bsp.b.CleanerId,
+                    StatusId = bsp.b.BookingStatusId
+                })
+                .Where(b => b.CleanerId == employeeId &&
+                       (b.StatusId == CommonConstants.BookingStatus.NEW
+                     || b.StatusId == CommonConstants.BookingStatus.ACCEPT
+                     || b.StatusId == CommonConstants.BookingStatus.IN_PROGRESS
+                     || b.StatusId == CommonConstants.BookingStatus.PENDING_DONE))
+                .ToListAsync();
+
+            // Step 3: Kiểm tra trùng giờ hoặc không đủ thời gian nghỉ
+            foreach (var work in existingWorks)
+            {
+                if (work.Date == default || work.StartTime == default)
+                    continue;
+
+                DateTime existingStart = work.Date.ToDateTime(work.StartTime);
+                DateTime existingEnd = existingStart.AddHours(work.Duration);
+
+                // Trùng thời gian
+                if (newWorkStart < existingEnd && newWorkEnd > existingStart)
+                    return false;
+
+                // Không đủ thời gian nghỉ
+                TimeSpan gap = (newWorkStart > existingStart)
+                    ? newWorkStart - existingEnd
+                    : existingStart - newWorkEnd;
+
+                if (gap < CommonConstants.TIME_INTERVAL)
+                    return false;
+            }
+
+            return true; // Không trùng lịch, có thể nhận
+        }
+
+
     }
 }

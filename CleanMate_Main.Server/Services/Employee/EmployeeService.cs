@@ -86,5 +86,9 @@ namespace CleanMate_Main.Server.Services.Employee
         {
             return await _employeeRepository.GetBookingStatusesAsync();
         }
+        public async Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId)
+        {
+            return await _employeeRepository.CanCleanerAcceptWorkAsync(bookingId, employeeId);
+        }
     }
 }

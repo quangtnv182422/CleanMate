@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Drawer,
-    Tabs,
-    Tab,
     Typography,
     Table,
     TableBody,
@@ -21,10 +19,21 @@ import {
     Button,
     Modal,
     InputLabel,
-    FormControl
+    FormControl,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemButton,
+    ListItemText,
+    Divider,
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import userImage from '../../images/user-image.png';
 import { BookingStatusContext } from '../../context/BookingStatusProvider'
@@ -44,6 +53,8 @@ const SettingsPage = () => (
     </Box>
 );
 
+const drawerWidth = 300;
+
 const WorkList = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
@@ -57,14 +68,6 @@ const WorkList = () => {
     const [status, setStatus] = useState('');
     const { statusList, loading } = useContext(BookingStatusContext);
     const [selectedWork, setSelectedWork] = useState(null);
-    const statusMapping = {
-        "Việc mới": 1, // BOOKING_STATUS_NEW
-        "Đã huỷ": 2, // CANCEL
-        "Đã nhận": 3, // ACCEPT
-        "Đang thực hiện": 4, // IN_PROGRESS
-        "Chờ xác nhận": 5, // PENDING_DONE
-        "Hoàn thành": 6, // DONE
-    };
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
@@ -186,10 +189,6 @@ const WorkList = () => {
         const startIndex = (page - 1) * rowsPerPage;
         return filteredData.slice(startIndex, startIndex + rowsPerPage);
     }, [filteredData, page, rowsPerPage]);
-
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
 
     const handleLogout = () => {
         fetch('/api/authen/logout', {
@@ -359,34 +358,102 @@ const WorkList = () => {
         }
     };
 
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const handleDrawerOpen = () => {
+        setOpenDrawer(true);
+    }
+
+    const handleCloseDrawer = () => {
+        setOpenDrawer(false)
+    }
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+        setOpenDrawer(false)
+    };
+    const menuItems = [
+        {
+            title: 'Danh sách công việc',
+            icon: <DnsOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Thu nhập',
+            icon: <CreditCardOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Settings',
+            icon: <SettingsOutlinedIcon sx={style.drawerIcon} />,
+        },
+    ];
+
     return (
         <Box sx={{ display: 'flex' }}>
             <Drawer
-                variant="permanent"
+                open={openDrawer}
+                onClose={handleCloseDrawer}
+                variant="temporary" // giữ Drawer trên content
+                anchor="left"
+                modalProps={{
+                    keepMounted: true, // giúp Drawer hoạt động tốt trên mobile
+                }}
                 sx={{
-                    width: 240,
-                    flexShrink: 0,
+                    zIndex: 1400,
                     '& .MuiDrawer-paper': {
-                        width: 240,
-                        backgroundColor: '#f8f9fa',
+                        padding: 1,
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        backgroundColor: '#1565C0',
+                        color: '#fff',
                     },
                 }}
             >
-                <Tabs
-                    orientation="vertical"
-                    value={tabValue}
-                    onChange={handleTabChange}
+                <List sx={{ width: '100%' }}>
+                    {menuItems.map((item, index) => (
+                        <ListItemButton
+                            key={index}
+                            selected={tabValue === index}
+                            onClick={() => handleTabChange(null, index)}
+                            sx={{padding: '10px 0'}}
+                        >
+                            <ListItemIcon>
+                                {item.icon}
+                            </ListItemIcon>
+                            <ListItemText primary={item.title} />
+                        </ListItemButton>
+                    ))}
+                </List>
+
+                <Divider sx={{ backgroundColor: '#fff', my: 2 }} />
+
+                <Button
+                    variant="outlined"
+                    onClick={handleLogout}
+                    sx={{
+                        mt: 2,
+                        borderColor: '#fff',
+                        color: '#fff',
+                        '&:hover': {
+                            borderColor: '#aaa',
+                            backgroundColor: '#222',
+                        },
+                    }}
                 >
-                    <Tab label="Danh sách công việc" />
-                    <Tab label="Thu nhập" />
-                    <Tab label="Settings" />
-                </Tabs>
-                <Button variant="outlined" onClick={handleLogout} sx={{ mt: 2, mx: 2 }}>
                     Đăng xuất
                 </Button>
             </Drawer>
 
-            <Box sx={{ flexGrow: 1, p: 2 }}>
+            <IconButton onClick={handleDrawerOpen}
+                sx={{
+                    position: 'fixed',
+                    top: 16,
+                    left: 12,
+                    zIndex: 1400
+                }}
+            >
+                <MenuIcon />
+            </IconButton>
+
+            <Box sx={{ flexGrow: 1, pt: 3, pl: 8 }}>
                 {renderPage()}
             </Box>
         </Box>
@@ -424,6 +491,11 @@ const style = {
     time: {
         color: '#FBA500',
         fontSize: '18px'
+    },
+    drawerIcon: {
+        minWidth: '40px',
+        color: '#fff',
+        marginRight: '5px',
     },
     lightGray: {
         color: "#969495"

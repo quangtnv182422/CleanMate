@@ -275,7 +275,8 @@ namespace CleanMate_Main.Server.Migrations
                     AddressId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    AddressTitle = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    GG_FormattedAddress = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    GG_PlaceId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     IsInUse = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IsDefault = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),

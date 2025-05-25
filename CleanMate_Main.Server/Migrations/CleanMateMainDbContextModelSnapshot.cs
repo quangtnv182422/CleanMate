@@ -288,10 +288,15 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
 
-                    b.Property<string>("AddressTitle")
+                    b.Property<string>("GG_FormattedAddress")
                         .IsRequired()
                         .HasMaxLength(450)
                         .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_PlaceId")
+                        .IsRequired()
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDefault")

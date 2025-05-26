@@ -16,7 +16,7 @@ namespace CleanMate_Main.Server.Models.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal Balance { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public virtual AspNetUser User { get; set; } = null!;
 

@@ -7,6 +7,7 @@ using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Employee;
+using CleanMate_Main.Server.Repository.Wallet;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Address;
 using CleanMate_Main.Server.Services.Authentication;
@@ -15,6 +16,7 @@ using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Smtp;
+using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -71,6 +73,9 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 //Address
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+//Wallet
+builder.Services.AddScoped<IUserWalletRepo, UserWalletRepo>();
+builder.Services.AddScoped<IUserWalletService, UserWalletService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

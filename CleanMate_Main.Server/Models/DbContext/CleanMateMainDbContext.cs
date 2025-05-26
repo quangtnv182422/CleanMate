@@ -276,7 +276,7 @@ namespace CleanMate_Main.Server.Models.DbContext
             {
                 entity.HasKey(e => e.WalletId);
                 entity.Property(e => e.Balance).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(e => e.User)
                     .WithOne(u => u.Wallet)

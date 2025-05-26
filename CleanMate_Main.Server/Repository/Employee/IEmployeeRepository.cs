@@ -11,7 +11,7 @@ namespace CleanMate_Main.Server.Repository.Employee
 
         Task<IEnumerable<WorkListViewModel>> FindWorkByEmployeeIdAsync(string employeeId);
 
-        Task ChangeWorkAsync(int bookingId, int status, string? employeeId = null);
+        Task<bool> ChangeWorkAsync(int bookingId, int status, string? employeeId = null);
 
         Task<AcceptWorkNotificationViewModel> GetCustomerDetailsAsync(int bookingId);
 

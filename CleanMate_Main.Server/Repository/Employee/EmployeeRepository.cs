@@ -60,7 +60,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * 0.35m / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
                             StartTime = Common.CommonConstants.ChangeTimeType(booking.StartTime),
-                            Address = address.GG_FormattedAddress,
+                            Address = address.AddressNo +" " + address.GG_FormattedAddress,
                             Note = booking.Note,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId),
                             IsRead = false,
@@ -88,7 +88,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Date = booking.Date,
                             StartTime = booking.StartTime,
                             Duration = duration.DurationTime,
-                            //Address = address.AddressTitle,
+                            Address = address.AddressNo + " " + address.GG_FormattedAddress,
                             Note = booking.Note,
                             TotalPrice = booking.TotalPrice ?? 0m,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId)
@@ -108,16 +108,30 @@ namespace CleanMate_Main.Server.Repository.Employee
             await _context.SaveChangesAsync();
         }
 
-        public async Task ChangeWorkAsync(int bookingId, int status, string? employeeId = null)
+        public async Task<bool> ChangeWorkAsync(int bookingId, int status, string? employeeId = null)
         {
-            var booking = await _context.Bookings.FindAsync(bookingId)
-                ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
-            booking.BookingStatusId = status;
-            if (employeeId != null)
+            try
             {
-                booking.CleanerId = employeeId;
+                var booking = await _context.Bookings.FindAsync(bookingId);
+                if (booking == null)
+                {
+                    return false; // Booking not found
+                }
+
+                booking.BookingStatusId = status;
+
+                if (!string.IsNullOrEmpty(employeeId))
+                {
+                    booking.CleanerId = employeeId;
+                }
+
+                await _context.SaveChangesAsync();
+                return true; // Successfully updated
             }
-            await _context.SaveChangesAsync();
+            catch
+            {
+                return false; // Something went wrong
+            }
         }
 
         public async Task<AcceptWorkNotificationViewModel> GetCustomerDetailsAsync(int bookingId)

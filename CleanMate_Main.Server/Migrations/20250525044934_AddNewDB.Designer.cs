@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250525042151_UpdateCustomerAddressTable")]
-    partial class UpdateCustomerAddressTable
+    [Migration("20250525044934_AddNewDB")]
+    partial class AddNewDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

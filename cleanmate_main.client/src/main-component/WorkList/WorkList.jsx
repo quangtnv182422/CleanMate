@@ -198,6 +198,47 @@ const WorkList = () => {
             navigate('/login');
         });
     };
+    const handleAcceptWork = async () => {
+        try {
+            const response = await fetch(`/worklist/${selectedWork.bookingId}/accept`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || `Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+
+            if (result.success) {
+                alert("Công việc đã được nhận thành công!");
+                handleClose();
+                const fetchWorkList = async () => {
+                    const url = status ? `/worklist?status=${status}` : '/api/worklist';
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    if (res.ok) {
+                        const workItems = await res.json();
+                        setData(workItems);
+                    }
+                };
+                fetchWorkList();
+            } else {
+                alert(result.message || "Không thể nhận công việc.");
+            }
+        } catch (error) {
+            console.error('Lỗi nhận công việc:', error);
+            alert(error.message || "Đã xảy ra lỗi khi nhận công việc.");
+        }
+    };
 
     const WorkListPage = () => (
         <Box>
@@ -323,9 +364,15 @@ const WorkList = () => {
                             <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork.note}</strong></Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Button variant="outlined" color='error'>Từ chối</Button>
+                            <Button variant="outlined" color='error' onclick={handleClose}>Từ chối</Button>
                             <Button variant="outlined">Google Maps</Button>
-                            <Button variant="contained" sx={style.confirmButton}>Nhận việc</Button>
+                            <Button
+                                variant="contained"
+                                sx={style.confirmButton}
+                                onClick={handleAcceptWork}
+                            >
+                                Nhận việc
+                            </Button>
                         </Box>
                     </Box>
                 </Modal>
@@ -413,7 +460,7 @@ const WorkList = () => {
                             key={index}
                             selected={tabValue === index}
                             onClick={() => handleTabChange(null, index)}
-                            sx={{padding: '10px 0'}}
+                            sx={{ padding: '10px 0' }}
                         >
                             <ListItemIcon>
                                 {item.icon}

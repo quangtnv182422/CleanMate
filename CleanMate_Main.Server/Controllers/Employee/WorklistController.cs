@@ -59,13 +59,13 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userEmail))
                 {
-                    return Unauthorized(new { message = "User email not found." });
+                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
                 }
 
                 var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                 {
-                    return Unauthorized(new { message = "User not found." });
+                    return Unauthorized(new { message = "Không tìm thấy thông tin người dùng." });
                 }
 
                 string employeeId = user.Id;
@@ -78,8 +78,44 @@ namespace CleanMate_Main.Server.Controllers.Employee
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "An unexpected error occurred while fetching work detail." });
+                return StatusCode(500, new { error = "Đã xảy ra lỗi xảy ra!" });
+            }
+        }
+
+        [HttpPost("{id}/accept")]
+        public async Task<IActionResult> AcceptWork(int id)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
+                }
+
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null)
+                {
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+                }
+
+                string employeeId = user.Id;
+                bool success = await _employeeService.AcceptWorkRequestAsync(id, employeeId);
+                return Ok(new { success, message = "Công việc đã được nhận thành công." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi không mong muốn khi nhận công việc." });
             }
         }
     }
 }
+

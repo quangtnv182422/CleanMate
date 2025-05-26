@@ -10,11 +10,11 @@ namespace CleanMate_Main.Server.Services.Employee
 
         Task<IEnumerable<WorkListViewModel>> GetWorkByEmployeeIdAsync(string employeeId);
 
-        Task AcceptWorkRequestAsync(int bookingId, string employeeId);
+        Task<bool> AcceptWorkRequestAsync(int bookingId, string employeeId);
 
-        Task CancelWorkRequestAsync(int bookingId);
+        Task<bool> CancelWorkRequestAsync(int bookingId);
 
-        Task CompleteWorkRequestAsync(int bookingId);
+        Task<bool> CompleteWorkRequestAsync(int bookingId);
 
         Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId);
 

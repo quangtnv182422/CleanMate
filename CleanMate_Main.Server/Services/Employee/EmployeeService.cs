@@ -28,24 +28,31 @@ namespace CleanMate_Main.Server.Services.Employee
             return await _employeeRepository.FindWorkByEmployeeIdAsync(employeeId);
         }
 
-        public async Task AcceptWorkRequestAsync(int bookingId, string employeeId)
+        public async Task<bool> AcceptWorkRequestAsync(int bookingId, string employeeId)
         {
-            var canAccept = await ValidateWorkAcceptanceAsync(bookingId, employeeId);
+            var isValid = await ValidateWorkAcceptanceAsync(bookingId, employeeId);
+            if (!isValid)
+            {
+                throw new InvalidOperationException("Không thể nhận công việc này. Công việc có thể đã bị hủy hoặc đã được người khác nhận.");
+            }
+
+            var canAccept = await _employeeRepository.CanCleanerAcceptWorkAsync(bookingId, employeeId);
             if (!canAccept)
             {
-                throw new InvalidOperationException("Cannot accept this work item.");
+                throw new InvalidOperationException("Không thể nhận công việc này do trùng thời gian với công việc khác.");
             }
-            await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.ACCEPT, employeeId);
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.ACCEPT, employeeId);
         }
 
-        public async Task CancelWorkRequestAsync(int bookingId)
+        public async Task<bool> CancelWorkRequestAsync(int bookingId)
         {
-            await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL);
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL);
         }
 
-        public async Task CompleteWorkRequestAsync(int bookingId)
+        public async Task<bool> CompleteWorkRequestAsync(int bookingId)
         {
-            await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE);
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE);
         }
 
         public async Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId)
@@ -88,6 +95,10 @@ namespace CleanMate_Main.Server.Services.Employee
         }
         public async Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId)
         {
+            if (!await ValidateWorkAcceptanceAsync(bookingId, employeeId))
+            {
+                return false;
+            }
             return await _employeeRepository.CanCleanerAcceptWorkAsync(bookingId, employeeId);
         }
     }

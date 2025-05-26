@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +18,13 @@ namespace CleanMate_Main.Server.Controllers.Authen
     public class AuthenController : ControllerBase
     {
         private readonly IAuthenService _authenService;
+        private readonly IUserWalletService _walletService;
         private readonly UserManager<AspNetUser> _userManager;
-        public AuthenController(IAuthenService authenService, UserManager<AspNetUser> userManager)
+        public AuthenController(IAuthenService authenService, UserManager<AspNetUser> userManager, IUserWalletService walletService)
         {
             _authenService = authenService;
             _userManager = userManager;
+            _walletService = walletService;
         }
         
         //đăng kí dành cho khách hàng
@@ -150,6 +153,8 @@ namespace CleanMate_Main.Server.Controllers.Authen
             {
                 return StatusCode(400, new { message = "Xác nhận email thất bại.", errors = result.Errors });
             }
+
+            await _walletService.AddNewWalletAsync(userId); // NOTE: Confirm mail thành công thì mới tạo ví
 
             return Ok(new { message = "Xác nhận email thành công. Bạn có thể đăng nhập." });
         }

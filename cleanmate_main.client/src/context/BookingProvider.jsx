@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+﻿import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 export const BookingContext = createContext();
 
@@ -10,11 +10,13 @@ const BookingProvider = ({ children }) => {
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
+    const [userAddress, setUserAddress] = useState([]);
+    console.log("User Address:", userAddress);
 
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get('/cleanservice/all-clean-service'); 
+                const res = await axios.get('/cleanservice/all-clean-service');
                 if (res.status === 200) {
                     setServices(res.data);
                 } else {
@@ -28,6 +30,28 @@ const BookingProvider = ({ children }) => {
         fetchServices();
     }, []);
 
+    const fetchUserAddress = async () => {
+        try {
+            const res = await fetch('/address/get-address', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setUserAddress(data);
+            } else {
+                throw new Error('Failed to fetch');
+            }
+        } catch (error) {
+            console.error('Fetch user address error:', error);
+        }
+    };
+
+    // gọi khi app load
+    useEffect(() => {
+        fetchUserAddress();
+    }, []);
+
     return <BookingContext.Provider value={{
         open,
         handleOpen,
@@ -38,7 +62,8 @@ const BookingProvider = ({ children }) => {
         houseType,
         setHouseType,
         houseNumber,
-        setHouseNumber
+        setHouseNumber,
+        userAddress,
     }}>{children}</BookingContext.Provider>
 }
 

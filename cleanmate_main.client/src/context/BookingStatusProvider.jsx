@@ -5,7 +5,7 @@ export const BookingStatusContext = createContext();
 const BookingStatusProvider = ({ children }) => {
     const [statusList, setStatusList] = useState([]);
     const [loading, setLoading] = useState(true);
-    console.log(statusList)
+
     useEffect(() => {
         const fetchBookingStatuses = async () => {
             try {

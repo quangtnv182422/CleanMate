@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
-    [Migration("20250525093134_UpdateLatLog")]
-    partial class UpdateLatLog
+    [Migration("20250525143846_AddNewDB")]
+    partial class AddNewDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -292,6 +292,12 @@ namespace CleanMate_Main.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
 
                     b.Property<string>("AddressNo")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_DispalyName")
                         .IsRequired()
                         .HasMaxLength(450)
                         .IsUnicode(true)

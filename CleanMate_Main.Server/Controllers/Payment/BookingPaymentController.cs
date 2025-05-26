@@ -24,7 +24,6 @@ namespace CleanMate_Main.Server.Controllers.Payment
         {
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
 
-            // Vì ControllerBase vẫn hỗ trợ Redirect, bạn có thể dùng nó
             return Redirect(url);
         }
 

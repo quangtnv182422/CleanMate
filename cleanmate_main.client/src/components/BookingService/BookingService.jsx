@@ -217,7 +217,7 @@ const BookingService = () => {
                         {isNewUser ? (
                             <Button
                                 variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }}
-                                onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
+                                onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
 
                             >
                                 Thêm địa chỉ mới

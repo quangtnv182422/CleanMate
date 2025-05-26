@@ -36,6 +36,8 @@ const BookingProvider = ({ children }) => {
                 method: 'GET',
                 credentials: 'include',
             });
+            console.log("Đây là địa chỉ ahiihi:", res);
+
             if (res.ok) {
                 const data = await res.json();
                 setUserAddress(data);

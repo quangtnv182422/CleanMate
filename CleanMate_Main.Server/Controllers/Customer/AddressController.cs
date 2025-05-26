@@ -11,7 +11,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Customer")]
+   // [Authorize(Roles = "Customer")]
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _addressService;
@@ -59,6 +59,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
                 return Unauthorized("User not found");
 
             var addresses = await _addressService.GetAddressInUseByCustomerId(user.Id);
+
             return Ok(addresses);
         }
 

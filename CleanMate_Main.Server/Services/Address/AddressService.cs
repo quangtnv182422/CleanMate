@@ -58,10 +58,29 @@ namespace CleanMate_Main.Server.Services.Address
             return await _addressRepo.AddAddressAsync(newAddress);
         }
 
-        public async Task<List<CustomerAddress?>> GetAddressInUseByCustomerId(string userId)
+        public async Task<List<CustomerAddressDTO>> GetAddressInUseByCustomerId(string userId)
         {
-            return await _addressRepo.GetAddressInUseByCustomerId(userId);
+            var addresses = await _addressRepo.GetAddressInUseByCustomerId(userId);
+
+            var dtoList = addresses
+                .Where(x => x != null)
+                .Select(address => new CustomerAddressDTO
+                {
+                    AddressId = address.AddressId,
+                    GG_FormattedAddress = address.GG_FormattedAddress,
+                    GG_DispalyName = address.GG_DispalyName,
+                    GG_PlaceId = address.GG_PlaceId,
+                    AddressNo = address.AddressNo,
+                    IsInUse = address.IsInUse,
+                    IsDefault = address.IsDefault,
+                    Latitude = address.Latitude,
+                    Longitude = address.Longitude
+                })
+                .ToList();
+
+            return dtoList;
         }
+
 
     }
 }

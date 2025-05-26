@@ -36,6 +36,9 @@ namespace CleanMate_Main.Server.Models.DbContext
         public virtual DbSet<UserVoucher> UserVouchers { get; set; }
 
         public virtual DbSet<Voucher> Vouchers { get; set; }
+        public virtual DbSet<UserWallet> UserWallets { get; set; }
+        public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -268,6 +271,46 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("Discount_Percentage");
             });
+
+            modelBuilder.Entity<UserWallet>(entity =>
+            {
+                entity.HasKey(e => e.WalletId);
+                entity.Property(e => e.Balance).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.Wallet)
+                    .HasForeignKey<UserWallet>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_UserWallet_User");
+            });
+
+            modelBuilder.Entity<WalletTransaction>(entity =>
+            {
+                entity.HasKey(e => e.TransactionId);
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.TransactionType)
+                    .HasConversion<string>()             
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.Wallet)
+                    .WithMany(w => w.Transactions)
+                    .HasForeignKey(e => e.WalletId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_WalletTransaction_Wallet");
+            });
+
+
 
             OnModelCreatingPartial(modelBuilder);
         }

@@ -1,5 +1,6 @@
 ﻿using CleanMate_Main.Server.Models.DTO.vnPay;
 using CleanMate_Main.Server.Proxy.vnPay;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace CleanMate_Main.Server.Controllers.Payment
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class BookingPaymentController : ControllerBase
     {
 

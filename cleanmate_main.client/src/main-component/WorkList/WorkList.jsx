@@ -29,14 +29,15 @@ import {
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
+import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import userImage from '../../images/user-image.png';
 import { BookingStatusContext } from '../../context/BookingStatusProvider'
+import useAuth from '../../hooks/useAuth';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -66,8 +67,9 @@ const WorkList = () => {
     const [page, setPage] = useState(1);
     const [tabValue, setTabValue] = useState(0);
     const [status, setStatus] = useState('');
-    const { statusList, loading } = useContext(BookingStatusContext);
+    const { statusList } = useContext(BookingStatusContext);
     const [selectedWork, setSelectedWork] = useState(null);
+    const { user, loading } = useAuth();
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
@@ -446,15 +448,22 @@ const WorkList = () => {
                 sx={{
                     zIndex: 1400,
                     '& .MuiDrawer-paper': {
-                        padding: 1,
+                        padding: 0,
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        backgroundColor: '#1565C0',
-                        color: '#fff',
+                        backgroundColor: '#fff',
+                        color: '#ccc',
                     },
                 }}
             >
-                <List sx={{ width: '100%' }}>
+                <Box sx={style.userAvatar}>
+                    <img src={userImage} alt="Avatar của người dùng" />
+                    <Box>
+                        <Typography sx={style.userFullName}>{user?.fullName}</Typography>
+                        <Typography>{user?.email}</Typography>
+                    </Box>
+                </Box>
+                <List sx={{ width: '100%', padding: 0 }}>
                     {menuItems.map((item, index) => (
                         <ListItemButton
                             key={index}
@@ -465,28 +474,32 @@ const WorkList = () => {
                             <ListItemIcon>
                                 {item.icon}
                             </ListItemIcon>
-                            <ListItemText primary={item.title} />
+                            <ListItemText primary={item.title} sx={style.listItemText} />
                         </ListItemButton>
                     ))}
                 </List>
 
-                <Divider sx={{ backgroundColor: '#fff', my: 2 }} />
+                <Divider sx={{ backgroundColor: '#999', my: 2 }} />
 
-                <Button
-                    variant="outlined"
-                    onClick={handleLogout}
-                    sx={{
-                        mt: 2,
-                        borderColor: '#fff',
-                        color: '#fff',
-                        '&:hover': {
-                            borderColor: '#aaa',
-                            backgroundColor: '#222',
-                        },
-                    }}
-                >
-                    Đăng xuất
-                </Button>
+                <Box sx={{ padding: '0 10px' }}>
+                    <Button
+                        variant="outlined"
+                        onClick={handleLogout}
+                        sx={{
+                            width: '100%',
+                            mt: 2,
+                            borderColor: '#000',
+                            color: '#000',
+                            '&:hover': {
+                                borderColor: '#aaa',
+                                backgroundColor: '#f1f1f1',
+                            },
+                        }}
+                        startIcon={<ExitToAppOutlinedIcon sx={{color: '#000'}} />}
+                    >
+                        Đăng xuất
+                    </Button>
+                </Box>
             </Drawer>
 
             <IconButton onClick={handleDrawerOpen}
@@ -535,14 +548,32 @@ const style = {
             color: '#fff',
         },
     },
+    userAvatar: {
+        display: 'flex',
+        gap: '10px',
+        alignItems: 'center',
+        padding: 1.5,
+        'img': {
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+        }
+    },
+    userFullName: {
+        fontWeight: 'bold',
+    },
     time: {
         color: '#FBA500',
         fontSize: '18px'
     },
     drawerIcon: {
         minWidth: '40px',
-        color: '#fff',
+        color: '#000',
         marginRight: '5px',
+    },
+    listItemText: {
+        color: '#000'
     },
     lightGray: {
         color: "#969495"

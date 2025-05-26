@@ -12,7 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanMate_Main.Server.Migrations
 {
     [DbContext(typeof(CleanMateMainDbContext))]
+<<<<<<<< HEAD:CleanMate_Main.Server/Migrations/20250525044934_AddNewDB.Designer.cs
     [Migration("20250525044934_AddNewDB")]
+========
+    [Migration("20250525143846_AddNewDB")]
+>>>>>>>> 4b70b8a3aed6e7354180efd5bc06334591270356:CleanMate_Main.Server/Migrations/20250525143846_AddNewDB.Designer.cs
     partial class AddNewDB
     {
         /// <inheritdoc />
@@ -297,6 +301,12 @@ namespace CleanMate_Main.Server.Migrations
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("GG_DispalyName")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("GG_FormattedAddress")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -319,10 +329,10 @@ namespace CleanMate_Main.Server.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<string>("UserId")
                         .IsRequired()

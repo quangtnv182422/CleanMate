@@ -1,19 +1,16 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import AccessTime from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import GroupIcon from '@mui/icons-material/Group';
 import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
-import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
 import TextField from '@mui/material/TextField';
@@ -24,6 +21,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import axios from 'axios';
+import { BookingContext } from '../../context/BookingProvider';
 
 const primaryColor = '#1565C0';
 const style = {
@@ -60,7 +58,7 @@ const style = {
     },
     subHeaderTitle: {
         fontSize: '16px',
-        color: '#425398'
+        color: '#1565C0'
     },
     footer: {
         backgroundColor: '#fff',
@@ -89,63 +87,44 @@ const style = {
         fontSize: '14px',
         color: '#1565C0',
     },
-    modal: {
+    chooseAddressContainer: {
         position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 24,
-        p: 1,
+        top: '55px',
+        left: '140px',
+        width: '350px',
+        backgroundColor: '#fff',
+        border: '1px solid #ccc',
+        borderRadius: '5px',
+        padding: 1.2,
+        zIndex: '1000'
     },
-    houseType: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        borderRadius: 2,
-    },
-    houseTypeSelection: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-    },
-    selectButton: {
-        justifyContent: 'flex-start',
-        textTransform: 'none',
+    googleMapAddress: {
         fontSize: '16px',
-        borderColor: '#1565C0',
-        color: 'inherit',
-        p: 1,
-        '&.MuiButton-outlined': {
-            borderWidth: 2,
-        },
+        color: '#000',
+        fontWeight: 'bold',
     },
-    confirmButton: {
-        width: '100%',
-        backgroundColor: primaryColor,
-        color: '#fff',
-        '&:hover': {
-            backgroundColor: '#005cbf',
-        },
+    specificAddress: {
+        color: '#666',
     }
 };
 
 const BookingService = () => {
+    const { userAddress } = useContext(BookingContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedDuration, setSelectedTime] = useState(1);
     const [selectedDay, setSelectedDay] = useState(null);
     const [days, setDays] = useState([]);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
-    const [houseType, setHouseType] = useState('house');
-    const [houseNumber, setHouseNumber] = useState('');
-    const [service, setService] = useState([])
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [service, setService] = useState([]);
+    const [isNewUser, setIsNewUser] = useState(true)
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
     const isToday = selectedDay === todayStr;
@@ -154,19 +133,19 @@ const BookingService = () => {
     const serviceId = queryParams.get('service');
 
     useEffect(() => {
-        const fetchDetailService = async () => {
-            try {
-                const res = await axios.get(`/cleanservice/serviceId/${Number(serviceId)}`);
-                setService(res.data);
-            } catch (error) {
-                console.error('Error fetching service details:', error);
-            }
-        };
+        if (!serviceId) return;
 
-        if (serviceId) {
-            fetchDetailService();
-        }
+        fetchDetailService(serviceId)
     }, [serviceId]);
+
+    const fetchDetailService = async (serviceId) => {
+        try {
+            const res = await axios.get(`/cleanservice/serviceId/${Number(serviceId)}`);
+            setService(res.data);
+        } catch (error) {
+            console.error('Error fetching service details:', error);
+        }
+    };
 
     useEffect(() => {
         const today = new Date();
@@ -229,76 +208,67 @@ const BookingService = () => {
                 </Box>
                 <Box sx={{ p: 1 }}>
                     {/* Địa điểm làm việc */}
-                    <Box mb={2}>
+                    <Box mb={2} sx={{ position: 'relative' }}>
                         <Typography fontWeight="bold" sx={style.subHeaderTitle}>
                             <LocationOnIcon sx={{ mr: 1 }} />
                             Địa điểm làm việc
                         </Typography>
                         <Typography ml={4}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</Typography>
-                        <Button variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }} onClick={handleOpen}>
-                            Thay đổi
-                        </Button>
-                        <Modal
-                            open={open}
-                            onClose={handleClose}
-                            disableAutoFocus
-                        >
-                            <Box sx={style.modal}>
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="h5" sx={{ textAlign: 'center' }}>Vui lòng chọn địa điểm</Typography>
-                                </Box>
-                                <Box sx={style.houseType}>
-                                    <HomeOutlinedIcon />
-                                    <Typography sx={{ fontFamily: 'arial' }}>Loại nhà</Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, mb: 2 }}>
-                                    <Button
-                                        variant='outlined'
-                                        onClick={() => setHouseType('house')}
-                                        sx={style.selectButton}
-                                    >
-                                        <Typography sx={houseType === 'house' ? { color: '#1565C0' } : { color: '#000' }}>
-                                            Nhà / nhà phố
-                                        </Typography>
-                                    </Button>
-                                    <Button
-                                        variant='outlined'
-                                        onClick={() => setHouseType('apartment')}
-                                        sx={style.selectButton}
-                                    >
-                                        <Typography sx={houseType === 'apartment' ? { color: '#1565C0' } : { color: '#000' }}>
-                                            Căn hộ
-                                        </Typography>
-                                    </Button>
-                                </Box>
-                                <Box sx={style.houseType}>
-                                    {houseType === 'house' ? <HouseOutlinedIcon /> : <ApartmentOutlinedIcon />}
-                                    <Typography sx={{ fontFamily: 'arial' }}>{houseType === 'house' ? 'Số nhà, hẻm (ngõ)' : 'Căn hộ'}</Typography>
-                                </Box>
-                                <Box sx={{ mt: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        value={houseNumber}
-                                        onChange={(e) => setHouseNumber(e.target.value)}
-                                        placeholder={houseType === 'house' ? 'Số nhà 1, hẻm 2' : 'Lầu 1, phòng 2, block A'}
-                                    />
-                                </Box>
+                        {isNewUser ? (
+                            <Button
+                                variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }}
+                                onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
 
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                    *Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.
-                                </Typography>
-
-                                <Box sx={{ mt: 2 }}>
-                                    <Button
-                                        variant={houseNumber.length > 0 ? 'contained' : 'disabled'}
-                                        sx={style.confirmButton}
-                                    >
-                                        Đồng ý
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Modal>
+                            >
+                                Thêm địa chỉ mới
+                            </Button>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        ml: 4,
+                                        mt: 1,
+                                        fontSize: "12px",
+                                    }}
+                                    onClick={toggleDropdown}
+                                >
+                                    Thay đổi
+                                </Button>
+                                {showDropdown && (
+                                    <Box sx={style.chooseAddressContainer}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Typography variant="h6" sx={{
+                                                color: '#1565C0',
+                                                fontWeight: 'bold',
+                                            }}>Chọn địa chỉ</Typography>
+                                            <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
+                                        </Box>
+                                            <Box sx={{
+                                                mt: 1.5,
+                                                p: 0.5,
+                                                cursor: 'pointer',
+                                                borderRadius: '4px',
+                                                '&:hover': {
+                                                    backgroundColor: '#f0f0f0',
+                                                    color: '#1565C0',
+                                                }
+                                            }} onClick={() => alert('bạn đã chọn địa chỉ')}>
+                                            <Typography sx={style.googleMapAddress}>Berriver Long Biên</Typography>
+                                            <Typography sx={style.specificAddress}>Số nhà 30, ngách 158/38</Typography>
+                                        </Box>
+                                        <Box sx={{ mt: 4 }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    sx={{ width: '100%' }}
+                                                    onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
+                                                >Chọn địa chỉ mới</Button>
+                                        </Box>
+                                    </Box>
+                                )}
+                            </>
+                        )
+                        }
                     </Box>
 
                     {/* Số lượng nhân viên */}

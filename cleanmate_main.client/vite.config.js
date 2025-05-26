@@ -66,6 +66,10 @@ export default defineConfig({
             '^/bookingstatus': {
                 target,
                 secure: false
+            },
+            '^/address': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

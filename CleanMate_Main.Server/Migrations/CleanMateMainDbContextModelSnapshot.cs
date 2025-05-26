@@ -294,6 +294,12 @@ namespace CleanMate_Main.Server.Migrations
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("GG_DispalyName")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("GG_FormattedAddress")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -316,10 +322,10 @@ namespace CleanMate_Main.Server.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(9, 6)");
+                        .HasColumnType("decimal(20, 17)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -524,6 +530,35 @@ namespace CleanMate_Main.Server.Migrations
                     b.ToTable("User_Voucher", (string)null);
                 });
 
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.Property<int>("WalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WalletId"));
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("WalletId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("User_Wallet");
+                });
+
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Voucher", b =>
                 {
                     b.Property<int>("VoucherId")
@@ -552,6 +587,41 @@ namespace CleanMate_Main.Server.Migrations
                         .HasName("PK__Voucher__3AEE7921AB741345");
 
                     b.ToTable("Voucher", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WalletTransaction", b =>
+                {
+                    b.Property<int>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("WalletId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("Wallet_Transaction");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -812,6 +882,30 @@ namespace CleanMate_Main.Server.Migrations
                     b.Navigation("Voucher");
                 });
 
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithOne("Wallet")
+                        .HasForeignKey("CleanMate_Main.Server.Models.Entities.UserWallet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_UserWallet_User");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.UserWallet", "Wallet")
+                        .WithMany("Transactions")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WalletTransaction_Wallet");
+
+                    b.Navigation("Wallet");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetRole", null)
@@ -878,6 +972,8 @@ namespace CleanMate_Main.Server.Migrations
                     b.Navigation("FeedbackUsers");
 
                     b.Navigation("UserVouchers");
+
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Booking", b =>
@@ -910,6 +1006,11 @@ namespace CleanMate_Main.Server.Migrations
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.ServicePrice", b =>
                 {
                     b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Voucher", b =>

@@ -2,13 +2,15 @@
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Bookings;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanMate_Main.Server.Controllers.Bookings
+namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(Roles = "Customer")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;

@@ -21,6 +21,8 @@ public partial class AspNetUser : IdentityUser
     public string? FullName { get; set; }
 
     public string? CCCD { get; set; }
+
+    public virtual UserWallet? Wallet { get; set; }
     public virtual ICollection<Booking> BookingCleaners { get; set; } = new List<Booking>();
 
     public virtual ICollection<Booking> BookingUsers { get; set; } = new List<Booking>();

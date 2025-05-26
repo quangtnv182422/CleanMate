@@ -6,5 +6,8 @@ namespace CleanMate_Main.Server.Services.Wallet
     public interface IUserWalletService
     {
         Task<UserWallet> AddNewWalletAsync(string userId);
+        Task<decimal> GetWalletBalanceAsync(string userId);
+        Task<bool> ExchangeCoinsForMoneyAsync(string userId, decimal amount, string bankAccount, string bankName);
     }
 }
+

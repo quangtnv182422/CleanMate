@@ -12,6 +12,7 @@ import {
     Grid,
     TextField,
 } from '@mui/material';
+import { toast } from 'react-toastify';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import CalendarToday from '@mui/icons-material/CalendarToday';
@@ -122,28 +123,31 @@ const style = {
 };
 
 const BookingService = () => {
-    const { userAddress } = useContext(BookingContext);
+    const {
+        userAddress
+    } = useContext(BookingContext);
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [selectedEmployee, setSelectedEmployee] = useState(1);
-    const [selectedDuration, setSelectedDuration] = useState(1);
-    const [price, setPrice] = useState(160000);
-    const [selectedDay, setSelectedDay] = useState(null);
-    const [days, setDays] = useState([]);
-    const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
-    // format time HH:mm A
+
+    // start of data to store booking information
     const [selectedAddress, setSelectedAddress] = useState(() => {
         const saved = localStorage.getItem('selectedAddress');
         return saved ? JSON.parse(saved) : null;
     });
+    const [selectedSpecificArea, setSelectedSpecificArea] = useState('15');
+    const [selectedEmployee, setSelectedEmployee] = useState(1);
+    const [selectedDuration, setSelectedDuration] = useState(1);
+    const [price, setPrice] = useState(160000);
+    const [selectedDay, setSelectedDay] = useState(null);
+    const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null); // format time HH:mm A
     const [note, setNote] = useState('');
-    console.log(note)
-    const [service, setService] = useState([]);
+    // end of data to store booking information
+
+    const [days, setDays] = useState([]);
+    const [service, setService] = useState([]); //store information of service details
     const [showDropdown, setShowDropdown] = useState(false);
     const [open, setOpen] = useState(false);
-
-    const toggleDropdown = () => setShowDropdown(!showDropdown);
 
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
@@ -152,8 +156,11 @@ const BookingService = () => {
     const queryParams = new URLSearchParams(location.search);
     const serviceId = queryParams.get('service');
 
+    const toggleDropdown = () => setShowDropdown(!showDropdown);
+
     const handleChoosePrice = (service) => {
         setSelectedDuration(service.durationTime);
+        setSelectedSpecificArea(service.squareMeterSpecific)
         setPrice(service.price);
     }
 
@@ -229,10 +236,32 @@ const BookingService = () => {
     const shouldDisableTime = (timeValue, clockType) => {
         if (clockType === 'minutes') {
             const minutes = timeValue;
-            return minutes % 15 !== 0; // Vô hiệu hóa nếu phút không phải 0, 15, 30, 45
+            return minutes % 15 !== 0; // Disable if minutes are not 0, 15, 30, 45
         }
         return false;
     };
+
+    const formatSpecificTime = selectedSpecificTimes?.format("HH:mm A");
+
+    const handleSubmit = () => {
+        if (!selectedAddress || !selectedSpecificTimes) {
+            toast.error("Vui lòng chọn địa chỉ và giờ làm việc cụ thể.");
+            return;
+        } else {
+            navigate(`/order/booking-confirmation/${serviceId}`, {
+                state: {
+                    selectedAddress,
+                    selectedEmployee,
+                    selectedDuration,
+                    selectedSpecificArea,
+                    price,
+                    selectedDay,
+                    formatSpecificTime,
+                    note
+                }
+            })
+        }
+    }
 
     return (
         <div>
@@ -485,7 +514,7 @@ const BookingService = () => {
                                 color: '#425398',
                                 fontWeight: 'bold',
                             }}
-                            onClick={() => navigate(`/order/booking-confirmation/${serviceId}`)}
+                            onClick={handleSubmit}
                         >
                             Tiếp tục
                         </Button>

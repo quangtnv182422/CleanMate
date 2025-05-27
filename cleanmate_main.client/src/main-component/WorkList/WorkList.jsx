@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
+﻿import React, { useState, useMemo, useCallback, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -21,7 +21,6 @@ import {
     InputLabel,
     FormControl,
     List,
-    ListItem,
     ListItemIcon,
     ListItemButton,
     ListItemText,
@@ -32,12 +31,15 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import userImage from '../../images/user-image.png';
 import { BookingStatusContext } from '../../context/BookingStatusProvider'
 import useAuth from '../../hooks/useAuth';
+import { WorkContext } from '../../context/WorkProvider';
+import EmployeeWorkDetails from '../../components/EmployeeWorkDetails/EmployeeWorkDetails';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -47,20 +49,18 @@ const ReportsPage = () => (
     </Box>
 );
 
-const SettingsPage = () => (
+const RevenuePage = () => (
     <Box sx={{ p: 3 }}>
-        <Typography variant="h5">Settings Page</Typography>
-        <Typography>This is a placeholder for the Settings page.</Typography>
+        <Typography variant="h5">Revenue Page</Typography>
+        <Typography>This is a placeholder for the Revenue page.</Typography>
     </Box>
 );
 
 const drawerWidth = 300;
 
 const WorkList = () => {
+    const { open, handleOpen, handleClose, selectedWork, data, setData } = useContext(WorkContext);
     const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-
-    const [data, setData] = useState([]);
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -68,45 +68,17 @@ const WorkList = () => {
     const [tabValue, setTabValue] = useState(0);
     const [status, setStatus] = useState('');
     const { statusList } = useContext(BookingStatusContext);
-    const [selectedWork, setSelectedWork] = useState(null);
     const { user, loading } = useAuth();
+    const role = user?.roles?.[0] || '';
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
         setPage(1); // Reset to first page when status changes
     };
-    const handleOpen = async (bookingId) => {
-        try {
-            const response = await fetch(`/worklist/${bookingId}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                console.error(`HTTP error! status: ${response.status}, response: ${text}`);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const workDetail = await response.json();
-            setSelectedWork(workDetail);
-            setOpen(true);
-        } catch (error) {
-            console.error('Error fetching work detail:', error);
-        }
-    };
-    console.log(selectedWork)
-
-    const handleClose = () => {
-        setOpen(false);
-        setSelectedWork(null);
-    };
 
     useEffect(() => {
         const fetchWorkList = async () => {
+            if (role !== "Cleaner") return;
             try {
                 const url = status
                     ? `/worklist?status=${status}`
@@ -128,14 +100,11 @@ const WorkList = () => {
                 setData(workItems);
             } catch (error) {
                 console.error('Error fetching work list:', error);
-                if (error.message.includes('401')) {
-                    navigate('/login');
-                }
             }
         };
 
         fetchWorkList();
-    }, [navigate, status]);
+    }, [setData, status, role]);
 
     const handleSort = useCallback((vietnameseKey) => {
         const keyMapping = {
@@ -199,47 +168,6 @@ const WorkList = () => {
         }).then(() => {
             navigate('/login');
         });
-    };
-    const handleAcceptWork = async () => {
-        try {
-            const response = await fetch(`/worklist/${selectedWork.bookingId}/accept`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || `Lỗi HTTP! Trạng thái: ${response.status}`);
-            }
-
-            if (result.success) {
-                alert("Công việc đã được nhận thành công!");
-                handleClose();
-                const fetchWorkList = async () => {
-                    const url = status ? `/worklist?status=${status}` : '/api/worklist';
-                    const res = await fetch(url, {
-                        method: 'GET',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    if (res.ok) {
-                        const workItems = await res.json();
-                        setData(workItems);
-                    }
-                };
-                fetchWorkList();
-            } else {
-                alert(result.message || "Không thể nhận công việc.");
-            }
-        } catch (error) {
-            console.error('Lỗi nhận công việc:', error);
-            alert(error.message || "Đã xảy ra lỗi khi nhận công việc.");
-        }
     };
 
     const WorkListPage = () => (
@@ -342,41 +270,7 @@ const WorkList = () => {
                     onClose={handleClose}
                     disableAutoFocus
                 >
-                    <Box sx={style.modal}>
-                        <Box sx={{ mb: 2 }}>
-                            <Typography variant="h5">{selectedWork.serviceName}</Typography>
-                            <Typography variant="body2" sx={style.lightGray}>
-                                Bắt đầu lúc: <span style={style.time}>{selectedWork.startTime} </span>ngày<span style={style.time}>  {selectedWork.date}</span>
-                            </Typography>
-                        </Box>
-                        <Box sx={style.mainContent}>
-                            <Box sx={{ textAlign: 'center' }}>
-                                <Typography variant="body1" sx={style.lightGray}>Làm trong:</Typography>
-                                <Typography variant="h5" sx={{ color: '#FBA500' }}>{selectedWork.duration}</Typography>
-                                <Typography variant="body1">{selectedWork.serviceDescription}</Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'center' }}>
-                                <Typography variant="body1" sx={style.lightGray}>Số tiền:</Typography>
-                                <Typography variant="h5" sx={{ color: '#FBA500' }}>{selectedWork.price}</Typography>
-                                <Typography variant="body1"> Hoa hồng: {selectedWork.commission}</Typography>
-                            </Box>
-                        </Box>
-                        <Box sx={{ mb: 2 }}>
-                            <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>{selectedWork.address}</strong></Typography>
-                            <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork.note}</strong></Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Button variant="outlined" color='error' onclick={handleClose}>Từ chối</Button>
-                            <Button variant="outlined">Google Maps</Button>
-                            <Button
-                                variant="contained"
-                                sx={style.confirmButton}
-                                onClick={handleAcceptWork}
-                            >
-                                Nhận việc
-                            </Button>
-                        </Box>
-                    </Box>
+                    <EmployeeWorkDetails />
                 </Modal>
             )}
 
@@ -401,7 +295,9 @@ const WorkList = () => {
             case 1:
                 return <ReportsPage />;
             case 2:
-                return <SettingsPage />;
+                return <RevenuePage />;
+            case 3:
+                return <RevenuePage />;
             default:
                 return <WorkListPage />;
         }
@@ -424,6 +320,10 @@ const WorkList = () => {
         {
             title: 'Danh sách công việc',
             icon: <DnsOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Công việc đã nhận',
+            icon: <PlaylistAddCheckOutlinedIcon sx={style.drawerIcon} />,
         },
         {
             title: 'Thu nhập',

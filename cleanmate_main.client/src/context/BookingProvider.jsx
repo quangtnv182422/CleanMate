@@ -1,5 +1,6 @@
 ﻿import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import useAuth from '../hooks/useAuth';
 export const BookingContext = createContext();
 
 const BookingProvider = ({ children }) => {
@@ -11,7 +12,8 @@ const BookingProvider = ({ children }) => {
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
     const [userAddress, setUserAddress] = useState([]);
-    console.log("User Address:", userAddress);
+    const { user } = useAuth()
+    const role = user?.roles?.[0] || '';
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -30,29 +32,30 @@ const BookingProvider = ({ children }) => {
         fetchServices();
     }, []);
 
-    const fetchUserAddress = async () => {
-        try {
-            const res = await fetch('/address/get-address', {
-                method: 'GET',
-                credentials: 'include',
-            });
-            console.log("Đây là địa chỉ ahiihi:", res);
-
-            if (res.ok) {
-                const data = await res.json();
-                setUserAddress(data);
-            } else {
-                throw new Error('Failed to fetch');
-            }
-        } catch (error) {
-            console.error('Fetch user address error:', error);
-        }
-    };
-
-    // gọi khi app load
     useEffect(() => {
+        const fetchUserAddress = async () => {
+            if (role !== "Customer") return;
+            try {
+                const res = await fetch('/address/get-address', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setUserAddress(data);
+                } else {
+                    throw new Error('Failed to fetch');
+                }
+            } catch (error) {
+                console.error('Fetch user address error:', error);
+            }
+        };
+
+        // gọi khi app load
+
         fetchUserAddress();
-    }, []);
+    }, [role]);
 
     return <BookingContext.Provider value={{
         open,

@@ -102,6 +102,9 @@ const style = {
         fontSize: '16px',
         color: '#000',
         fontWeight: 'bold',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
     },
     specificAddress: {
         color: '#666',
@@ -118,12 +121,11 @@ const BookingService = () => {
     const [selectedDay, setSelectedDay] = useState(null);
     const [days, setDays] = useState([]);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [service, setService] = useState([]);
-    const [isNewUser, setIsNewUser] = useState(true)
     const [showDropdown, setShowDropdown] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
-
 
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
@@ -131,6 +133,13 @@ const BookingService = () => {
 
     const queryParams = new URLSearchParams(location.search);
     const serviceId = queryParams.get('service');
+
+    const userFirstAddress = userAddress.length > 0 ? userAddress[0] : null;
+
+    const handleSelectAddress = (address) => {
+        setSelectedAddress(address);
+        toggleDropdown();
+    }
 
     useEffect(() => {
         if (!serviceId) return;
@@ -213,8 +222,8 @@ const BookingService = () => {
                             <LocationOnIcon sx={{ mr: 1 }} />
                             Địa điểm làm việc
                         </Typography>
-                        <Typography ml={4}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</Typography>
-                        {isNewUser ? (
+                        <Typography ml={4}>{userAddress.length === 0 ? "Hãy đặt địa chỉ đầu tiên" : selectedAddress?.addressNo}</Typography>
+                        {userAddress.length === 0 ? (
                             <Button
                                 variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }}
                                 onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
@@ -244,7 +253,8 @@ const BookingService = () => {
                                             }}>Chọn địa chỉ</Typography>
                                             <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
                                         </Box>
-                                            <Box sx={{
+                                        {userAddress.map((item) => (
+                                            <Box key={item.addressId} sx={{
                                                 mt: 1.5,
                                                 p: 0.5,
                                                 cursor: 'pointer',
@@ -253,16 +263,20 @@ const BookingService = () => {
                                                     backgroundColor: '#f0f0f0',
                                                     color: '#1565C0',
                                                 }
-                                            }} onClick={() => alert('bạn đã chọn địa chỉ')}>
-                                            <Typography sx={style.googleMapAddress}>Berriver Long Biên</Typography>
-                                            <Typography sx={style.specificAddress}>Số nhà 30, ngách 158/38</Typography>
-                                        </Box>
+                                            }} onClick={() => handleSelectAddress(item)}
+                                            >
+                                                <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
+                                                <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
+                                            </Box>
+                                        ))}
                                         <Box sx={{ mt: 4 }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    sx={{ width: '100%' }}
-                                                    onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
-                                                >Chọn địa chỉ mới</Button>
+                                            <Button
+                                                variant="outlined"
+                                                sx={{ width: '100%' }}
+                                                onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
+                                            >
+                                                Chọn địa chỉ mới
+                                            </Button>
                                         </Box>
                                     </Box>
                                 )}

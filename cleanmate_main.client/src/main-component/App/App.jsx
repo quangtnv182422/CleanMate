@@ -6,6 +6,7 @@ import '../../sass/style.scss';
 import AuthProvider from '../../../src/context/AuthContext';
 import BookingProvider from '../../context/BookingProvider';
 import BookingStatusProvider from '../../context/BookingStatusProvider';
+import WorkProvider from '../../context/WorkProvider';
 
 const App = () => {
 
@@ -13,10 +14,12 @@ const App = () => {
         <div className="App" id='scrool'>
             <AuthProvider>
                 <BookingProvider>
-                    <BookingStatusProvider>
-                        <AllRoute />
-                        <ToastContainer />
-                    </BookingStatusProvider>
+                    <WorkProvider>
+                        <BookingStatusProvider>
+                            <AllRoute />
+                            <ToastContainer />
+                        </BookingStatusProvider>
+                    </WorkProvider>
                 </BookingProvider>
             </AuthProvider>
         </div>

@@ -63,6 +63,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Address = address.AddressNo +" " + address.GG_FormattedAddress,
                             Note = booking.Note,
                             Status = CommonConstants.GetStatusString(booking.BookingStatusId),
+                            StatusId = booking.BookingStatusId,
                             IsRead = false,
                             CustomerFullName = customer.FullName,
                             CustomerPhoneNumber = customer.PhoneNumber

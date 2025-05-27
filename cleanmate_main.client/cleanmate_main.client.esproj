@@ -13,6 +13,7 @@
     <Folder Include="src\components\ConfirmBooking\" />
     <Folder Include="src\components\BookingConfirmation\" />
     <Folder Include="src\components\GoogleMap\" />
+    <Folder Include="src\components\EmployeeWorkDetails\" />
     <Folder Include="src\main-component\ConfirmMail\" />
     <Folder Include="src\main-component\WorkList\" />
     <Folder Include="src\main-component\Profile\" />

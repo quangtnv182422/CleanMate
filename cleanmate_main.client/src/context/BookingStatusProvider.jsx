@@ -1,13 +1,16 @@
 ﻿import { createContext, useState, useEffect } from 'react';
+import useAuth from '../hooks/useAuth';
 
 export const BookingStatusContext = createContext();
 
 const BookingStatusProvider = ({ children }) => {
     const [statusList, setStatusList] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const { user } = useAuth()
+    const role = user?.roles?.[0] || '';
     useEffect(() => {
         const fetchBookingStatuses = async () => {
+            if (role !== "Cleaner") return;
             try {
                 const response = await fetch('/bookingstatus', {
                     method: 'GET',
@@ -34,7 +37,7 @@ const BookingStatusProvider = ({ children }) => {
         };
 
         fetchBookingStatuses();
-    }, []);
+    }, [role]);
 
     return (
         <BookingStatusContext.Provider value={{ statusList, loading }}>

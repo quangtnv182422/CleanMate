@@ -13,6 +13,7 @@
         public string Address { get; set; } = null!;
         public string? Note { get; set; }
         public string Status { get; set; } = null!;
+        public int StatusId { get; set; } = 0;
         public bool IsRead { get; set; }
         public string CustomerFullName { get; set; }
         public string CustomerPhoneNumber { get; set; }

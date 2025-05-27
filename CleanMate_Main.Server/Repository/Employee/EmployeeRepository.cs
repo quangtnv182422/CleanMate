@@ -57,7 +57,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                             ServiceDescription = duration.SquareMeterSpecific + "m² làm trong " + duration.DurationTime + " giờ",
                             Duration = $"{duration.DurationTime} giờ",
                             Price = Common.CommonConstants.ChangeMoneyType(servicePrice.Price),
-                            Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * 0.35m / 1000) * 1000),
+                            Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
                             StartTime = Common.CommonConstants.ChangeTimeType(booking.StartTime),
                             Address = address.AddressNo +" " + address.GG_FormattedAddress,

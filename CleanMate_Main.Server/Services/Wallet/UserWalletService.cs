@@ -4,16 +4,19 @@ using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.Wallet;
+using CleanMate_Main.Server.Services.Transaction;
 
 namespace CleanMate_Main.Server.Services.Wallet
 {
     public class UserWalletService : IUserWalletService
     {
         private readonly IUserWalletRepo _walletRepo;
+        private readonly ITransactionService _transactionService;
 
-        public UserWalletService(IUserWalletRepo walletRepo)
+        public UserWalletService(IUserWalletRepo walletRepo, ITransactionService transactionService)
         {
             _walletRepo = walletRepo;
+            _transactionService = transactionService;
         }
 
 
@@ -53,13 +56,13 @@ namespace CleanMate_Main.Server.Services.Wallet
             {
                 throw new InvalidOperationException("Không thể cập nhật số dư ví.");
             }
-
-            // Record the transaction
-            //int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Withdrawal, $"Rút tiền sang tài khoản {bankAccount} tại {bankName}");
-            //if (transactionId <= 0)
-            //{
-            //    throw new InvalidOperationException("Không thể ghi lại giao dịch.");
-            //}
+            
+            //Record the transaction
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Debit, $"Yêu cầu rút tiền từ tài khoản {bankAccount} : {bankName}");
+            if (transactionId <= 0)
+            {
+                throw new InvalidOperationException("Không thể ghi lại giao dịch.");
+            }
 
             // Simulate bank transfer (in a real system, integrate with a payment gateway)
             // For now, assume success if all steps pass

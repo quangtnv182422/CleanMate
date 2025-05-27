@@ -4,10 +4,7 @@ import useAuth from '../hooks/useAuth';
 export const BookingContext = createContext();
 
 const BookingProvider = ({ children }) => {
-    const [open, setOpen] = useState(false);
     const [services, setServices] = useState([]);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
@@ -34,7 +31,7 @@ const BookingProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUserAddress = async () => {
-            if (role !== "Customer") return;
+            if (!user || role !== "Customer") return;
             try {
                 const res = await fetch('/address/get-address', {
                     method: 'GET',
@@ -55,12 +52,9 @@ const BookingProvider = ({ children }) => {
         // gọi khi app load
 
         fetchUserAddress();
-    }, [role]);
+    }, [user, role]);
 
     return <BookingContext.Provider value={{
-        open,
-        handleOpen,
-        handleClose,
         services,
         selectedPlace,
         setSelectedPlace,

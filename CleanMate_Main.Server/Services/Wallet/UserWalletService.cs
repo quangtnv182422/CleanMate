@@ -43,6 +43,9 @@ namespace CleanMate_Main.Server.Services.Wallet
             {
                 throw new ArgumentException("Số tiền yêu cầu phải lớn hơn 0.");
             }
+            if (amount < CommonConstants.MINIMUM_DEBIT_AMOUNT) {
+                throw new ArgumentException($"Sô tiền cần rút phải lớn hơn {CommonConstants.ChangeMoneyType(CommonConstants.MINIMUM_DEBIT_AMOUNT)}");
+            }
 
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
             if (wallet.Balance < amount)
@@ -58,14 +61,40 @@ namespace CleanMate_Main.Server.Services.Wallet
             }
             
             //Record the transaction
-            int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Debit, $"Yêu cầu rút tiền từ tài khoản {bankAccount} : {bankName}");
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Debit, $"Yêu cầu rút tiền từ tài khoản {bankAccount} ({bankName})");
             if (transactionId <= 0)
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");
             }
+            bool saved = await _walletRepo.SaveChangesAsync();
+            return saved;
+        }
+        public async Task<bool> ExchangeMoneyForCoinsAsync(string userId, decimal amount, string paymentMethod, string paymentId)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Số tiền yêu cầu phải lớn hơn 0.");
+            }
+            if (amount < CommonConstants.MINIMUM_DEPOSIT_AMOUNT)
+            {
+                throw new ArgumentException($"Số tiền nạp phải lớn hơn {CommonConstants.ChangeMoneyType(CommonConstants.MINIMUM_DEPOSIT_AMOUNT)}.");
+            }
 
-            // Simulate bank transfer (in a real system, integrate with a payment gateway)
-            // For now, assume success if all steps pass
+            var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
+
+            // Credit the wallet with the amount (assuming 1:1 conversion; adjust conversion rate if needed)
+            bool balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(userId, amount, $"Nạp tiền từ {paymentMethod}, mã giao dịch: {paymentId}");
+            if (!balanceUpdated)
+            {
+                throw new InvalidOperationException("Không thể cập nhật số dư ví.");
+            }
+
+            // Record the transaction
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Credit, $"Nạp tiền từ {paymentMethod}, mã giao dịch: {paymentId}");
+            if (transactionId <= 0)
+            {
+                throw new InvalidOperationException("Không thể ghi lại giao dịch.");
+            }
             bool saved = await _walletRepo.SaveChangesAsync();
             return saved;
         }

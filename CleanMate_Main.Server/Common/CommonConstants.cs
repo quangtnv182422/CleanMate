@@ -9,6 +9,9 @@ namespace CleanMate_Main.Server.Common
         // time interval between each work shift calculated in minutes
         public static readonly decimal COMMISSION_PERCENTAGE = 0.55m; 
         //Commission percentage 
+        public static readonly decimal MINIMUM_DEBIT_AMOUNT = 500000; //toi thieu can 500k coin
+        public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000; //nap toi thieu 200k coin
+
         public static class BookingStatus
         {
             public const int NEW = 1;

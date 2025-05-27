@@ -5,7 +5,7 @@ using CleanMate_Main.Server.Repository.Wallet;
 
 namespace CleanMate_Main.Server.Services.Transaction
 {
-    public class TransactionService
+    public class TransactionService : ITransactionService
     {
         private readonly ITransactionRepo _transactionRepo;
         private readonly IUserWalletRepo _walletRepo;

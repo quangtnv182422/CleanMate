@@ -7,6 +7,8 @@ namespace CleanMate_Main.Server.Common
         public const int DefaultPageSize = 9;
         public static readonly TimeSpan TIME_INTERVAL = TimeSpan.FromMinutes(20);
         // time interval between each work shift calculated in minutes
+        public static readonly decimal COMMISSION_PERCENTAGE = 0.55m; 
+        //Commission percentage 
         public static class BookingStatus
         {
             public const int NEW = 1;

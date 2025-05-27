@@ -2,7 +2,7 @@
 {
     public enum TransactionType
     {
-        Credit,
-        Debit
+        Credit, //nap tien
+        Debit //rut tien
     }
 }

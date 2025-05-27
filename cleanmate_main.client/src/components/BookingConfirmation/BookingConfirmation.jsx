@@ -83,7 +83,7 @@ const BookingConfirmation = () => {
                     </div>
                     <p className="mb-2" style={{ borderBottom: '1px solid #000' }}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</p>
                     <p className="mb-1">Ngày mai, N.Mai</p>
-                    <p className="mb-2" style={{ borderBottom: '1px solid #000', fontSize: '14px', color: '#ccc' }}>08:00 - 10:00 / 2h</p>
+                    <p className="mb-2" style={{ borderBottom: '1px solid #000', fontSize: '16px', color: '#d1d1d1' }}>08:00 - 10:00 / 2h</p>
                     <p className="text-muted">Không có ghi chú</p>
                 </div>
 

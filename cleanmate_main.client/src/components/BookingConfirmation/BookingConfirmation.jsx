@@ -1,4 +1,4 @@
-﻿import { useParams, useNavigate } from 'react-router-dom';
+﻿import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import WestIcon from '@mui/icons-material/West';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
@@ -64,6 +64,21 @@ const styles = {
 const BookingConfirmation = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const {
+        selectedAddress,
+        selectedEmployee,
+        selectedDuration,
+        selectedSpecificArea,
+        price,
+        selectedDay,
+        formatSpecificTime,
+        note
+    } = location.state || {};
+
+    const formatPrice = (price) => {
+        return price.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})
+    }
 
     return (
         <div style={styles.wrapper}>
@@ -81,10 +96,10 @@ const BookingConfirmation = () => {
                             Thông tin ca làm
                         </h6>
                     </div>
-                    <p className="mb-2" style={{ borderBottom: '1px solid #000' }}>số nhà 30 Bồ Đề, Bồ Đề, Long Biên, Hà Nội</p>
-                    <p className="mb-1">Ngày mai, N.Mai</p>
-                    <p className="mb-2" style={{ borderBottom: '1px solid #000', fontSize: '16px', color: '#d1d1d1' }}>08:00 - 10:00 / 2h</p>
-                    <p className="text-muted">Không có ghi chú</p>
+                    <p className="mb-2" style={{ borderBottom: '1px solid #000' }}>{selectedAddress.addressNo}</p>
+                    <p className="mb-1">Ngày: {selectedDay}</p>
+                    <p className="mb-2" style={{ borderBottom: '1px solid #000', fontSize: '16px', color: '#222', opacity: 0.8 }}>Bắt đầu lúc: {formatSpecificTime} / {selectedDuration}h</p>
+                    <p className="text-muted">{!note ? "Không có ghi chú" : note}</p>
                 </div>
 
                 {/* Thông tin dịch vụ */}
@@ -96,8 +111,8 @@ const BookingConfirmation = () => {
                         </h6>
                     </div>
                     <div className="d-flex justify-content-between">
-                        <span>Phí dịch vụ (2 nhân viên x 2h x 20m²)</span>
-                        <span>188,000đ</span>
+                        <span>Phí dịch vụ ({selectedEmployee} nhân viên x {selectedDuration}h x {selectedSpecificArea}m²)</span>
+                        <span>{formatPrice(price)}</span>
                     </div>
                     <hr />
                     <div className="d-flex justify-content-between text-muted">
@@ -110,11 +125,11 @@ const BookingConfirmation = () => {
                 <div className="mb-3">
                     <div className="d-flex justify-content-between fw-semibold">
                         <span>Tiền dịch vụ</span>
-                        <span>188,000đ</span>
+                        <span>{formatPrice(price)}</span>
                     </div>
                     <div className="d-flex justify-content-between fw-bold">
                         <span>Tổng tiền</span>
-                        <span>188,000đ</span>
+                        <span>{formatPrice(price)}</span>
                     </div>
                 </div>
             </div>

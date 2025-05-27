@@ -47,7 +47,7 @@ const GoogleMapAutocomplete = () => {
                     latitude: selectedPlace.location.lat,
                     longitude: selectedPlace.location.lng,
                     isInUse: true,
-                    isDefault: false
+                    isDefault: false // đang fix cứng tạm sau sẽ làm button để đánh dấu isDefault
                 },
                 { withCredentials: true }
             );

@@ -1,8 +1,17 @@
 ﻿import { useState, useEffect, useContext } from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { BookingContext } from '../../context/BookingProvider';
+import {
+    Box,
+    Button,
+    Typography,
+    Grid,
+    TextField,
+} from '@mui/material';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import CalendarToday from '@mui/icons-material/CalendarToday';
@@ -13,15 +22,8 @@ import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
-import TextField from '@mui/material/TextField';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import axios from 'axios';
-import { BookingContext } from '../../context/BookingProvider';
 
 const primaryColor = '#1565C0';
 const style = {
@@ -96,7 +98,15 @@ const style = {
         border: '1px solid #ccc',
         borderRadius: '5px',
         padding: 1.2,
-        zIndex: '1000'
+        zIndex: '1000',
+
+        '@media (max-width: 600px)': {
+            left: 0,
+            right: 0,
+            width: '90%',
+            margin: '0 auto',
+            top: '60px',
+        },
     },
     googleMapAddress: {
         fontSize: '16px',
@@ -117,13 +127,21 @@ const BookingService = () => {
     const location = useLocation();
 
     const [selectedEmployee, setSelectedEmployee] = useState(1);
-    const [selectedDuration, setSelectedTime] = useState(1);
+    const [selectedDuration, setSelectedDuration] = useState(1);
+    const [price, setPrice] = useState(160000);
     const [selectedDay, setSelectedDay] = useState(null);
     const [days, setDays] = useState([]);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
-    const [selectedAddress, setSelectedAddress] = useState(null);
+    // format time HH:mm A
+    const [selectedAddress, setSelectedAddress] = useState(() => {
+        const saved = localStorage.getItem('selectedAddress');
+        return saved ? JSON.parse(saved) : null;
+    });
+    const [note, setNote] = useState('');
+    console.log(note)
     const [service, setService] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
 
@@ -134,10 +152,18 @@ const BookingService = () => {
     const queryParams = new URLSearchParams(location.search);
     const serviceId = queryParams.get('service');
 
-    const userFirstAddress = userAddress.length > 0 ? userAddress[0] : null;
+    const handleChoosePrice = (service) => {
+        setSelectedDuration(service.durationTime);
+        setPrice(service.price);
+    }
+
+    const formatVNDCurrency = (amount) => {
+        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+    }
 
     const handleSelectAddress = (address) => {
         setSelectedAddress(address);
+        localStorage.setItem('selectedAddress', JSON.stringify(address));
         toggleDropdown();
     }
 
@@ -253,22 +279,29 @@ const BookingService = () => {
                                             }}>Chọn địa chỉ</Typography>
                                             <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
                                         </Box>
-                                        {userAddress.map((item) => (
-                                            <Box key={item.addressId} sx={{
-                                                mt: 1.5,
-                                                p: 0.5,
-                                                cursor: 'pointer',
-                                                borderRadius: '4px',
-                                                '&:hover': {
-                                                    backgroundColor: '#f0f0f0',
-                                                    color: '#1565C0',
-                                                }
-                                            }} onClick={() => handleSelectAddress(item)}
-                                            >
-                                                <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
-                                                <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
-                                            </Box>
-                                        ))}
+                                        {userAddress.slice().reverse().map((item) => {
+                                            const isSelected = selectedAddress?.addressId === item.addressId;
+
+                                            return (
+                                                <Box key={item.addressId} sx={{
+                                                    mt: 1,
+                                                    px: 0.5,
+                                                    py: 1,
+                                                    cursor: 'pointer',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: isSelected ? '#f1f1f1' : 'transparent',
+                                                    color: isSelected ? '#fff' : 'inherit',
+                                                    '&:hover': {
+                                                        backgroundColor: isSelected ? '#f1f1f1' : '#f0f0f0',
+                                                        color: '#1565C0',
+                                                    }
+                                                }} onClick={() => handleSelectAddress(item)}
+                                                >
+                                                    <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
+                                                    <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
+                                                </Box>
+                                            )
+                                        })}
                                         <Box sx={{ mt: 4 }}>
                                             <Button
                                                 variant="outlined"
@@ -322,7 +355,7 @@ const BookingService = () => {
                                     <Button
                                         fullWidth
                                         variant={selectedDuration === opt.durationTime ? "contained" : "outlined"}
-                                        onClick={() => setSelectedTime(opt.durationTime)}
+                                        onClick={() => handleChoosePrice(opt)}
                                         sx={{ whiteSpace: "pre-line", height: "70px", display: 'flex', flexDirection: 'column' }}
                                     >
                                         <p style={{
@@ -390,6 +423,15 @@ const BookingService = () => {
                                         slotProps={{ textField: { fullWidth: true } }}
                                         minTime={minTime}
                                         shouldDisableTime={shouldDisableTime}
+                                        open={open}
+                                        onOpen={() => setOpen(true)}
+                                        onClose={() => setOpen(false)}
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                onClick: () => setOpen(true), // ⬅ mở popup khi click vào input
+                                            }
+                                        }}
                                     />
                                 </DemoContainer>
                             </LocalizationProvider>
@@ -405,6 +447,8 @@ const BookingService = () => {
                         <TextField
                             fullWidth
                             multiline
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
                             rows={8}
                             placeholder="Nhập ghi chú để nhân viên có thể dễ dàng phục vụ bạn hơn"
                             variant="outlined"
@@ -429,7 +473,7 @@ const BookingService = () => {
                     </Box>
 
                     <Box sx={style.footer}>
-                        <Typography fontWeight="bold">169,200 đ / 2h</Typography>
+                        <Typography fontWeight="bold">{`${formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
                         <Button
                             variant="contained"
                             sx={{

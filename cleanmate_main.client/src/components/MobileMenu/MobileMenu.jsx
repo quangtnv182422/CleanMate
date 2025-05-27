@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+﻿import React, { Fragment, useState } from 'react';
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Collapse from "@mui/material/Collapse";
@@ -8,158 +8,29 @@ import './style.css';
 const menus = [
     {
         id: 1,
-        title: 'Home',
+        title: 'Trang chủ',
         link: '/home',
-        submenu: [
-            {
-                id: 11,
-                title: 'Home style 1',
-                link: '/home'
-            },
-            {
-                id: 12,
-                title: 'Home style 2',
-                link: '/home2'
-            },
-            {
-                id: 13,
-                title: 'Home style 3',
-                link: '/home3'
-            },
-        ]
     },
-
     {
         id: 2,
-        title: 'About',
+        title: 'Về chúng tôi',
         link: '/about',
     },
-
     {
         id: 6,
-        title: 'Service',
+        title: 'Dịch vụ',
         link: '/service',
-        submenu: [
-            {
-                id: 61,
-                title: 'Service',
-                link: '/service'
-            },
-            {
-                id: 62,
-                title: 'Service S2',
-                link: '/service-s2'
-            },
-            {
-                id: 63,
-                title: 'Service single',
-                link: '/service-single/1'
-            },
-        ]
     },
-
-    {
-        id: 3,
-        title: 'Pages',
-        link: '/',
-        submenu: [
-            {
-                id: 31,
-                title: 'Project',
-                link: '/project'
-            },
-            {
-                id: 32,
-                title: 'Project single',
-                link: '/project-single/1'
-            },
-            {
-                id: 322,
-                title: 'Team Single',
-                link: '/team-single/1'
-            },
-            {
-                id: 332,
-                title: 'Appointment',
-                link: '/appointment'
-            },
-            {
-                id: 333,
-                title: 'Terms & Conditions',
-                link: '/terms'
-            },
-            {
-                id: 334,
-                title: 'Testimonial',
-                link: '/testimonial'
-            },
-            {
-                id: 33,
-                title: 'Pricing',
-                link: '/pricing'
-            },
-            {
-                id: 34,
-                title: '404 Error',
-                link: '/404'
-            },
-            {
-                id: 35,
-                title: 'Login',
-                link: '/login'
-            },
-            {
-                id: 36,
-                title: 'Register',
-                link: '/register'
-            },
-        ]
-    },
-
     {
         id: 5,
         title: 'Blog',
         link: '/blog',
-        submenu: [
-            {
-                id: 51,
-                title: 'Blog',
-                link: '/blog'
-            },
-            {
-                id: 52,
-                title: 'Blog Left sidebar',
-                link: '/blog-left'
-            },
-            {
-                id: 53,
-                title: 'Blog full width',
-                link: '/blog-fullwidth'
-            },
-            {
-                id: 54,
-                title: 'Blog single',
-                link: '/blog-single/1'
-            },
-            {
-                id: 55,
-                title: 'Blog single Left sidebar',
-                link: '/blog-single-left-sidebar/1'
-            },
-            {
-                id: 56,
-                title: 'Blog single Left sidebar',
-                link: '/blog-single-fullwidth/1'
-            },
-        ]
     },
     {
         id: 88,
-        title: 'Contact',
+        title: 'Liên hệ',
         link: '/contact',
     }
-
-
 ]
 
 

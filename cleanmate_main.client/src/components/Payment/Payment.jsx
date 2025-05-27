@@ -89,7 +89,7 @@ const style = {
 const Payment = () => {
     const navigate = useNavigate();
     const [selectedMethod, setSelectedMethod] = useState('CleanMate');
-    const amount = 291000;
+    const amount = 188000;
 
     return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>

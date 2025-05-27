@@ -34,8 +34,7 @@ const Contactpage = () => {
                                         </div>
                                         <div className="office-info-text">
                                             <h2>Email</h2>
-                                            <p>support@cleanmate.com</p>
-                                            <p>booking@cleanmate.com</p>
+                                            <p>cleanmatemail@gmail.com</p>
                                         </div>
                                     </div>
                                 </div> 

@@ -18,6 +18,8 @@ import SimpleReactValidator from "simple-react-validator";
 
 import vnpayLogo from "../../images/vnpay-logo.png";
 import payosLogo from "../../images/payos-logo.png";
+import axios from "axios";
+import useAuth from "../../hooks/useAuth"
 
 const paymentMethods = [
     {
@@ -32,7 +34,10 @@ const paymentMethods = [
     },
 ];
 
+
+
 const DepositCoin = () => {
+    const { user } = useAuth();
     const [amount, setAmount] = useState(0);
     const [selectedMethod, setSelectedMethod] = useState("vnpay");
     const navigate = useNavigate();
@@ -63,7 +68,7 @@ const DepositCoin = () => {
         validator.showMessages();
     }
 
-    const handleTopUp = () => {
+   /* const handleTopUp = () => {
         if (validator.allValid()) {
             selectedMethod === "vnpay"
                 ? navigate('/coin/deposit/pay?method=vnpay')
@@ -71,7 +76,52 @@ const DepositCoin = () => {
         } else {
             validator.showMessages();
         }
+    };*/
+
+    const handleTopUp = async () => {
+        if (validator.allValid()) {
+            const parsedAmount = parseFloat(amount);
+            if (isNaN(parsedAmount)) {
+                alert("Số tiền không hợp lệ");
+                return;
+            }
+
+            try {
+                const response = await axios.post(
+                    "/payments/create-vnpay",
+                    {
+                        userId: user.id,
+                        orderType: 'other',
+                        amount: parsedAmount,
+                        typeTransaction: "Credit",
+                        name: user.fullName + "_" 
+                    },
+                    {
+                        withCredentials: true,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const { url } = response.data;
+                if (url) {
+                    window.location.href = url;
+                } else {
+                    alert("Không nhận được URL thanh toán.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi tạo giao dịch:", error);
+                const message =
+                    error.response?.data?.message || "Đã xảy ra lỗi khi tạo giao dịch.";
+                alert(message);
+            }
+        } else {
+            validator.showMessages();
+        }
     };
+
+
 
     return (
         <Box maxWidth={600} mx="auto" mt={4} p={2}>
@@ -116,7 +166,7 @@ const DepositCoin = () => {
                         <TextField
                             fullWidth
                             name="amount"
-                            type="amount"
+                            type="number"
                             value={amount}
                             onBlur={(e) => handleAmountChange(e)}
                             onChange={(e) => handleAmountChange(e)}

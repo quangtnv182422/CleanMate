@@ -1,20 +1,27 @@
 ﻿import React, { useContext } from 'react'
-import {useNavigate} from 'react-router-dom';
-import Services from '../../api/service';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'
+import Services from '../../api/service';
 import { BookingContext } from '../../context/BookingProvider';
 import BookingService from '../../components/BookingService/BookingService';
+import useAuth from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 const ServiceSidebar = ({ id }) => {
     const { open, handleOpen, handleClose } = useContext(BookingContext);
     const navigate = useNavigate();
-
+    const { user } = useAuth();
     const SubmitHandler = (e) => {
         e.preventDefault()
     }
 
     const ClickHandler = () => {
         window.scrollTo(10, 0);
+    }
+
+    const handleBooking = () => {
+        toast.error("Bạn phải đăng ký người dùng để sử dụng dịch vụ");
+        navigate('/register/user');
     }
 
     return (
@@ -24,7 +31,13 @@ const ServiceSidebar = ({ id }) => {
                     <h2>Hãy đặt dịch vụ</h2>
                     <p>Bấm đăng ký dịch vụ để hoàn thiện thông tin</p>
                     <form className="form" onSubmit={SubmitHandler}>
-                        <button type="submit" style={{ fontSize: "18px" }} onClick={() => navigate(`/booking-service?service=${id}`)}>Đăng ký dịch vụ</button>
+                        {!user ?
+                            (
+                                <button style={{ fontSize: "18px" }} onClick={handleBooking}>Đăng ký người dùng</button>
+                            ) : (
+                                <button type="submit" style={{ fontSize: "18px" }} onClick={() => navigate(`/booking-service?service=${id}`)}>Đăng ký dịch vụ</button>
+                            )
+                        }
                     </form>
                 </div>
                 <div className="wpo-contact-widget widget">

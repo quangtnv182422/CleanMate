@@ -100,7 +100,6 @@ const style = {
         borderRadius: '5px',
         padding: 1.2,
         zIndex: '1000',
-
         '@media (max-width: 600px)': {
             left: 0,
             right: 0,
@@ -123,14 +122,11 @@ const style = {
 };
 
 const BookingService = () => {
-    const {
-        userAddress
-    } = useContext(BookingContext);
+    const { userAddress } = useContext(BookingContext);
     const navigate = useNavigate();
     const location = useLocation();
 
-
-    // start of data to store booking information
+    // Start of data to store booking information
     const [selectedAddress, setSelectedAddress] = useState(() => {
         const saved = localStorage.getItem('selectedAddress');
         return saved ? JSON.parse(saved) : null;
@@ -140,12 +136,12 @@ const BookingService = () => {
     const [selectedDuration, setSelectedDuration] = useState(1);
     const [price, setPrice] = useState(160000);
     const [selectedDay, setSelectedDay] = useState(null);
-    const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null); // format time HH:mm A
+    const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
     const [note, setNote] = useState('');
-    // end of data to store booking information
+    // End of data to store booking information
 
     const [days, setDays] = useState([]);
-    const [service, setService] = useState([]); //store information of service details
+    const [service, setService] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [open, setOpen] = useState(false);
 
@@ -160,25 +156,26 @@ const BookingService = () => {
 
     const handleChoosePrice = (service) => {
         setSelectedDuration(service.durationTime);
-        setSelectedSpecificArea(service.squareMeterSpecific)
+        setSelectedSpecificArea(service.squareMeterSpecific);
         setPrice(service.price);
-    }
+    };
 
     const formatVNDCurrency = (amount) => {
-        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-    }
+        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    };
 
     const handleSelectAddress = (address) => {
         setSelectedAddress(address);
         localStorage.setItem('selectedAddress', JSON.stringify(address));
         toggleDropdown();
-    }
+    };
 
+    // Fetch service details and update on navigation or serviceId change
     useEffect(() => {
         if (!serviceId) return;
 
-        fetchDetailService(serviceId)
-    }, [serviceId]);
+        fetchDetailService(serviceId);
+    }, [serviceId, location]); // Add location as a dependency to re-run on navigation
 
     const fetchDetailService = async (serviceId) => {
         try {
@@ -189,6 +186,7 @@ const BookingService = () => {
         }
     };
 
+    // Update days on mount
     useEffect(() => {
         const today = new Date();
         const dayLabels = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
@@ -215,6 +213,31 @@ const BookingService = () => {
         setSelectedDay(newDays[0].date);
     }, []);
 
+    // Update selectedAddress when userAddress changes
+    useEffect(() => {
+        if (userAddress.length > 0 && !selectedAddress) {
+            // Select the latest address by default
+            const latestAddress = userAddress[userAddress.length - 1];
+            setSelectedAddress(latestAddress);
+            localStorage.setItem('selectedAddress', JSON.stringify(latestAddress));
+        }
+    }, [userAddress, selectedAddress]);
+
+    // Listen for localStorage changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const saved = localStorage.getItem('selectedAddress');
+            if (saved) {
+                setSelectedAddress(JSON.parse(saved));
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
     const handleDaySelect = (day) => setSelectedDay(day);
     const minTime = isToday ? now : dayjs(selectedDay, 'DD/MM/YYYY').startOf('day');
 
@@ -236,13 +259,13 @@ const BookingService = () => {
     const shouldDisableTime = (timeValue, clockType) => {
         if (clockType === 'minutes') {
             const minutes = timeValue;
-            return minutes % 15 !== 0; // Disable if minutes are not 0, 15, 30, 45
+            return minutes % 15 !== 0;
         }
         return false;
     };
 
     const formatSpecificTime = selectedSpecificTimes?.format("HH:mm A");
-
+    console.log(selectedAddress)
     const handleSubmit = () => {
         if (!selectedAddress || !selectedSpecificTimes) {
             toast.error("Vui lòng chọn địa chỉ và giờ làm việc cụ thể.");
@@ -259,9 +282,9 @@ const BookingService = () => {
                     formatSpecificTime,
                     note
                 }
-            })
+            });
         }
-    }
+    };
 
     return (
         <div>
@@ -282,7 +305,6 @@ const BookingService = () => {
                             <Button
                                 variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }}
                                 onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
-
                             >
                                 Thêm địa chỉ mới
                             </Button>
@@ -329,13 +351,13 @@ const BookingService = () => {
                                                     <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
                                                     <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
                                                 </Box>
-                                            )
+                                            );
                                         })}
                                         <Box sx={{ mt: 4 }}>
                                             <Button
                                                 variant="outlined"
                                                 sx={{ width: '100%' }}
-                                                onClick={() => navigate(`/booking-service/choose-address?serviceId=${serviceId}`)}
+                                                onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
                                             >
                                                 Chọn địa chỉ mới
                                             </Button>
@@ -343,8 +365,7 @@ const BookingService = () => {
                                     </Box>
                                 )}
                             </>
-                        )
-                        }
+                        )}
                     </Box>
 
                     {/* Số lượng nhân viên */}
@@ -428,7 +449,7 @@ const BookingService = () => {
                                         borderWidth: 2,
                                     }}
                                 >
-                                    {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
+                                    {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>): (<Typography>{day.label}</Typography>)}
                                     <Typography variant="caption">{day.sub}</Typography>
                                 </Button>
                             ))}
@@ -458,7 +479,7 @@ const BookingService = () => {
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
-                                                onClick: () => setOpen(true), // ⬅ mở popup khi click vào input
+                                                onClick: () => setOpen(true),
                                             }
                                         }}
                                     />

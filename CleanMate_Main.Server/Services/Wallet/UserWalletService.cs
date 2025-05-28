@@ -37,6 +37,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             return wallet.Balance;
         }
 
+        //--Rút tiền---
         public async Task<bool> ExchangeCoinsForMoneyAsync(string userId, decimal amount, string bankAccount, string bankName)
         {
             if (amount <= 0)
@@ -69,6 +70,8 @@ namespace CleanMate_Main.Server.Services.Wallet
             bool saved = await _walletRepo.SaveChangesAsync();
             return saved;
         }
+
+        //--Nạp tiền---
         public async Task<bool> ExchangeMoneyForCoinsAsync(string userId, decimal amount, string paymentMethod, string paymentId)
         {
             if (amount <= 0)

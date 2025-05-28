@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useContext } from 'react';
+﻿import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Helmet } from 'react-helmet';
@@ -13,6 +13,9 @@ import useAuth from '../../hooks/useAuth';
 const GoogleMapAutocomplete = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const mapRef = useRef(null);
+    const markerRef = useRef(null);
+    const infoWindowRef = useRef(null);
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const {
         selectedPlace,
@@ -31,7 +34,7 @@ const GoogleMapAutocomplete = () => {
 
     const queryParams = new URLSearchParams(location.search);
 
-    const serviceId = queryParams.get('serviceId');
+    const serviceId = queryParams.get('service');
 
 
     const handleSubmitAddress = async () => {
@@ -62,111 +65,58 @@ const GoogleMapAutocomplete = () => {
                 navigate(`/booking-service?service=${serviceId}`);
             }, 200); 
             handleClose();
-*/
-            handleClose(); // đóng modal trước
-            console.log("➡️ Chuyển hướng đến:", `/booking-service?service=${serviceId}`);
+            */
+
+            //handleClose(); // đóng modal trước
+            //console.log("➡️ Chuyển hướng đến:", `/booking-service?service=${serviceId}`);
+            //setTimeout(() => {
+            //    navigate(`/booking-service?service=${serviceId}`);
+            //}, 100);
+
+            if (mapRef.current) {
+                if (selectedPlace.viewport) {
+                    mapRef.current.fitBounds(selectedPlace.viewport);
+                } else {
+                    mapRef.current.setCenter(selectedPlace.location);
+                    mapRef.current.setZoom(17);
+                }
+
+                // Update or create marker
+                if (markerRef.current) {
+                    markerRef.current.setMap(null);
+                }
+                markerRef.current = new google.maps.marker.AdvancedMarkerElement({
+                    map: mapRef.current,
+                    position: selectedPlace.location,
+                    title: selectedPlace.displayName,
+                });
+
+                // Update or create infoWindow
+                if (infoWindowRef.current) {
+                    infoWindowRef.current.close();
+                }
+                infoWindowRef.current = new google.maps.InfoWindow({
+                    content: `<div><strong>${selectedPlace.displayName}</strong><br>${selectedPlace.formattedAddress}</div>`,
+                    position: selectedPlace.location,
+                });
+                infoWindowRef.current.open({ map: mapRef.current, anchor: markerRef.current });
+            }
+
+            handleClose();
             setTimeout(() => {
                 navigate(`/booking-service?service=${serviceId}`);
-            }, 100); 
+            }, 100);
 
         } catch (error) {
             console.error("❌ Lỗi khi thêm địa chỉ:", error);
         }
     };
 
-   /* useEffect(() => {
-        if (window._googleMapAutocompleteInitialized) return;
-        window._googleMapAutocompleteInitialized = true;
-
-        const loader = new Loader({
-            apiKey: apiKey,
-            version: "weekly",
-            libraries: ["places"],
-        });
-
-        loader.load().then(async () => {
-            const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
-                google.maps.importLibrary("maps"),
-                google.maps.importLibrary("marker"),
-            ]);
-
-            await google.maps.importLibrary("places");
-
-            const center = { lat: 21.0278, lng: 105.8342 };
-
-            const map = new Map(document.getElementById("map"), {
-                center,
-                zoom: 13,
-                mapId: "4504f8b37365c3d0",
-                mapTypeControl: false,
-            });
-
-            const placeAutocomplete = new google.maps.places.PlaceAutocompleteElement({
-                locationBias: center,
-                includedRegionCodes: ['vn'],
-            });
-
-            placeAutocomplete.id = "place-autocomplete-input";
-
-            const card = document.getElementById("place-autocomplete-card");
-            if (!document.getElementById("place-autocomplete-input")) {
-                card.appendChild(placeAutocomplete);
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
-            }
-
-            const marker = new AdvancedMarkerElement({ map });
-            const infoWindow = new google.maps.InfoWindow({});
-
-            const title = document.getElementById("place-title");
-            const info = document.getElementById("place-info");
-
-            placeAutocomplete.addEventListener("gmp-select", async ({ placePrediction }) => {
-                const place = placePrediction.toPlace();
-                await place.fetchFields({
-                    fields: ["displayName", "formattedAddress", "location", "viewport"],
-                });
-
-                if (place.viewport) {
-                    map.fitBounds(place.viewport);
-                } else {
-                    map.setCenter(place.location);
-                    map.setZoom(17);
-                }
-
-                marker.position = place.location;
-
-                const content =
-                    `<div><strong>${place.displayName}</strong><br>${place.formattedAddress}</div>`;
-                infoWindow.setContent(content);
-                infoWindow.setPosition(place.location);
-                infoWindow.open({ map, anchor: marker });
-
-                const placeData = {
-                    id: place.id,
-                    displayName: place.displayName,
-                    formattedAddress: place.formattedAddress,
-                    location: {
-                        lat: place.location.lat(),
-                        lng: place.location.lng(),
-                    },
-                    viewport: place.viewport,
-                };
-                setSelectedPlace(placeData);
-
-                if (title) title.textContent = "Selected Place:";
-                if (info) info.textContent = JSON.stringify(place.toJSON(), null, 2);
-            });
-        });
-    }, [apiKey]);
-*/
     useEffect(() => {
         if (window._googleMapAutocompleteInitialized) return;
         window._googleMapAutocompleteInitialized = true;
 
-        let map;
         let placeAutocomplete;
-        let marker;
-        let infoWindow;
         let card;
         let placeAutocompleteListener;
 
@@ -186,7 +136,7 @@ const GoogleMapAutocomplete = () => {
 
             const center = { lat: 21.0278, lng: 105.8342 };
 
-            map = new Map(document.getElementById("map"), {
+            mapRef.current = new Map(document.getElementById("map"), {
                 center,
                 zoom: 13,
                 mapId: "4504f8b37365c3d0",
@@ -203,14 +153,8 @@ const GoogleMapAutocomplete = () => {
             card = document.getElementById("place-autocomplete-card");
             if (!document.getElementById("place-autocomplete-input")) {
                 card.appendChild(placeAutocomplete);
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+                mapRef.current.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
             }
-
-            marker = new AdvancedMarkerElement({ map });
-            infoWindow = new google.maps.InfoWindow({});
-
-            const title = document.getElementById("place-title");
-            const info = document.getElementById("place-info");
 
             placeAutocompleteListener = placeAutocomplete.addEventListener(
                 "gmp-select",
@@ -221,18 +165,31 @@ const GoogleMapAutocomplete = () => {
                     });
 
                     if (place.viewport) {
-                        map.fitBounds(place.viewport);
+                        mapRef.current.fitBounds(place.viewport);
                     } else {
-                        map.setCenter(place.location);
-                        map.setZoom(17);
+                        mapRef.current.setCenter(place.location);
+                        mapRef.current.setZoom(17);
                     }
 
-                    marker.position = place.location;
+                    // Update marker
+                    if (markerRef.current) {
+                        markerRef.current.setMap(null);
+                    }
+                    markerRef.current = new google.maps.marker.AdvancedMarkerElement({
+                        map: mapRef.current,
+                        position: place.location,
+                        title: place.displayName,
+                    });
 
-                    const content = `<div><strong>${place.displayName}</strong><br>${place.formattedAddress}</div>`;
-                    infoWindow.setContent(content);
-                    infoWindow.setPosition(place.location);
-                    infoWindow.open({ map, anchor: marker });
+                    // Update infoWindow
+                    if (infoWindowRef.current) {
+                        infoWindowRef.current.close();
+                    }
+                    infoWindowRef.current = new google.maps.InfoWindow({
+                        content: `<div><strong>${place.displayName}</strong><br>${place.formattedAddress}</div>`,
+                        position: place.location,
+                    });
+                    infoWindowRef.current.open({ map: mapRef.current, anchor: markerRef.current });
 
                     const placeData = {
                         id: place.id,
@@ -245,29 +202,22 @@ const GoogleMapAutocomplete = () => {
                         viewport: place.viewport,
                     };
                     setSelectedPlace(placeData);
-
-                    if (title) title.textContent = "Selected Place:";
-                    if (info) info.textContent = JSON.stringify(place.toJSON(), null, 2);
                 }
             );
         });
 
         return () => {
-            // Remove event listener
             if (placeAutocompleteListener) {
                 google.maps.event.removeListener(placeAutocompleteListener);
             }
-            // Remove marker from map
-            if (marker) {
-                marker.setMap(null);
+            if (markerRef.current) {
+                markerRef.current.setMap(null);
             }
-            // Close info window
-            if (infoWindow) {
-                infoWindow.close();
+            if (infoWindowRef.current) {
+                infoWindowRef.current.close();
             }
-            // Remove controls added to map (the card element)
-            if (map && card) {
-                const controls = map.controls[google.maps.ControlPosition.TOP_LEFT];
+            if (mapRef.current && card) {
+                const controls = mapRef.current.controls[google.maps.ControlPosition.TOP_LEFT];
                 for (let i = 0; i < controls.getLength(); i++) {
                     if (controls.getAt(i) === card) {
                         controls.removeAt(i);
@@ -275,7 +225,6 @@ const GoogleMapAutocomplete = () => {
                     }
                 }
             }
-            // Clear global flag if you want to allow reinit later (optional)
             window._googleMapAutocompleteInitialized = false;
         };
     }, [apiKey, setSelectedPlace]);

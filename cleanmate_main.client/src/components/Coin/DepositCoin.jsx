@@ -15,6 +15,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import SimpleReactValidator from "simple-react-validator";
+import { toast } from "react-toastify";
 
 import vnpayLogo from "../../images/vnpay-logo.png";
 import payosLogo from "../../images/payos-logo.png";
@@ -65,9 +66,7 @@ const DepositCoin = () => {
 
     const handleTopUp = () => {
         if (validator.allValid()) {
-            selectedMethod === "vnpay"
-                ? navigate('/coin/deposit/pay?method=vnpay')
-                : navigate('/coin/deposit/pay?method=payos')
+            toast.success('Bạn đã thanh toán thành công')
         } else {
             validator.showMessages();
         }

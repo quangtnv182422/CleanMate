@@ -144,6 +144,47 @@
     background-color: #f0f0f0;
 }
 
+.cleanmate-wallet {
+    height: 115px;
+    margin: 5px 0;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+
+    .cleanmate-wallet-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+        padding: 10px;
+    }
+
+    .cleanmate-wallet-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 50px;
+        padding: 10px;
+        margin: 0 10px;
+        border-radius: 6px;
+        color: #000;
+        border: 1px solid #ccc;
+
+        .cleanmate-wallet-balance {
+            margin: 0;
+        }
+
+        .deposit-button {
+            color: #13287E;
+            border: 1.4px solid #13287E;
+
+            &:hover {
+                background-color: #13287E;
+                color: #fff;
+            }
+        }
+    }
+}
+
 .user-avatar-container {
     display: flex;
     justify-content: center;
@@ -188,9 +229,14 @@
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    min-width: 300px;
+    min-width: 350px;
     font-family: Arial, sans-serif;
     padding: 10px;
+
+    @media (max-width: 767px) {
+        right: -160px;
+        width: 100%;
+    }
 }
 
 .user-profile {

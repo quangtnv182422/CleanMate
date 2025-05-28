@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -88,8 +88,13 @@ const style = {
 
 const Payment = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { price } = location.state || {};
     const [selectedMethod, setSelectedMethod] = useState('CleanMate');
-    const amount = 188000;
+
+    const formatPrice = (price) => {
+        return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    }
 
     return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>
@@ -166,7 +171,7 @@ const Payment = () => {
                 <Box>
                     <Typography variant="body2">Số tiền phải thanh toán</Typography>
                     <Typography variant="h6" sx={{ color: '#1565C0', fontWeight: 600 }}>
-                        {amount.toLocaleString()} ₫
+                        {formatPrice(price)}
                     </Typography>
                 </Box>
                 <Button

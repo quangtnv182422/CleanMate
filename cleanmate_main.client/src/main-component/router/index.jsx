@@ -36,6 +36,7 @@ import BookingConfirmation from '../../components/BookingConfirmation/BookingCon
 import BookingService from '../../components/BookingService/BookingService';
 import Payment from '../../components/Payment/Payment';
 import GoogleMapAutocomplete from '../../components/GoogleMap/GoogleMapAutocomplete';
+import DepositCoin from '../../components/Coin/DepositCoin';
 
 const AllRoute = () => {
 
@@ -76,7 +77,7 @@ const AllRoute = () => {
                     <Route path="/booking-service" element={<BookingService key={location.search} />} />
                     <Route path="/order/payment" element={<Payment />} />
                     <Route path="/booking-service/choose-address" element={<GoogleMapAutocomplete />} />
-
+                    <Route path="/coin/deposit" element={<DepositCoin />} />
                 </Routes>
             </BrowserRouter>
         </div>

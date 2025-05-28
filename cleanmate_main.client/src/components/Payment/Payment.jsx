@@ -23,12 +23,6 @@ const paymentMethods = [
         icon: <AccountBalanceWalletIcon sx={{ color: '#43A047' }} />,
     },
     {
-        id: 'momo',
-        label: 'Ví MoMo',
-        subLabel: '',
-        icon: <PaymentIcon sx={{ color: '#D81B60' }} />,
-    },
-    {
         id: 'vnpay',
         label: 'VNPAY',
         subLabel: '',
@@ -40,12 +34,6 @@ const paymentMethods = [
         subLabel: 'Qua ngân hàng',
         icon: <AccountBalanceIcon sx={{ color: '#1565C0' }} />,
     },
-    {
-        id: 'cash',
-        label: 'Tiền mặt',
-        subLabel: '',
-        icon: <PaymentIcon sx={{ color: '#FF9800' }} />,
-    }
 ];
 
 const primaryColor = '#1565C0';
@@ -156,6 +144,7 @@ const Payment = () => {
                                     '&:hover': { backgroundColor: '#388E3C' },
                                     textTransform: 'none',
                                 }}
+                                onClick={() => navigate('/coin/deposit')}
                             >
                                 Nạp tiền
                             </Button>

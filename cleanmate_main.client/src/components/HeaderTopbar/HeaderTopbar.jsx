@@ -5,7 +5,7 @@ import useAuth from '../../hooks/useAuth';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import CleaningServicesOutlinedIcon from '@mui/icons-material/CleaningServicesOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 
 const HeaderTopbar = () => {
     const { user, loading } = useAuth();
@@ -92,6 +92,16 @@ const HeaderTopbar = () => {
                                                     <div className="dropdown-item" onClick={() => navigateTo("/history")}>
                                                         <CleaningServicesOutlinedIcon size="small" />
                                                         Lịch sử giao dịch
+                                                    </div>
+                                                </div>
+                                                <div className="cleanmate-wallet">
+                                                    <div className="cleanmate-wallet-title">
+                                                        <AccountBalanceWalletOutlinedIcon size="small" />
+                                                        Ví CleanMate
+                                                    </div>
+                                                    <div className="cleanmate-wallet-content">
+                                                        <p className="cleanmate-wallet-balance">Số dư hiện tại: 0đ</p>
+                                                        <button className="btn deposit-button" onClick={() => navigate('/coin/deposit') }>Nạp Tiền</button>
                                                     </div>
                                                 </div>
                                                 <div className="dropdown-item logout-btn" onClick={handleLogout}>

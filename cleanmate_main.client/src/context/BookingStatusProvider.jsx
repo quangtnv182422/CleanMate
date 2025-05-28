@@ -10,7 +10,6 @@ const BookingStatusProvider = ({ children }) => {
     const role = user?.roles?.[0] || '';
     useEffect(() => {
         const fetchBookingStatuses = async () => {
-            if (role !== "Cleaner") return;
             try {
                 const response = await fetch('/bookingstatus', {
                     method: 'GET',
@@ -37,7 +36,7 @@ const BookingStatusProvider = ({ children }) => {
         };
 
         fetchBookingStatuses();
-    }, [role]);
+    }, []);
 
     return (
         <BookingStatusContext.Provider value={{ statusList, loading }}>

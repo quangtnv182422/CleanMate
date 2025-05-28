@@ -11,4 +11,3 @@ namespace CleanMate_Main.Server.Services.Wallet
         Task<bool> ExchangeMoneyForCoinsAsync(string userId, decimal amount, string paymentMethod, string paymentId);
     }
 }
-

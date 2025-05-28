@@ -16,11 +16,8 @@ const AuthProvider = ({ children }) => {
                 console.error('Error fetching bank data:', error);
             }
         }
-
         fetchBankData();
     }, [])
-
-
     return <AuthContext.Provider value={{ banks }}>{ children }</AuthContext.Provider>
 }
 

@@ -59,8 +59,6 @@ const GoogleMapAutocomplete = () => {
 
 
             console.log("✅ Địa chỉ đã được thêm:", response.data);
-            console.log("✅ Dữ liệu trả về:", response);
-            console.log("✅ ServiceId:", serviceId);
            /* setTimeout(() => {
                 navigate(`/booking-service?service=${serviceId}`);
             }, 200); 

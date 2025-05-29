@@ -29,7 +29,7 @@ const BookingProvider = ({ children }) => {
         fetchServices();
     }, []);
 
-    useEffect(() => {
+   
         const fetchUserAddress = async () => {
             if (!user || role !== "Customer") return;
             try {
@@ -50,7 +50,7 @@ const BookingProvider = ({ children }) => {
         };
 
         // gọi khi app load
-
+    useEffect(() => {
         fetchUserAddress();
     }, [user, role]);
 
@@ -63,6 +63,7 @@ const BookingProvider = ({ children }) => {
         houseNumber,
         setHouseNumber,
         userAddress,
+        refetchUserAddress: fetchUserAddress 
     }}>{children}</BookingContext.Provider>
 }
 

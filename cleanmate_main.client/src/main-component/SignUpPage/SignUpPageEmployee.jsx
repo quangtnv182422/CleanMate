@@ -241,9 +241,8 @@ const SignUpPageEmployee = (props) => {
                                         Chọn ngân hàng
                                     </MenuItem>
                                     {banks.map((bank) => (
-                                        <MenuItem key={bank.bin} value={bank.name}>
+                                        <MenuItem key={bank.bin} value={bank.shortName}>
                                             {bank.shortName}
-                                            
                                         </MenuItem>
                                     ))}
                                 </Select>

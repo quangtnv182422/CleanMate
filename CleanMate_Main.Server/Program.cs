@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Proxy.VietQR;
 using CleanMate_Main.Server.Proxy.vnPay;
 using CleanMate_Main.Server.Repository.Address;
 using CleanMate_Main.Server.Repository.Bookings;
@@ -86,7 +87,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 //vnPay
 builder.Services.AddScoped<IVnPayService, VnPayService>();
-
+//vietqr
+builder.Services.AddScoped<IVIetQRService, VietQRService>();
 
 // Cấu hình JWT (dành cho API)
 builder.Services.AddAuthentication(options =>
@@ -129,7 +131,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("https://localhost:60391") // React app origin
+            policy.WithOrigins("https://localhost:60391") // phần này sau nhớ phải đổi đọc ra từ file cấu hình ----------------------
                   .AllowAnyMethod() // Allow GET, POST, etc.
                   .AllowAnyHeader() // Allow headers like Content-Type
                   .AllowCredentials(); // Allow cookies if needed

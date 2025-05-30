@@ -1,13 +1,16 @@
-﻿using CleanMate_Main.Server.Models.DTO.vnPay;
+﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.DTO.vnPay;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.vnPay;
+using CleanMate_Main.Server.Services.Bookings;
+using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace CleanMate_Main.Server.Controllers.Payment
+namespace CleanMate_Main.Server.Controllers.Payments
 {
     [Route("[controller]")]
     [ApiController]
@@ -15,11 +18,16 @@ namespace CleanMate_Main.Server.Controllers.Payment
     {
         private readonly IVnPayService _vnPayService;
         private readonly IUserWalletService _walletService;
+        private readonly IBookingService _bookingService;
+        private readonly IPaymentService _paymentService;
 
-        public PaymentsController(IVnPayService vnPayService, IUserWalletService walletService)
+
+        public PaymentsController(IVnPayService vnPayService, IUserWalletService walletService, IBookingService bookingService, IPaymentService paymentService)
         {
             _vnPayService = vnPayService;
             _walletService = walletService;
+            _bookingService = bookingService;
+            _paymentService = paymentService;
         }
 
         [HttpPost("create-vnpay")]
@@ -48,6 +56,50 @@ namespace CleanMate_Main.Server.Controllers.Payment
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
             return Ok(new { url });
         }
+
+
+        [HttpPost("booking-create-vnpay")]
+        public async Task<IActionResult> CreateBookingAndPaymentVnPay([FromBody] BookingCreateDTO bookingDto)
+        {
+            if (bookingDto == null || bookingDto.TotalPrice == null || bookingDto.TotalPrice <= 0)
+                return BadRequest("Thông tin đặt lịch không hợp lệ.");
+
+            try
+            {
+                // 1. Tạo booking
+                var createdBooking = await _bookingService.AddNewBookingAsync(bookingDto);
+
+                // 2. Tạo payment với status = Unpaid
+                var payment = new Payment
+                {
+                    BookingId = createdBooking.BookingId,
+                    Amount = bookingDto.TotalPrice.Value,
+                    PaymentMethod = "vnPay",
+                    PaymentStatus = "Unpaid",
+                    CreatedAt = DateTime.Now
+                };
+
+                await _paymentService.AddNewPaymentAsync(payment);
+
+                // 3. Tạo URL thanh toán VNPay
+                var paymentModel = new PaymentInformationModel
+                {
+                    Amount = (double) bookingDto.TotalPrice.Value,
+                    BookingId = createdBooking.BookingId,
+                    TypeTransaction = "Booking",
+                    OrderDescription = $"_Booking_{createdBooking.BookingId}_{bookingDto.TotalPrice}_"
+                };
+
+                var url = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
+
+                return Ok(new { url });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi khi xử lý đặt lịch và thanh toán: {ex.Message}");
+            }
+        }
+
 
 
         [HttpGet("callback-vnpay")]

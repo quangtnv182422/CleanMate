@@ -7,6 +7,7 @@ using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Employee;
+using CleanMate_Main.Server.Repository.Payments;
 using CleanMate_Main.Server.Repository.Transaction;
 using CleanMate_Main.Server.Repository.Wallet;
 using CleanMate_Main.Server.SeedData;
@@ -16,6 +17,7 @@ using CleanMate_Main.Server.Services.Bookings;
 using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Smtp;
 using CleanMate_Main.Server.Services.Transaction;
 using CleanMate_Main.Server.Services.Wallet;
@@ -81,6 +83,9 @@ builder.Services.AddScoped<IUserWalletService, UserWalletService>();
 //Transaction
 builder.Services.AddScoped<ITransactionRepo, TransactionRepo>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+//Payment
+builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

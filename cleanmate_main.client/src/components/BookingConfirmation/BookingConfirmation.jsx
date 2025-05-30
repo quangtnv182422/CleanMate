@@ -142,7 +142,14 @@ const BookingConfirmation = () => {
                     style={{ backgroundColor: primaryColor }}
                     onClick={() => navigate(`/order/payment?orderId=${id}`, {
                         state: {
+                            selectedAddress,
+                            selectedEmployee,
+                            selectedDuration,
+                            selectedSpecificArea,
                             price,
+                            selectedDay,
+                            formatSpecificTime,
+                            note,
                         }
                     })}
                 >

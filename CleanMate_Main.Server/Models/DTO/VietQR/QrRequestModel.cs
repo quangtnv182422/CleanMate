@@ -3,8 +3,8 @@
     public class QrRequestModel
     {
         public string AccountNo { get; set; } = null!;
-        public int BankId { get; set; }
-        public int Amount { get; set; }
+        public string BankId { get; set; }
+        public decimal Amount { get; set; }
 
     }
 }

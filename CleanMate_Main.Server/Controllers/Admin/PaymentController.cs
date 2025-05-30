@@ -40,8 +40,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
                 }
 
-                string cleanerUserId = request.CleanerUserId;
-                var qrDataUrl = await _adminService.GeneratePaymentQRCodeAsync(cleanerUserId, request.Amount, request.AddInfo);
+                var qrDataUrl = _vietQRService.GenerateQRCodeUrl(request.BankId, request.AccountNo, request.Amount);
                 return Ok(new { qrDataUrl, message = "Mã QR đã được tạo thành công." });
             }
             catch (KeyNotFoundException ex)

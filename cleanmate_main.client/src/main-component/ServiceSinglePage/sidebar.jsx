@@ -29,7 +29,7 @@ const ServiceSidebar = ({ id }) => {
             <div className="wpo-single-sidebar">
                 <div className="wpo-newsletter-widget widget">
                     <h2>Hãy đặt dịch vụ</h2>
-                    <p>Bấm đăng ký dịch vụ để hoàn thiện thông tin</p>
+                    <p>{!user ? "Bạn phải đăng ký người dùng để có thể đặt dịch vụ" : "Bấm đăng ký dịch vụ để hoàn thiện thông tin"}</p>
                     <form className="form" onSubmit={SubmitHandler}>
                         {!user ?
                             (

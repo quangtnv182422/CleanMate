@@ -17,9 +17,14 @@ const menus = [
         link: '/about',
     },
     {
-        id: 6,
+        id: 3,
         title: 'Dịch vụ',
         link: '/service',
+    },
+    {
+        id: 4, 
+        title: 'Lịch sử đặt dịch vụ',
+        link: '/order-history',
     },
     {
         id: 5,
@@ -27,7 +32,7 @@ const menus = [
         link: '/blog',
     },
     {
-        id: 88,
+        id: 6,
         title: 'Liên hệ',
         link: '/contact',
     }

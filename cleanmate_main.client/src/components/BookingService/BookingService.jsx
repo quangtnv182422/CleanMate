@@ -122,7 +122,12 @@ const style = {
 };
 
 const BookingService = () => {
-    const { userAddress } = useContext(BookingContext);
+    const { userAddress, refetchUserAddress } = useContext(BookingContext);
+
+    useEffect(() => {
+        refetchUserAddress(); // fetch lại địa chỉ
+    }, []);
+
     const navigate = useNavigate();
     const location = useLocation();
 

@@ -34,6 +34,7 @@ namespace CleanMate_Main.Server.Repository.Wallet
             var wallet = await GetWalletByUserIdAsync(userId);
             wallet.Balance += amount;
             wallet.UpdatedAt = DateTime.Now;
+            await _context.SaveChangesAsync();
             return true;
         }
 

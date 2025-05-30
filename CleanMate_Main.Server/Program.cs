@@ -131,7 +131,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("https://localhost:60391") // React app origin
+            policy.WithOrigins("https://localhost:60391") // phần này sau nhớ phải đổi đọc ra từ file cấu hình ----------------------
                   .AllowAnyMethod() // Allow GET, POST, etc.
                   .AllowAnyHeader() // Allow headers like Content-Type
                   .AllowCredentials(); // Allow cookies if needed

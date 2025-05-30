@@ -67,8 +67,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");
             }
-            bool saved = await _walletRepo.SaveChangesAsync();
-            return saved;
+            return true;
         }
 
         //--Nạp tiền---
@@ -86,7 +85,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
 
             // Credit the wallet with the amount (assuming 1:1 conversion; adjust conversion rate if needed)
-            bool balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(userId, amount, $"Nạp tiền từ {paymentMethod}, mã giao dịch: {paymentId}");
+            bool balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(userId, amount, $"Nạp tiền từ {paymentMethod}, mã giao dịch:_{paymentId}");
             if (!balanceUpdated)
             {
                 throw new InvalidOperationException("Không thể cập nhật số dư ví.");
@@ -98,8 +97,8 @@ namespace CleanMate_Main.Server.Services.Wallet
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");
             }
-            bool saved = await _walletRepo.SaveChangesAsync();
-            return saved;
+
+            return true;
         }
     }
 }

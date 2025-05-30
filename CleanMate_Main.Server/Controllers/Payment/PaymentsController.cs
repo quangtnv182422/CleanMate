@@ -1,8 +1,11 @@
 ﻿using CleanMate_Main.Server.Models.DTO.vnPay;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.vnPay;
 using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CleanMate_Main.Server.Controllers.Payment
 {
@@ -22,17 +25,18 @@ namespace CleanMate_Main.Server.Controllers.Payment
         [HttpPost("create-vnpay")]
         public IActionResult CreatePaymentUrlVnpay([FromBody] PaymentInformationModel model)
         {
+
             string description;
 
             if (model.TypeTransaction == "Credit")
             {
                 // nạp ví
-                description = $"Credit_{model.UserId}_{model.Amount}";
+                description = $"_Credit_{model.UserId}_{model.Amount}_";
             }
             else if (model.TypeTransaction == "Booking")
             {
                 // thanh toán đặt lịch
-                description = $"Booking_{model.BookingId}_{model.Amount}";
+                description = $"_Booking_{model.BookingId}_{model.Amount}_";
             }
             else
             {
@@ -42,7 +46,7 @@ namespace CleanMate_Main.Server.Controllers.Payment
             model.OrderDescription = description;
 
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
-            return Redirect(url);
+            return Ok(new { url });
         }
 
 
@@ -57,24 +61,24 @@ namespace CleanMate_Main.Server.Controllers.Payment
             try
             {
                 var parts = response.OrderDescription.Split('_');
-                var purpose = parts[0]; // "Credit" hoặc "Booking"
+                var purpose = parts[2]; // "Credit" hoặc "Booking"
 
                 switch (purpose)
                 {
                     case "Credit":
-                        var userId = parts[1];
-                        var amount = decimal.Parse(parts[2]);
+                        var userId = parts[3];
+                        var amount = decimal.Parse(parts[4]);
                         var updated = await _walletService.ExchangeMoneyForCoinsAsync(userId, amount, "vnPay", response.TransactionId);
                         if (!updated)
                             return BadRequest(new { message = "Cập nhật ví thất bại", response });
                         break;
 
-                    /*case "Booking":
+                    case "Booking":
                         var bookingId = parts[1];
-                        var bookingSuccess = await _bookingService.MarkBookingAsPaidAsync(bookingId, response.TransactionId);
+                      /*  var bookingSuccess = await _bookingService.MarkBookingAsPaidAsync(bookingId, response.TransactionId);
                         if (!bookingSuccess)
-                            return BadRequest(new { message = "Cập nhật trạng thái booking thất bại", response });
-                        break;*/
+                            return BadRequest(new { message = "Cập nhật trạng thái booking thất bại", response });*/
+                        break;
 
                     default:
                         return BadRequest(new { message = "Mục đích giao dịch không xác định", response });

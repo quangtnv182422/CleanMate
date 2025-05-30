@@ -148,7 +148,7 @@ const WorkList = () => {
 
         setSortConfig({ key: vietnameseKey, direction });
         setData(sortedData);
-    }, [data, sortConfig]);
+    }, [data, sortConfig, setData]);
 
     const filteredData = useMemo(() => {
         return data.filter((row) =>

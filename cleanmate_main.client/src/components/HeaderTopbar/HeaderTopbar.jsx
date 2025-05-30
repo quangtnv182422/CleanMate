@@ -89,9 +89,9 @@ const HeaderTopbar = () => {
                                                         <AccountCircleOutlinedIcon size="small" />
                                                         Hồ sơ cá nhân
                                                     </div>
-                                                    <div className="dropdown-item" onClick={() => navigateTo("/history")}>
+                                                    <div className="dropdown-item" onClick={() => navigateTo("/order-history")}>
                                                         <CleaningServicesOutlinedIcon size="small" />
-                                                        Lịch sử giao dịch
+                                                        Lịch sử đặt dịch vụ
                                                     </div>
                                                 </div>
                                                 <div className="cleanmate-wallet">

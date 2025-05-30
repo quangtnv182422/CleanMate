@@ -48,21 +48,6 @@ const Header = (props) => {
                                         <li className="menu-item-has-children">
                                             <Link to="/service">Dịch vụ</Link>
                                         </li>
-                                        {/*<li className="menu-item-has-children">*/}
-                                        {/*    <Link to="/project">Pages</Link>*/}
-                                        {/*    <ul className="sub-menu">*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/project">Project</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/project-single/1">Project Single</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/team-single/1">Team Single</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/appointment">Appointment</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/terms">Terms & Conditions</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/testimonial">Testimonial</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/pricing">Pricing</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/404">Error 404</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/login">Login</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/register">Register</Link></li>*/}
-                                        {/*    </ul>*/}
-                                        {/*</li>*/}
                                         <li className="menu-item-has-children">
                                             <Link onClick={ClickHandler} to="/blog">Blog</Link>
                                         </li>

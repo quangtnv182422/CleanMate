@@ -305,7 +305,12 @@ const BookingService = () => {
                             <LocationOnIcon sx={{ mr: 1 }} />
                             Địa điểm làm việc
                         </Typography>
-                        <Typography ml={4}>{userAddress.length === 0 ? "Hãy đặt địa chỉ đầu tiên" : selectedAddress?.addressNo}</Typography>
+                        <Typography ml={4}>{userAddress.length === 0 ? "Hãy đặt địa chỉ đầu tiên" : (
+                            <>
+                                <Typography sx={style.googleMapAddress}>{selectedAddress?.gG_FormattedAddress}</Typography>
+                                <Typography sx={style.addressNo}>{selectedAddress?.addressNo}</Typography>
+                            </>
+                        )}</Typography>
                         {userAddress.length === 0 ? (
                             <Button
                                 variant="outlined" sx={{ ml: 4, mt: 1, fontSize: "12px" }}

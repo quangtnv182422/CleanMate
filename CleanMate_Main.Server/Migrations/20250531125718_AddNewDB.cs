@@ -366,29 +366,6 @@ namespace CleanMate_Main.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Wallet_Transaction",
-                columns: table => new
-                {
-                    TransactionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WalletId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TransactionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Wallet_Transaction", x => x.TransactionId);
-                    table.ForeignKey(
-                        name: "FK_WalletTransaction_Wallet",
-                        column: x => x.WalletId,
-                        principalTable: "User_Wallet",
-                        principalColumn: "WalletId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Booking",
                 columns: table => new
                 {
@@ -491,6 +468,72 @@ namespace CleanMate_Main.Server.Migrations
                         column: x => x.BookingId,
                         principalTable: "Booking",
                         principalColumn: "BookingId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallet_Transaction",
+                columns: table => new
+                {
+                    TransactionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WalletId = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())"),
+                    RelatedBookingId = table.Column<int>(type: "int", nullable: true),
+                    BookingId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallet_Transaction", x => x.TransactionId);
+                    table.ForeignKey(
+                        name: "FK_WalletTransaction_Wallet",
+                        column: x => x.WalletId,
+                        principalTable: "User_Wallet",
+                        principalColumn: "WalletId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Wallet_Transaction_Booking_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Booking",
+                        principalColumn: "BookingId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WithdrawRequest",
+                columns: table => new
+                {
+                    RequestId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    RequestedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())"),
+                    ProcessedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AdminNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionId = table.Column<int>(type: "int", nullable: true),
+                    ProcessedBy = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WithdrawRequest", x => x.RequestId);
+                    table.ForeignKey(
+                        name: "FK_Withdraw_Admin",
+                        column: x => x.ProcessedBy,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Withdraw_Transaction",
+                        column: x => x.TransactionId,
+                        principalTable: "Wallet_Transaction",
+                        principalColumn: "TransactionId");
+                    table.ForeignKey(
+                        name: "FK_Withdraw_User",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -619,9 +662,31 @@ namespace CleanMate_Main.Server.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Wallet_Transaction_BookingId",
+                table: "Wallet_Transaction",
+                column: "BookingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Wallet_Transaction_WalletId",
                 table: "Wallet_Transaction",
                 column: "WalletId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawRequest_ProcessedBy",
+                table: "WithdrawRequest",
+                column: "ProcessedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawRequest_TransactionId",
+                table: "WithdrawRequest",
+                column: "TransactionId",
+                unique: true,
+                filter: "[TransactionId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawRequest_UserId",
+                table: "WithdrawRequest",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -658,19 +723,22 @@ namespace CleanMate_Main.Server.Migrations
                 name: "User_Voucher");
 
             migrationBuilder.DropTable(
-                name: "Wallet_Transaction");
+                name: "WithdrawRequest");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Booking");
-
-            migrationBuilder.DropTable(
                 name: "Voucher");
 
             migrationBuilder.DropTable(
+                name: "Wallet_Transaction");
+
+            migrationBuilder.DropTable(
                 name: "User_Wallet");
+
+            migrationBuilder.DropTable(
+                name: "Booking");
 
             migrationBuilder.DropTable(
                 name: "Customer_Address");

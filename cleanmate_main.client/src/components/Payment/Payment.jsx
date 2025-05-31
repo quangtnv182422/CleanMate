@@ -13,7 +13,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PaymentIcon from '@mui/icons-material/Payment';
 import WestIcon from '@mui/icons-material/West';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-
+import useAuth from '../../hooks/useAuth';
 const paymentMethods = [
     {
         id: 'CleanMate',
@@ -84,22 +84,28 @@ const Payment = () => {
         price,
         selectedDay,
         formatSpecificTime,
-        note } = location.state || {};
-    console.log("Giá trị price từ location.state:", price);
-    console.log("Giá trị selectedAddress từ location.state:", selectedAddress);
-    console.log("Giá trị selectedEmployee từ location.state:", selectedEmployee);
-    console.log("Giá trị selectedDuration từ location.state:", selectedDuration);
-    console.log("Giá trị selectedSpecificArea từ location.state:", selectedSpecificArea);
-    console.log("Giá trị selectedDay từ location.state:", selectedDay);
-    console.log("Giá trị formatSpecificTime từ location.state:", formatSpecificTime);
+        note,
+        priceId
+    } = location.state || {};
+
     const [selectedMethod, setSelectedMethod] = useState('CleanMate');
+    const { user } = useAuth();
 
     const formatPrice = (price) => {
         return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     }
 
+    function convertToISODate(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    console.log(convertToISODate(selectedDay));
+    console.log(selectedAddress)
+
     const handlePayment = async () => {
         if (selectedMethod === 'vnpay') {
+            const isoDate = convertToISODate(selectedDay);
             try {
                 const response = await fetch('/payments/booking-create-vnpay', {
                     method: 'POST',
@@ -107,8 +113,13 @@ const Payment = () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        bookingInfo,
-                        amount: price//Đoạn này đang chưa đúng với BookingCreateDTO bên backend
+                        ServicePriceId: priceId,
+                        userId: user?.id,
+                        note: note,
+                        AddressId: selectedAddress.addressId,
+                        date: isoDate,
+                        StartTime: formatSpecificTime,
+                        TotalPrice: price
                     })
                 });
 
@@ -131,100 +142,100 @@ const Payment = () => {
     /*return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>
             {*//* Header *//*}
-            <Box sx={style.header}>
-                <WestIcon sx={style.backIcon} onClick={() => navigate(-1)} />
-                <Typography variant="h6" sx={style.headerTitle}>
-                    Thanh toán
-                </Typography>
-            </Box>
+    <Box sx={style.header}>
+        <WestIcon sx={style.backIcon} onClick={() => navigate(-1)} />
+        <Typography variant="h6" sx={style.headerTitle}>
+            Thanh toán
+        </Typography>
+    </Box>
 
-            {*//* Scrollable content *//*}
-            <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
-                {paymentMethods.map((method) => (
-                    <Paper
-                        key={method.id}
-                        variant="outlined"
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            p: 2,
-                            mb: 2,
-                            borderColor: selectedMethod === method.id ? '#1565C0' : '#e0e0e0',
-                            borderWidth: selectedMethod === method.id ? 2 : 1,
-                            cursor: 'pointer',
-                            '&:hover': {
-                                borderColor: '#1565C0',
-                            },
-                        }}
-                        onClick={() => setSelectedMethod(method.id)}
-                    >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Box sx={{ mr: 2 }}>{method.icon}</Box>
-                            <Box>
-                                <Typography sx={{ fontWeight: 600, color: selectedMethod === method.id ? '#1565C0' : 'inherit' }}>
-                                    {method.label}
-                                </Typography>
-                                {method.subLabel && (
-                                    <Typography variant="body2" color="text.secondary">
-                                        {method.subLabel}
-                                    </Typography>
-                                )}
-                                {method.id === 'CleanMate' && (
-                                    <Typography sx={{ mt: 1, fontSize: 13 }}>
-                                        Số dư hiện tại: <strong>{method.balance}</strong>
-                                    </Typography>
-                                )}
-                            </Box>
-                        </Box>
-
-                        {method.id === 'CleanMate' && (
-                            <Button
-                                size="medium"
-                                variant="contained"
-                                sx={{
-                                    fontSize: '16px',
-                                    backgroundColor: '#43A047',
-                                    '&:hover': { backgroundColor: '#388E3C' },
-                                    textTransform: 'none',
-                                }}
-                                onClick={() => navigate('/coin/deposit')}
-                            >
-                                Nạp tiền
-                            </Button>
-                        )}
-                    </Paper>
-                ))}
-            </Box>
-
-            {*//* Sticky footer *//*}
-            <Box
-                sx={style.footer}
+    {*//* Scrollable content *//*}
+    <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+        {paymentMethods.map((method) => (
+            <Paper
+                key={method.id}
+                variant="outlined"
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    p: 2,
+                    mb: 2,
+                    borderColor: selectedMethod === method.id ? '#1565C0' : '#e0e0e0',
+                    borderWidth: selectedMethod === method.id ? 2 : 1,
+                    cursor: 'pointer',
+                    '&:hover': {
+                        borderColor: '#1565C0',
+                    },
+                }}
+                onClick={() => setSelectedMethod(method.id)}
             >
-                <Box>
-                    <Typography variant="body2">Số tiền phải thanh toán</Typography>
-                    <Typography variant="h6" sx={{ color: '#1565C0', fontWeight: 600 }}>
-                        {formatPrice(price)}
-                    </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ mr: 2 }}>{method.icon}</Box>
+                    <Box>
+                        <Typography sx={{ fontWeight: 600, color: selectedMethod === method.id ? '#1565C0' : 'inherit' }}>
+                            {method.label}
+                        </Typography>
+                        {method.subLabel && (
+                            <Typography variant="body2" color="text.secondary">
+                                {method.subLabel}
+                            </Typography>
+                        )}
+                        {method.id === 'CleanMate' && (
+                            <Typography sx={{ mt: 1, fontSize: 13 }}>
+                                Số dư hiện tại: <strong>{method.balance}</strong>
+                            </Typography>
+                        )}
+                    </Box>
                 </Box>
-                <Button
-                    variant="contained"
-                    sx={{
-                        fontSize: '16px',
-                        bgcolor: '#1565C0',
-                        px: 3,
-                        py: 1.2,
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        '&:hover': { bgcolor: '#0d47a1' },
-                    }}
-                    onClick={() => alert(`Thanh toán qua: ${selectedMethod}`)}
-                >
-                    Thanh toán
-                </Button>
-            </Box>
+
+                {method.id === 'CleanMate' && (
+                    <Button
+                        size="medium"
+                        variant="contained"
+                        sx={{
+                            fontSize: '16px',
+                            backgroundColor: '#43A047',
+                            '&:hover': { backgroundColor: '#388E3C' },
+                            textTransform: 'none',
+                        }}
+                        onClick={() => navigate('/coin/deposit')}
+                    >
+                        Nạp tiền
+                    </Button>
+                )}
+            </Paper>
+        ))}
+    </Box>
+
+    {*//* Sticky footer *//*}
+    <Box
+        sx={style.footer}
+    >
+        <Box>
+            <Typography variant="body2">Số tiền phải thanh toán</Typography>
+            <Typography variant="h6" sx={{ color: '#1565C0', fontWeight: 600 }}>
+                {formatPrice(price)}
+            </Typography>
         </Box>
-    );*/
+        <Button
+            variant="contained"
+            sx={{
+                fontSize: '16px',
+                bgcolor: '#1565C0',
+                px: 3,
+                py: 1.2,
+                borderRadius: 2,
+                textTransform: 'none',
+                '&:hover': { bgcolor: '#0d47a1' },
+            }}
+            onClick={() => alert(`Thanh toán qua: ${selectedMethod}`)}
+        >
+            Thanh toán
+        </Button>
+    </Box>
+</Box>
+);*/
 
     return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>

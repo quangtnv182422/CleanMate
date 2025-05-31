@@ -7,12 +7,22 @@ export const styles = {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        maxHeight: '80vh', // hoặc height: '500px'
+        maxHeight: '80vh',
         overflowY: 'auto',
-        bgcolor: 'background.paper',
+        backgroundColor: '#fff',
         borderRadius: '5px',
-        zIndex: '1000',
+        zIndex: 1000,
+
+        '@media (max-width: 900px)': {
+            width: '90%',
+            maxHeight: '70vh',
+        },
+        '@media (max-width: 600px)': {
+            width: '95%',
+            maxHeight: '60vh',
+        },
     },
+
     orderDetailTitle: {
         position: 'sticky',
         top: 0,
@@ -24,7 +34,14 @@ export const styles = {
         color: '#1976D2',
         padding: '10px 0',
         borderBottom: borderBottom,
+        fontSize: '1.25rem',
+
+        '@media (max-width: 600px)': {
+            fontSize: '1rem',
+            padding: '8px 0',
+        },
     },
+
     statusContainer: {
         display: 'flex',
         flexDirection: 'column',
@@ -33,12 +50,21 @@ export const styles = {
         marginTop: '15px',
         marginBottom: '15px',
     },
+
     iconLarge: {
         fontSize: '60px',
+        '@media (max-width: 600px)': {
+            fontSize: '40px',
+        },
     },
+
     status: {
         fontSize: '18px',
+        '@media (max-width: 600px)': {
+            fontSize: '16px',
+        },
     },
+
     informationTitle: {
         display: 'flex',
         alignItems: 'center',
@@ -46,35 +72,43 @@ export const styles = {
         backgroundColor: '#F3F3F3',
         padding: '8px 10px',
     },
+
     subtitleIcon: {
         color: '#1976D2',
     },
+
     subtitle: {
         fontWeight: 500,
         color: '#6D6D6D',
     },
+
     informationContent: {
         padding: '5px 10px',
         margin: '5px 0',
     },
+
     contentTitle: {
         fontWeight: 600,
         color: '#666',
         marginBottom: '2px',
     },
+
     bookingTitle: {
         fontWeight: 600,
         color: '#666',
     },
+
     content: {
         fontWeight: 500,
         color: '#666',
     },
+
     bookingContent: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderBottom: '1px solid #ccc',
         padding: '10px 0',
-    }
-}
+        flexWrap: 'nowrap',
+    },
+};

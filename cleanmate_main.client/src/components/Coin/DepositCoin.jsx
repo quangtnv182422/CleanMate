@@ -53,7 +53,7 @@ const DepositCoin = () => {
             validators: {
                 min_amount: {
                     message: "Bạn phải nạp tối thiểu 200,000 đồng.",
-                    rule: (val) => parseFloat(val) >= 200000,
+                    rule: (val) => parseFloat(val) >= 2000, /// tạm sửa thành 2k để test PayOS
                     required: true,
                 },
                 positive_number: {
@@ -77,7 +77,7 @@ const DepositCoin = () => {
         }
     };*/
 
-    const handleTopUp = async () => {
+    const handleVnPay = async () => {
         if (validator.allValid()) {
             const parsedAmount = parseFloat(amount);
             if (isNaN(parsedAmount)) {
@@ -87,13 +87,54 @@ const DepositCoin = () => {
 
             try {
                 const response = await axios.post(
-                    "/payments/create-vnpay",
+                    "/payments/deposit-vnpay",
                     {
                         userId: user.id,
                         orderType: 'other',
                         amount: parsedAmount,
                         typeTransaction: "Credit",
                         name: user.fullName + "_" 
+                    },
+                    {
+                        withCredentials: true,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const { url } = response.data;
+                if (url) {
+                    window.location.href = url;
+                } else {
+                    alert("Không nhận được URL thanh toán.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi tạo giao dịch:", error);
+                const message =
+                    error.response?.data?.message || "Đã xảy ra lỗi khi tạo giao dịch.";
+                alert(message);
+            }
+        } else {
+            validator.showMessages();
+        }
+    };
+
+    const handlePayOS = async () => {
+        if (validator.allValid()) {
+            const parsedAmount = parseFloat(amount);
+            if (isNaN(parsedAmount)) {
+                alert("Số tiền không hợp lệ");
+                return;
+            }
+
+            try {
+                const response = await axios.post(
+                    "/payments/deposit-payos",
+                    {
+                        userId: user.id,
+                        amount: parsedAmount,
+                        typeTransaction: "Credit"
                     },
                     {
                         withCredentials: true,
@@ -228,7 +269,13 @@ const DepositCoin = () => {
                         variant="contained"
                         color="primary"
                         size="large"
-                        onClick={handleTopUp}
+                        onClick={() => {
+                            if (selectedMethod === "vnpay") {
+                                handleVnPay();
+                            } else if (selectedMethod === "payos") {
+                                handlePayOS();
+                            }
+                        }}
                     >
                         Thanh toán
                     </Button>

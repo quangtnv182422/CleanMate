@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Proxy.GGMail;
+using CleanMate_Main.Server.Proxy.Payos;
 using CleanMate_Main.Server.Proxy.VietQR;
 using CleanMate_Main.Server.Proxy.vnPay;
 using CleanMate_Main.Server.Repository.Address;
@@ -87,6 +88,8 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 //Payment
 builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+//PayOS
+builder.Services.AddScoped<IPayosService, PayosService>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();

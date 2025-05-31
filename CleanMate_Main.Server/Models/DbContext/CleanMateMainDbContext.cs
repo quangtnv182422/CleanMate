@@ -36,9 +36,12 @@ namespace CleanMate_Main.Server.Models.DbContext
         public virtual DbSet<UserVoucher> UserVouchers { get; set; }
 
         public virtual DbSet<Voucher> Vouchers { get; set; }
+
         public virtual DbSet<UserWallet> UserWallets { get; set; }
+
         public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
 
+        public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -310,6 +313,44 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasConstraintName("FK_WalletTransaction_Wallet");
             });
 
+            modelBuilder.Entity<WithdrawRequest>(entity =>
+            {
+                entity.ToTable("WithdrawRequest");
+
+                entity.HasIndex(e => e.TransactionId).IsUnique();
+
+                entity.Property(e => e.Status)
+                    .HasConversion<string>() 
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.RequestedAt)
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Withdraw_User");
+
+                entity.HasOne(e => e.Admin)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProcessedBy)
+                    .HasConstraintName("FK_Withdraw_Admin");
+
+                entity.HasOne(e => e.Wallet)
+                    .WithMany()
+                    .HasForeignKey(e => e.WalletId)
+                    .HasConstraintName("FK_Withdraw_Wallet");
+
+                entity.HasOne(e => e.Transaction)
+                    .WithMany()
+                    .HasForeignKey(e => e.TransactionId)
+                    .HasConstraintName("FK_Withdraw_Transaction");
+            });
 
 
             OnModelCreatingPartial(modelBuilder);

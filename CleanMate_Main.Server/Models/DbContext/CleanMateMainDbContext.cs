@@ -341,11 +341,6 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasForeignKey(e => e.ProcessedBy)
                     .HasConstraintName("FK_Withdraw_Admin");
 
-                entity.HasOne(e => e.Wallet)
-                    .WithMany()
-                    .HasForeignKey(e => e.WalletId)
-                    .HasConstraintName("FK_Withdraw_Wallet");
-
                 entity.HasOne(e => e.Transaction)
                     .WithMany()
                     .HasForeignKey(e => e.TransactionId)

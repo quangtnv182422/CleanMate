@@ -47,11 +47,5 @@ namespace CleanMate_Main.Server.Models.Entities
 
         [ForeignKey(nameof(ProcessedBy))]
         public virtual AspNetUser? Admin { get; set; }
-
-        [Required]
-        public int WalletId { get; set; }
-
-        [ForeignKey(nameof(WalletId))]
-        public virtual UserWallet Wallet { get; set; } = null!;
     }
 }

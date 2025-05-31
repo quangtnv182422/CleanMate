@@ -74,6 +74,10 @@ export default defineConfig({
             '^/payments': {
                 target,
                 secure: false
+            },
+            '^/work': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

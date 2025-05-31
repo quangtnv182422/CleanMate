@@ -73,7 +73,8 @@ const BookingConfirmation = () => {
         price,
         selectedDay,
         formatSpecificTime,
-        note
+        note,
+        priceId
     } = location.state || {};
 
     const formatPrice = (price) => {
@@ -150,6 +151,7 @@ const BookingConfirmation = () => {
                             selectedDay,
                             formatSpecificTime,
                             note,
+                            priceId
                         }
                     })}
                 >

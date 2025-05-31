@@ -140,6 +140,7 @@ const BookingService = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedDuration, setSelectedDuration] = useState(1);
     const [price, setPrice] = useState(160000);
+    const [priceId, setServicePriceId] = useState(1);
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
     const [note, setNote] = useState('');
@@ -163,6 +164,7 @@ const BookingService = () => {
         setSelectedDuration(service.durationTime);
         setSelectedSpecificArea(service.squareMeterSpecific);
         setPrice(service.price);
+        setServicePriceId(service.priceId)
     };
 
     const formatVNDCurrency = (amount) => {
@@ -269,8 +271,9 @@ const BookingService = () => {
         return false;
     };
 
-    const formatSpecificTime = selectedSpecificTimes?.format("HH:mm A");
-    console.log(selectedAddress)
+    const formatSpecificTime = selectedSpecificTimes?.format("HH:mm:ss");
+    console.log(formatSpecificTime);
+
     const handleSubmit = () => {
         if (!selectedAddress || !selectedSpecificTimes) {
             toast.error("Vui lòng chọn địa chỉ và giờ làm việc cụ thể.");
@@ -285,7 +288,8 @@ const BookingService = () => {
                     price,
                     selectedDay,
                     formatSpecificTime,
-                    note
+                    note,
+                    priceId
                 }
             });
         }
@@ -459,7 +463,7 @@ const BookingService = () => {
                                         borderWidth: 2,
                                     }}
                                 >
-                                    {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>): (<Typography>{day.label}</Typography>)}
+                                    {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
                                     <Typography variant="caption">{day.sub}</Typography>
                                 </Button>
                             ))}

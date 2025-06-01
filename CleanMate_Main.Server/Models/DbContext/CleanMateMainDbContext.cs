@@ -43,6 +43,16 @@ namespace CleanMate_Main.Server.Models.DbContext
 
         public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("MyCnn");
+                optionsBuilder.UseSqlServer(ConnectionString);
+            }
+
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -128,7 +138,7 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
                 entity.Property(e => e.GG_FormattedAddress)
-                        .HasMaxLength(450) 
+                        .HasMaxLength(450)
                         .IsUnicode(true);
                 entity.Property(e => e.GG_DispalyName)
                         .HasMaxLength(450)
@@ -296,7 +306,7 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasColumnType("decimal(18,2)");
 
                 entity.Property(e => e.TransactionType)
-                    .HasConversion<string>()             
+                    .HasConversion<string>()
                     .HasMaxLength(50)
                     .IsRequired();
 
@@ -311,6 +321,12 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasForeignKey(e => e.WalletId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_WalletTransaction_Wallet");
+
+                entity.HasOne(e => e.Booking)
+                   .WithMany() 
+                   .HasForeignKey(e => e.RelatedBookingId)
+                   .OnDelete(DeleteBehavior.SetNull) 
+                   .HasConstraintName("FK_WalletTransaction_Booking");
             });
 
             modelBuilder.Entity<WithdrawRequest>(entity =>
@@ -320,7 +336,7 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.HasIndex(e => e.TransactionId).IsUnique();
 
                 entity.Property(e => e.Status)
-                    .HasConversion<string>() 
+                    .HasConversion<string>()
                     .HasMaxLength(50)
                     .IsRequired();
 

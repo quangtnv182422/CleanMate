@@ -237,7 +237,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     var amount = (decimal)result.amount;
                     var transactionId = result.id;
 
-                    // Gọi dịch vụ để cộng coin vào ví
+                    // Cộng coin vào ví
                     var updated = await _walletService.ExchangeMoneyForCoinsAsync(user.Id, amount, "PayOS", transactionId);
                     if (!updated)
                         return BadRequest(new { message = "Cập nhật ví thất bại", response });

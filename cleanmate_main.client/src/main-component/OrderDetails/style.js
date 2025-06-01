@@ -34,7 +34,7 @@ export const styles = {
         color: '#1976D2',
         padding: '10px 0',
         borderBottom: borderBottom,
-        fontSize: '1.25rem',
+        fontSize: '1.5rem',
 
         '@media (max-width: 600px)': {
             fontSize: '1rem',
@@ -111,4 +111,51 @@ export const styles = {
         padding: '10px 0',
         flexWrap: 'nowrap',
     },
+
+    paymentButton: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: '5px 10px',
+        margin: '5px 0',
+    },
+
+    modalFeedback: {
+        position: 'relative', 
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#fff',
+        width: 350,
+        zIndex: 1001,
+        padding: '60px 10px 10px 10px',
+        borderRadius: '8px',
+    },
+
+    serviceImage: {
+        position: 'absolute',
+        top: '-50px', 
+        left: '50%',
+        transform: 'translateX(-50%)',
+        border: '1px solid #ddd',
+        borderRadius: '50%',
+        width: '100px',
+        height: '100px',
+        backgroundColor: '#fff',
+        zIndex: 1002, 
+    },
+
+    feedbackTitle: {
+        textAlign: 'center',
+        fontWeight: 500,
+        marginBottom: '10px',
+        color: '#1976D2',
+    },
+
+    feedbackReason: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 1,
+    }
 };

@@ -132,10 +132,7 @@ const BookingService = () => {
     const location = useLocation();
 
     // Start of data to store booking information
-    const [selectedAddress, setSelectedAddress] = useState(() => {
-        const saved = localStorage.getItem('selectedAddress');
-        return saved ? JSON.parse(saved) : null;
-    });
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [selectedSpecificArea, setSelectedSpecificArea] = useState('15');
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedDuration, setSelectedDuration] = useState(1);
@@ -171,11 +168,14 @@ const BookingService = () => {
         return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
 
-    const handleSelectAddress = (address) => {
-        setSelectedAddress(address);
-        localStorage.setItem('selectedAddress', JSON.stringify(address));
-        toggleDropdown();
-    };
+    useEffect(() => {
+        // Chọn địa chỉ mặc định từ danh sách userAddress
+        const defaultAddress = userAddress?.find(addr => addr.isDefault === true);
+
+        if (defaultAddress) {
+            setSelectedAddress(defaultAddress);
+        }
+    }, [userAddress]);
 
     // Fetch service details and update on navigation or serviceId change
     useEffect(() => {
@@ -220,31 +220,6 @@ const BookingService = () => {
         setSelectedDay(newDays[0].date);
     }, []);
 
-    // Update selectedAddress when userAddress changes
-    useEffect(() => {
-        if (userAddress.length > 0 && !selectedAddress) {
-            // Select the latest address by default
-            const latestAddress = userAddress[userAddress.length - 1];
-            setSelectedAddress(latestAddress);
-            localStorage.setItem('selectedAddress', JSON.stringify(latestAddress));
-        }
-    }, [userAddress, selectedAddress]);
-
-    // Listen for localStorage changes
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const saved = localStorage.getItem('selectedAddress');
-            if (saved) {
-                setSelectedAddress(JSON.parse(saved));
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
-
     const handleDaySelect = (day) => setSelectedDay(day);
     const minTime = isToday ? now : dayjs(selectedDay, 'DD/MM/YYYY').startOf('day');
 
@@ -272,7 +247,6 @@ const BookingService = () => {
     };
 
     const formatSpecificTime = selectedSpecificTimes?.format("HH:mm:ss");
-    console.log(formatSpecificTime);
 
     const handleSubmit = () => {
         if (!selectedAddress || !selectedSpecificTimes) {
@@ -294,6 +268,13 @@ const BookingService = () => {
             });
         }
     };
+
+    const handleSetDefaultAddress = (address) => { //hàm để đổi trạng thái default của địa chỉ
+        alert(`Đặt địa chỉ ${address.addressId} làm địa chỉ mặc định`) //sau này thay bằng API
+
+        setSelectedAddress(address); //Set địa chỉ để hiện thị trên booking service
+        toggleDropdown();
+    }
 
     return (
         <div>
@@ -360,14 +341,35 @@ const BookingService = () => {
                                                         backgroundColor: isSelected ? '#f1f1f1' : '#f0f0f0',
                                                         color: '#1565C0',
                                                     }
-                                                }} onClick={() => handleSelectAddress(item)}
+                                                }}
                                                 >
                                                     <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
                                                     <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
+
+                                                    {/* Nút Đặt làm mặc định */}
+                                                    {item.isDefault ? (
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            disabled
+                                                            sx={{ mt: 1, backgroundColor: 'gray' }}
+                                                        >
+                                                            Địa chỉ mặc định
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="outlined"
+                                                            size="small"
+                                                                sx={{ mt: 1 }}
+                                                                onClick={() => handleSetDefaultAddress(item)}
+                                                        >
+                                                            Đặt làm mặc định
+                                                        </Button>
+                                                    )}
                                                 </Box>
                                             );
                                         })}
-                                        <Box sx={{ mt: 4 }}>
+                                        <Box sx={{ mt: 1 }}>
                                             <Button
                                                 variant="outlined"
                                                 sx={{ width: '100%' }}
@@ -465,7 +467,7 @@ const BookingService = () => {
                                 >
                                     {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
                                     {selectedDay === day.date ? (<Typography variant="caption" sx={{ color: '#fff' }}>{day.sub}</Typography>) : (<Typography variant="caption">{day.sub}</Typography>)}
-                                    
+
                                 </Button>
                             ))}
                         </Box>

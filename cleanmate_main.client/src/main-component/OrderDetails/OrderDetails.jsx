@@ -2,6 +2,12 @@
 import {
     Box,
     Typography,
+    Button,
+    Modal,
+    Rating,
+    Chip,
+    Divider,
+    TextField
 } from '@mui/material';
 import PendingIcon from '@mui/icons-material/Pending';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -9,7 +15,92 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { styles } from './style';
+import serviceImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
+
 const OrderDetails = ({ selectedOrder }) => {
+    const [openFeedback, setOpenFeedback] = useState(false);
+    const handleOpenFeedback = () => {
+        setOpenFeedback(true);
+    }
+
+    const [ratingValue, setRatingValue] = useState(null);
+    const [selectedReasons, setSelectedReasons] = useState([]);
+    const [otherReason, setOtherReason] = useState("");
+
+    const handleReasonSelect = (reason) => {
+        setSelectedReasons(prev =>
+            prev.includes(reason)
+                ? prev.filter(item => item !== reason)
+                : [...prev, reason]
+        );
+    };
+
+    const feedbackLabels = {
+        1: "Rất không hài lòng",
+        2: "Không hài lòng",
+        3: "Bình thường",
+        4: "Hài lòng",
+        5: "Rất hài lòng"
+    }
+
+    const feedbackReason = [
+        {
+            star: 1,
+            reason: [
+                "Không tới làm",
+                "Thái độ không tốt",
+                "Làm không đúng yêu cầu",
+                "Không sạch sẽ",
+                "Không đúng giờ",
+                "Không mặc đồng phục",
+                "Khác",
+            ],
+        },
+        {
+            star: 2,
+            reason: [
+                "Không đúng giờ",
+                "Thái độ chưa tốt",
+                "Làm chưa kỹ",
+                "Không sạch sẽ",
+                "Không mặc đồng phục",
+                "Khác",
+            ],
+        },
+        {
+            star: 3,
+            reason: [
+                "Không đúng giờ",
+                "Làm chưa kỹ",
+                "Chưa thân thiện",
+                "Không mặc đồng phục",
+                "Khác",
+            ],
+        },
+        {
+            star: 4,
+            reason: [
+                "Cần cải thiện thái độ",
+                "Cần sạch sẽ hơn",
+                "Cần đúng giờ hơn",
+                "Khác",
+            ],
+        },
+        {
+            star: 5,
+            reason: [
+                "Rất hài lòng",
+                "Làm việc vượt mong đợi",
+                "Thái độ chuyên nghiệp",
+                "Rất sạch sẽ",
+                "Sẽ giới thiệu cho người khác",
+                "Khác",
+            ],
+        },
+    ];
+
+
+    const handleCloseFeedback = () => setOpenFeedback(false);
 
     const formatPrice = (price) => {
         return price.toLocaleString("vi-VN", {
@@ -33,9 +124,11 @@ const OrderDetails = ({ selectedOrder }) => {
                 <Typography sx={styles.status}>
                     {selectedOrder.status === "active"
                         ? "Chờ xác nhận"
-                        : selectedOrder.status === "completed"
-                            ? "Hoàn thành"
-                            : "Đã hủy"}
+                        : selectedOrder.status === "paymentFail"
+                            ? "Thanh toán thất bại"
+                            : selectedOrder.status === "completed"
+                                ? "Hoàn thành"
+                                : "Đã hủy"}
                 </Typography>
             </Box>
 
@@ -92,6 +185,108 @@ const OrderDetails = ({ selectedOrder }) => {
                     <Typography sx={styles.content}>{formatPrice(selectedOrder.price)}</Typography>
                 </Box>
             </Box>
+
+            {selectedOrder.status === 'completed' && (
+                <Box sx={styles.paymentButton}>
+                    <Button variant="contained" color="primary" onClick={handleOpenFeedback}>Đánh giá dịch vụ</Button>
+                </Box>
+            )}
+
+            {/*Modal feedback*/}
+            <Modal
+                open={openFeedback}
+                onClose={handleCloseFeedback}
+                disableAutoFocus
+            >
+                <Box sx={styles.modalFeedback}>
+                    <Box sx={styles.serviceImage}>
+                        <img
+                            src={serviceImage}
+                            alt="hình ảnh của dịch vụ"
+                            style={{
+                                objectFit: 'cover',
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: '50%',
+                            }} />
+                    </Box>
+
+                    <Typography variant="h5" sx={styles.feedbackTitle}>Đánh giá dịch vụ</Typography>
+
+                    <Divider />
+
+                    <Box sx={{ textAlign: 'center', mt: 2 }}>
+                        {ratingValue !== null && (
+                            <Typography variant="h5" sx={{ mt: 1, fontWeight: 500, color: '#666' }}>
+                                {feedbackLabels[ratingValue]}
+                            </Typography>
+                        )}
+                        <Rating
+                            value={ratingValue}
+                            onChange={(event, newValue) => {
+                                setRatingValue(newValue);
+                            }}
+                            size="large"
+                            sx={{
+                                color: '#FBC11B',
+                                '& .MuiRating-iconFilled': {
+                                    color: '#FBC11B',
+                                },
+                                '& .MuiRating-iconHover': {
+                                    color: '#FBC11B',
+                                },
+                            }}
+                        />
+                    </Box>
+
+                    {ratingValue <= 5 && ratingValue > 0 && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography sx={{ mb: 1, textAlign: 'center' }}>Điều gì bạn chưa hài lòng?</Typography>
+                            <Box sx={styles.feedbackReason}>
+                                {feedbackReason
+                                    .find(item => item.star === ratingValue)?.reason
+                                    .map((reason, idx) => (
+                                        <Chip
+                                            key={idx}
+                                            label={reason}
+                                            variant={selectedReasons.includes(reason) ? 'filled' : 'outlined'}
+                                            color={selectedReasons.includes(reason) ? 'warning' : 'default'}
+                                            onClick={() => handleReasonSelect(reason)}
+                                        />
+                                    ))
+                                }
+                            </Box>
+                            {selectedReasons.includes("Khác") && (
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    minRows={3}
+                                    sx={{ mt: 2 }}
+                                    placeholder="Vui lòng nhập lý do khác..."
+                                    value={otherReason}
+                                    onChange={(e) => setOtherReason(e.target.value)}
+                                />
+                            )}
+                        </Box>
+                    )}
+
+                    <Box sx={{ display: 'flex' }}>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            sx={{ mt: 1, ml: 'auto' }}
+                        >
+                            Gửi đánh giá
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            {selectedOrder.status === 'paymentFail' && (
+                <Box sx={styles.paymentButton}>
+                    <Button variant="contained" color="primary">Thanh toán lại</Button>
+                </Box>
+            )}
         </Box>
     )
 }

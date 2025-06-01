@@ -12,7 +12,7 @@ import {
 import { style } from './style';
 import OrderDetails from '../../main-component/OrderDetails/OrderDetails';
 
-const mockOrders = Array(15).fill(null).map((_, index) => ({
+const mockOrders = Array(30).fill(null).map((_, index) => ({
     id: `#362689FG-${index + 1}`,
     service: 'Dọn dẹp theo giờ',
     startTime: '10',
@@ -26,8 +26,9 @@ const mockOrders = Array(15).fill(null).map((_, index) => ({
     employee: 1,
     status:
         index % 4 === 0 ? 'canceled' :
-            index % 2 === 1 ? 'active' :
-                'completed',
+            index % 3 === 0 ? 'paymentFail' :
+                index % 2 === 1 ? 'active' :
+                    'completed',
 }));
 
 const ORDERS_PER_PAGE = 6;
@@ -56,6 +57,12 @@ const colorMap = {
         blurBackground: '#FFEBEE',
         color: '#fff',
     },
+    paymentFail: {
+        background: '#E4293D',
+        border: '#E4293D',
+        blurBackground: '#FFEBEE',
+        color: '#fff',
+    },
 };
 
 const OrderHistorySection = () => {
@@ -74,6 +81,7 @@ const OrderHistorySection = () => {
         active: mockOrders.filter((o) => o.status === 'active').length,
         completed: mockOrders.filter((o) => o.status === 'completed').length,
         canceled: mockOrders.filter((o) => o.status === 'canceled').length,
+        paymentFail: mockOrders.filter((o) => o.status === 'paymentFail').length,
     };
     stats.total = mockOrders.length;
 
@@ -104,11 +112,11 @@ const OrderHistorySection = () => {
             <Box className="container" sx={style.container}>
                 {/* Tabs */}
                 <Grid container spacing={2} sx={{ mb: 4 }}>
-                    {['total', 'active', 'completed', 'canceled'].map((type) => {
+                    {['total', 'active', 'completed', 'canceled', 'paymentFail'].map((type) => {
                         const selected = selectedTab === type;
                         const colors = colorMap[type];
                         return (
-                            <Grid item xs={12} sm={3} key={type}>
+                            <Grid item xs={12} sm={2.4} key={type}>
                                 <Card
                                     onClick={() => handleSelect(type)}
                                     sx={{
@@ -140,9 +148,11 @@ const OrderHistorySection = () => {
                                                 ? 'Tổng số đơn'
                                                 : type === 'active'
                                                     ? 'Chờ xác nhận'
-                                                    : type === 'completed'
-                                                        ? 'Đơn hoàn thành'
-                                                        : 'Đơn đã hủy'}
+                                                    : type === 'paymentFail'
+                                                        ? 'Thanh toán thất bại'
+                                                        : type === 'completed'
+                                                            ? 'Đơn hoàn thành'
+                                                            : 'Đơn đã hủy'}
                                         </Typography>
                                         <Typography variant="h4" fontWeight={600} sx={{ color: 'inherit' }}>
                                             {stats[type]}
@@ -157,7 +167,7 @@ const OrderHistorySection = () => {
                 {/* Stats Summary */}
                 <Box sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
                     <Typography variant="body1" color="textSecondary">
-                        Tổng: {stats.total} | Đang xử lý: {stats.active} | Đã hoàn thành: {stats.completed} | Đã hủy: {stats.canceled}
+                        Tổng: {stats.total} | Chờ xác nhận: {stats.active} | Đơn hoàn thành: {stats.completed} | Đơn đã hủy: {stats.canceled} | Thanh toán thất bại: {stats.paymentFail}
                     </Typography>
                 </Box>
 
@@ -183,9 +193,11 @@ const OrderHistorySection = () => {
                                         >
                                             {order.status === "active"
                                                 ? "Chờ xác nhận"
-                                                : order.status === "completed"
-                                                    ? "Hoàn thành"
-                                                    : "Đã hủy"}
+                                                : order.status === "paymentFail"
+                                                    ? "Thanh toán thất bại"
+                                                    : order.status === "completed"
+                                                        ? "Hoàn thành"
+                                                        : "Đã hủy"}
                                         </Typography>
                                     </Box>
                                 </CardContent>

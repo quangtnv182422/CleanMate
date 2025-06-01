@@ -344,7 +344,7 @@ const BookingService = () => {
                                             }}>Chọn địa chỉ</Typography>
                                             <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
                                         </Box>
-                                        {userAddress.slice().reverse().map((item) => {
+                                        {userAddress.map((item) => {
                                             const isSelected = selectedAddress?.addressId === item.addressId;
 
                                             return (
@@ -464,7 +464,8 @@ const BookingService = () => {
                                     }}
                                 >
                                     {selectedDay === day.date ? (<Typography sx={{ color: '#fff' }}>{day.label}</Typography>) : (<Typography>{day.label}</Typography>)}
-                                    <Typography variant="caption">{day.sub}</Typography>
+                                    {selectedDay === day.date ? (<Typography variant="caption" sx={{ color: '#fff' }}>{day.sub}</Typography>) : (<Typography variant="caption">{day.sub}</Typography>)}
+                                    
                                 </Button>
                             ))}
                         </Box>
@@ -543,7 +544,7 @@ const BookingService = () => {
                             sx={{
                                 backgroundColor: '#ffc107',
                                 '&:hover': {
-                                    backgroundColor: '#42bcc8',
+                                    backgroundColor: '#1976D2',
                                     color: '#fff',
                                 },
                                 color: '#425398',

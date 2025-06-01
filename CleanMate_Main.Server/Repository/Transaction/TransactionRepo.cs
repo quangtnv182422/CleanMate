@@ -1,5 +1,6 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -64,6 +65,53 @@ namespace CleanMate_Main.Server.Repository.Transaction
 
             await _context.SaveChangesAsync();
             return true;
+        }
+        public async Task<bool> ExecuteWithdrawTransactionAsync(int requestId, string adminId, decimal amount, string userId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Update wallet balance
+                var wallet = await _context.UserWallets.FirstOrDefaultAsync(w => w.UserId == userId);
+                if (wallet == null)
+                {
+                    throw new InvalidOperationException("Ví của người dùng không tồn tại.");
+                }
+
+                wallet.Balance -= amount;
+                wallet.UpdatedAt = DateTime.Now;
+
+                // Record transaction
+                var walletTransaction = new WalletTransaction
+                {
+                    WalletId = wallet.WalletId,
+                    Amount = -amount,
+                    TransactionType = TransactionType.Debit,
+                    Description = $"Rút tiền theo yêu cầu #{requestId}",
+                    CreatedAt = DateTime.Now
+                };
+                _context.WalletTransactions.Add(walletTransaction);
+
+                // Update withdraw request
+                var request = await _context.WithdrawRequests.FindAsync(requestId);
+                if (request == null)
+                {
+                    throw new KeyNotFoundException($"Yêu cầu rút tiền với ID {requestId} không tồn tại.");
+                }
+
+                request.ProcessedAt = DateTime.Now;
+                request.TransactionId = walletTransaction.TransactionId;
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw; // Re-throw for service handling
+            }
         }
     }
 }

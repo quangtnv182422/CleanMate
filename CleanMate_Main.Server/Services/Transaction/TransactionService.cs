@@ -118,42 +118,28 @@ namespace CleanMate_Main.Server.Services.Transaction
 
         public async Task<bool> CompleteWithdrawRequestAsync(int requestId, string adminId)
         {
+            // Validate request
             var request = await _transactionRepo.GetWithdrawRequestByIdAsync(requestId);
             if (request.Status != WithdrawStatus.Approved)
             {
                 throw new InvalidOperationException("Yêu cầu rút tiền không ở trạng thái Xác nhận.");
             }
 
-            // Deduct amount from wallet
+            // Validate wallet balance
             var wallet = await _walletRepo.GetWalletByUserIdAsync(request.UserId);
             if (wallet.Balance < request.Amount)
             {
                 throw new InvalidOperationException("Số dư ví không đủ để hoàn tất giao dịch.");
             }
 
-            var balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(
-                request.UserId,
-                -request.Amount,
-                $"Rút tiền theo yêu cầu #{requestId}"
-            );
-            if (!balanceUpdated)
-            {
-                throw new InvalidOperationException("Không thể cập nhật số dư ví.");
-            }
 
-            // Record transaction
-            var transactionId = await RecordTransactionAsync(
-                request.UserId,
+            // Execute the transaction
+            return await _transactionRepo.ExecuteWithdrawTransactionAsync(
+                requestId,
+                adminId,
                 request.Amount,
-                TransactionType.Debit,
-                $"Rút tiền theo yêu cầu #{requestId}"
+                request.UserId
             );
-
-            // Update withdraw request
-            request.ProcessedAt = DateTime.Now;
-            request.TransactionId = transactionId;
-
-            return await _transactionRepo.UpdateWithdrawRequestAsync(requestId, request);
         }
         public async Task<bool> RejectWithdrawRequestAsync(int requestId, string adminId, string? adminNote)
         {

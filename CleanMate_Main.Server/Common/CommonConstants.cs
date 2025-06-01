@@ -11,6 +11,9 @@ namespace CleanMate_Main.Server.Common
         //Commission percentage 
         public static readonly decimal MINIMUM_DEBIT_AMOUNT = 500000; //toi thieu can 500k coin
         public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000; //nap toi thieu 200k coin
+        public static readonly string DEFAULT_ADMIN = "";
+        public static readonly string DEFAULT_CUSTOMER = "";
+        public static readonly string DEFAULT_CLEANER = "";
 
         public static class BookingStatus
         {

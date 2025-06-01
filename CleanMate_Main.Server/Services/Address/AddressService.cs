@@ -19,7 +19,17 @@ namespace CleanMate_Main.Server.Services.Address
         public async Task<CustomerAddress> AddNewAddressAsync(CustomerAddressDTO dto)
         {
             var listAddress = await _addressRepo.GetAddressInUseByCustomerId(dto.UserId);
-
+            if (dto.IsDefault)
+            {
+                foreach (var address in listAddress)
+                {
+                    if (address.IsDefault)
+                    {
+                        address.IsDefault = false;
+                        await _addressRepo.EditAddressAsync(address);
+                    }
+                }
+            }
             // Tìm địa chỉ trùng GG_PlaceId
             var existing = listAddress?.FirstOrDefault(ad => ad.GG_PlaceId == dto.GG_PlaceId);
 
@@ -63,6 +73,20 @@ namespace CleanMate_Main.Server.Services.Address
             {
                 oldAddress.IsInUse = false;
                 await _addressRepo.EditAddressAsync(oldAddress);
+            }
+
+            // Nếu địa chỉ mới là mặc định => reset tất cả địa chỉ cũ
+            if (dto.IsDefault)
+            {
+                var listAddress = await _addressRepo.GetAddressInUseByCustomerId(dto.UserId);
+                foreach (var address in listAddress)
+                {
+                    if (address.IsDefault)
+                    {
+                        address.IsDefault = false;
+                        await _addressRepo.EditAddressAsync(address);
+                    }
+                }
             }
 
             var newAddress = new CustomerAddress

@@ -28,6 +28,6 @@ namespace CleanMate_Main.Server.Models.Entities
         public int? RelatedBookingId { get; set; }
 
         public virtual UserWallet Wallet { get; set; } = null!;
-        public virtual Booking Booking { get; set; } = null!;
+        public virtual Booking? Booking { get; set; } = null!;
     }
 }

@@ -134,7 +134,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add CORS policy
-builder.Services.AddCors(options =>
+/*builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
@@ -144,6 +144,29 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader() // Allow headers like Content-Type
                   .AllowCredentials(); // Allow cookies if needed
         });
+});*/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        // Đọc origin từ appsettings.json
+        var allowedOrigin = builder.Configuration["Cors:AllowedOrigin"];
+        if (!string.IsNullOrEmpty(allowedOrigin))
+        {
+            policy.WithOrigins(allowedOrigin)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Giữ nếu cần cookie/xác thực
+        }
+        else
+        {
+            // Fallback cho local hoặc lỗi cấu hình
+            policy.WithOrigins("https://localhost:60391")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+    });
 });
 
 

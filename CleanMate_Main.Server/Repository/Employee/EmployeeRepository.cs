@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Common;
 using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -66,7 +67,8 @@ namespace CleanMate_Main.Server.Repository.Employee
                             StatusId = booking.BookingStatusId,
                             IsRead = false,
                             CustomerFullName = customer.FullName,
-                            CustomerPhoneNumber = customer.PhoneNumber
+                            CustomerPhoneNumber = customer.PhoneNumber,
+                            EmployeeId = booking.CleanerId
                         };
 
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
@@ -240,7 +242,24 @@ namespace CleanMate_Main.Server.Repository.Employee
 
             return true; // Không trùng lịch, có thể nhận
         }
+        public async Task CreateCleanerProfileAsync(string userId)
+        {
+            if (await _context.CleanerProfiles.AnyAsync(p => p.UserId == userId))
+            {
+                return;
+            }
+            var cleanerProfile = new CleanerProfile
+            {
+                UserId = userId,
+                Rating = 0,
+                ExperienceYear = 0,
+                Available = true,
+                Area = "Hòa Lạc"
+            };
 
+            _context.CleanerProfiles.Add(cleanerProfile);
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

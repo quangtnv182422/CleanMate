@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
+using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,13 +21,20 @@ namespace CleanMate_Main.Server.Controllers.Authen
         private readonly IAuthenService _authenService;
         private readonly IUserWalletService _walletService;
         private readonly UserManager<AspNetUser> _userManager;
-        public AuthenController(IAuthenService authenService, UserManager<AspNetUser> userManager, IUserWalletService walletService)
+        private readonly IEmployeeService _employeeService;
+
+        public AuthenController(
+            IAuthenService authenService,
+            UserManager<AspNetUser> userManager,
+            IUserWalletService walletService,
+            IEmployeeService employeeService)
         {
             _authenService = authenService;
             _userManager = userManager;
             _walletService = walletService;
+            _employeeService = employeeService;
         }
-        
+
         //đăng kí dành cho khách hàng
         [HttpPost("registercustomer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] RegisterModel model)
@@ -155,7 +163,10 @@ namespace CleanMate_Main.Server.Controllers.Authen
             }
 
             await _walletService.AddNewWalletAsync(userId); // NOTE: Confirm mail thành công thì mới tạo ví
-
+            if (await _userManager.IsInRoleAsync(user, "Cleaner"))
+            {
+                await _employeeService.CreateCleanerProfileAsync(userId);
+            }
             return Ok(new { message = "Xác nhận email thành công. Bạn có thể đăng nhập." });
         }
 

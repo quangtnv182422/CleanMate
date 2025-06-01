@@ -21,6 +21,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         Task UpdateWorkReadStatusAsync(int bookingId, bool isRead);
         Task<IEnumerable<object>> GetBookingStatusesAsync();
         Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId);
+        Task CreateCleanerProfileAsync(string userId);
 
     }
 }

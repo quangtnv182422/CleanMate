@@ -12,9 +12,10 @@ namespace CleanMate_Main.Server.Services.Employee
 
         Task<bool> AcceptWorkRequestAsync(int bookingId, string employeeId);
 
-        Task<bool> CancelWorkRequestAsync(int bookingId);
+        Task<bool> CancelWorkRequestAsync(int bookingId, string employeeId);
+        Task<bool> BeginWorkRequestAsync(int bookingId, string employeeId);
 
-        Task<bool> CompleteWorkRequestAsync(int bookingId);
+        Task<bool> CompleteWorkRequestAsync(int bookingId, string employeeId);
 
         Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId);
 
@@ -26,6 +27,7 @@ namespace CleanMate_Main.Server.Services.Employee
         Task CheckWorkReadStatusAsync(int bookingId, bool isRead);
         Task<IEnumerable<object>> GetBookingStatusesAsync();
         Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId);
+        Task CreateCleanerProfileAsync(string userId);
 
     }
 }

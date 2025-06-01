@@ -1,5 +1,8 @@
 ﻿using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CleanMate_Main.Server.Repository.Transaction
 {
@@ -19,9 +22,48 @@ namespace CleanMate_Main.Server.Repository.Transaction
             return transaction.TransactionId;
         }
 
-        public async Task<bool> SaveChangesAsync()
+        public async Task<IEnumerable<WithdrawRequest>> GetAllWithdrawRequestsAsync()
         {
-            return await _context.SaveChangesAsync() > 0;
+            return await _context.WithdrawRequests
+                .Include(r => r.User)
+                .Include(r => r.Admin)
+                .Include(r => r.Transaction)
+                .ToListAsync();
+        }
+
+        public async Task<WithdrawRequest> GetWithdrawRequestByIdAsync(int requestId)
+        {
+            var request = await _context.WithdrawRequests
+                .Include(r => r.User)
+                .Include(r => r.Admin)
+                .Include(r => r.Transaction)
+                .FirstOrDefaultAsync(r => r.RequestId == requestId);
+            return request ?? throw new KeyNotFoundException($"Withdraw request with ID {requestId} not found.");
+        }
+
+        public async Task<int> CreateWithdrawRequestAsync(WithdrawRequest request)
+        {
+            _context.WithdrawRequests.Add(request);
+            await _context.SaveChangesAsync();
+            return request.RequestId;
+        }
+
+        public async Task<bool> UpdateWithdrawRequestAsync(int requestId, WithdrawRequest updatedRequest)
+        {
+            var request = await _context.WithdrawRequests.FindAsync(requestId);
+            if (request == null)
+            {
+                return false;
+            }
+
+            request.Status = updatedRequest.Status;
+            request.ProcessedAt = updatedRequest.ProcessedAt;
+            request.AdminNote = updatedRequest.AdminNote;
+            request.TransactionId = updatedRequest.TransactionId;
+            request.ProcessedBy = updatedRequest.ProcessedBy;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

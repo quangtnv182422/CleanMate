@@ -1,11 +1,10 @@
-﻿using Azure.Core;
-using CleanMate_Main.Server.Models.DTO.VietQR;
-using CleanMate_Main.Server.Models.Entities;
-using CleanMate_Main.Server.Proxy.VietQR;
+﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Services.Transaction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace CleanMate_Main.Server.Controllers.Admin
 {
@@ -15,46 +14,162 @@ namespace CleanMate_Main.Server.Controllers.Admin
     public class PaymentController : ControllerBase
     {
         private readonly UserManager<AspNetUser> _userManager;
-        private readonly IVIetQRService _vietQRService;
+        private readonly ITransactionService _transactionService;
+        private readonly string DefaultAdmin = "87ae113a-bfa0-47fa-b580-f2d6a01185c9";
 
-        public PaymentController(UserManager<AspNetUser> userManager, IVIetQRService vIetQRService)
+        public PaymentController(
+            UserManager<AspNetUser> userManager,
+            ITransactionService transactionService)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _vietQRService = vIetQRService ?? throw new ArgumentNullException(nameof(vIetQRService));
+            _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
         }
 
-        [HttpPost("generate-qr")]
-        public async Task<IActionResult> GeneratePaymentQRCode([FromBody] QrRequestModel request)
+        [HttpGet("withdraw-requests")]
+        public async Task<IActionResult> GetAllWithdrawRequests()
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
-                }
+                var requests = await _transactionService.GetAllWithdrawRequestsAsync();
+                return Ok(new { success = true, data = requests });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (e.g., using Serilog)
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi lấy danh sách yêu cầu rút tiền." });
+            }
+        }
 
-                var admin = await _userManager.FindByEmailAsync(userEmail);
-                if (admin == null)
-                {
-                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
-                }
-
-                var qrDataUrl = _vietQRService.GenerateQRCodeUrl(request.BankId, request.AccountNo, request.Amount);
-                return Ok(new { qrDataUrl, message = "Mã QR đã được tạo thành công." });
+        [HttpGet("withdraw-requests/{id}")]
+        public async Task<IActionResult> GetWithdrawRequest(int id)
+        {
+            try
+            {
+                var request = await _transactionService.GetWithdrawRequestByIdAsync(id);
+                return Ok(new { success = true, data = request });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi lấy thông tin yêu cầu rút tiền." });
+            }
+        }
+
+        [HttpPost("withdraw-requests/{id}/accept")]
+        public async Task<IActionResult> AcceptWithdrawRequest(int id)
+        {
+            try
+            {
+                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                //if (string.IsNullOrEmpty(adminEmail))
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+
+                //var admin = await _userManager.FindByEmailAsync(adminEmail);
+                //if (admin == null)
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var qrCodeUrl = await _transactionService.AcceptWithdrawRequestAsync(id, admin.Id);
+                return Ok(new { success = true, message = "Yêu cầu rút tiền đã được chấp nhận.", qrCodeUrl });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
-            catch (Exception)
+            catch (KeyNotFoundException ex)
             {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi không mong muốn khi tạo mã QR." });
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi chấp nhận yêu cầu rút tiền." });
             }
         }
+
+        [HttpPost("withdraw-requests/{id}/complete")]
+        public async Task<IActionResult> CompleteWithdrawRequest(int id)
+        {
+            try
+            {
+                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                //if (string.IsNullOrEmpty(adminEmail))
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+
+                //var admin = await _userManager.FindByEmailAsync(adminEmail);
+                //if (admin == null)
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var success = await _transactionService.CompleteWithdrawRequestAsync(id, admin.Id);
+                return Ok(new { success, message = "Yêu cầu rút tiền đã được hoàn tất." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi hoàn tất yêu cầu rút tiền." });
+            }
+        }
+
+        [HttpPost("withdraw-requests/{id}/reject")]
+        public async Task<IActionResult> RejectWithdrawRequest(int id, [FromBody] RejectRequestModel model)
+        {
+            try
+            {
+                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                //if (string.IsNullOrEmpty(adminEmail))
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+
+                //var admin = await _userManager.FindByEmailAsync(adminEmail);
+                //if (admin == null)
+                //{
+                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                //}
+                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var success = await _transactionService.RejectWithdrawRequestAsync(id, admin.Id, model.AdminNote);
+                return Ok(new { success, message = "Yêu cầu rút tiền đã bị từ chối." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi từ chối yêu cầu rút tiền." });
+            }
+        }
+    }
+
+    public class RejectRequestModel
+    {
+        public string? AdminNote { get; set; }
     }
 }

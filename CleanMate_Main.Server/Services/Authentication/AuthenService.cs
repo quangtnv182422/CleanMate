@@ -176,6 +176,7 @@ namespace CleanMate_Main.Server.Services.Authentication
             return (true, null);
         }
 
+
         public async Task<(bool Success, string Token, string Error)> LoginAsync(LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);

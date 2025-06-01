@@ -2,6 +2,6 @@
 {
     public interface IVIetQRService
     {
-        public string GenerateQRCodeUrl(string bankId, string accountNo, decimal amount);
+        public Task<string> GenerateQRCodeUrl(string bankId, string accountNo, decimal amount, string description);
     }
 }

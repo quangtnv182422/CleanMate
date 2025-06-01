@@ -45,16 +45,66 @@ namespace CleanMate_Main.Server.Services.Employee
             return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.ACCEPT, employeeId);
         }
 
-        public async Task<bool> CancelWorkRequestAsync(int bookingId)
+        public async Task<bool> BeginWorkRequestAsync(int bookingId, string employeeId)
         {
-            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL);
+            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Công việc không tồn tại.");
+            }
+
+            if (booking.EmployeeId != employeeId)
+            {
+                throw new InvalidOperationException("Bạn không có quyền bắt đầu công việc này.");
+            }
+
+            if (booking.StatusId != CommonConstants.BookingStatus.ACCEPT)
+            {
+                throw new InvalidOperationException("Công việc phải ở trạng thái Đã nhận để bắt đầu.");
+            }
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.IN_PROGRESS, employeeId);
         }
 
-        public async Task<bool> CompleteWorkRequestAsync(int bookingId)
+        public async Task<bool> CompleteWorkRequestAsync(int bookingId, string employeeId)
         {
-            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE);
+            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Công việc không tồn tại.");
+            }
+
+            if (booking.EmployeeId != employeeId)
+            {
+                throw new InvalidOperationException("Bạn không có quyền hoàn thành công việc này.");
+            }
+            if (booking.StatusId != CommonConstants.BookingStatus.IN_PROGRESS)
+            {
+                throw new InvalidOperationException("Công việc phải ở trạng thái Đang thực hiện để hoàn thành.");
+            }
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.PENDING_DONE, employeeId);
         }
 
+        public async Task<bool> CancelWorkRequestAsync(int bookingId, string employeeId)
+        {
+            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Công việc không tồn tại.");
+            }
+            if (booking.EmployeeId != employeeId)
+            {
+                throw new InvalidOperationException("Bạn không có quyền hủy công việc này.");
+            }
+
+            if (booking.StatusId != CommonConstants.BookingStatus.ACCEPT)
+            {
+                throw new InvalidOperationException("Chỉ có thể hủy công việc khi trạng thái là Đã nhận.");
+            }
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL, employeeId);
+        }
         public async Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId)
         {
             return await _employeeRepository.GetCustomerDetailsAsync(bookingId);
@@ -101,5 +151,10 @@ namespace CleanMate_Main.Server.Services.Employee
             }
             return await _employeeRepository.CanCleanerAcceptWorkAsync(bookingId, employeeId);
         }
+        public async Task CreateCleanerProfileAsync(string userId)
+        {
+            await _employeeRepository.CreateCleanerProfileAsync(userId);
+        }
+
     }
 }

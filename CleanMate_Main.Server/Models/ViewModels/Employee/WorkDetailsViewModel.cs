@@ -17,5 +17,6 @@
         public bool IsRead { get; set; }
         public string CustomerFullName { get; set; }
         public string CustomerPhoneNumber { get; set; }
+        public string? EmployeeId { get; set; }
     }
 }

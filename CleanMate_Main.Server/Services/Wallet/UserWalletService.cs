@@ -37,6 +37,26 @@ namespace CleanMate_Main.Server.Services.Wallet
             return wallet.Balance;
         }
 
+        public async Task<UserWalletDTO> GetWalletAsync(string userId)
+        {
+            var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
+
+            // Nếu ví không tồn tại, tạo ví mới
+            if (wallet == null)
+            {
+                wallet = await AddNewWalletAsync(userId);
+            }
+
+            return new UserWalletDTO
+            {
+                WalletId = wallet.WalletId,
+                UserId = wallet.UserId,
+                UserFullName = wallet.User?.FullName ?? "Unknown",
+                Balance = wallet.Balance,
+                UpdatedAt = wallet.UpdatedAt
+            };
+        }
+
         //--Rút tiền---
         public async Task<bool> ExchangeCoinsForMoneyAsync(string userId, decimal amount, string bankAccount, string bankName)
         {

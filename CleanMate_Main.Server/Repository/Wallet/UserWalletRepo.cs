@@ -38,6 +38,8 @@ namespace CleanMate_Main.Server.Repository.Wallet
             return true;
         }
 
+
+
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;

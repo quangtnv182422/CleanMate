@@ -129,7 +129,7 @@ const SignUpPageEmployee = (props) => {
     return (
         <Grid className="loginWrapper">
             <Grid className="loginForm">
-                <div className="logo" onClick={() => push('/home')}>
+                <div className="logo" onClick={() => navigate('/home')}>
                     <img src={Logo} alt="Logo của hệ thống" />
                 </div>
                 <h2>Đăng ký</h2>

@@ -10,5 +10,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
         Task<int> CreateWithdrawRequestAsync(WithdrawRequest request);
         Task<bool> UpdateWithdrawRequestAsync(int requestId, WithdrawRequest updatedRequest);
         Task<bool> ExecuteWithdrawTransactionAsync(int requestId, string adminId, decimal amount, string userId);
+        Task<decimal> GetPendingWithdrawAmountAsync(string userId);
+
     }
 }

@@ -17,14 +17,14 @@ const Footer = (props) => {
             <div className="wpo-upper-footer">
                 <div className="container">
                     <div className="row">
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-6 col-sm-12 col-12">
                             <div className="widget about-widget">
                                 <div className="logo widget-title">
                                     <img src={Logo} alt="blog" />
                                 </div>
                             </div>
                         </div>
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-6 col-sm-12 col-12">
                             <div className="widget link-widget">
                                 <div className="widget-title">
                                     <h3>Xem nhanh</h3>
@@ -37,7 +37,7 @@ const Footer = (props) => {
                                 </ul>
                             </div>
                         </div>
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-12 col-sm-12 col-12">
                             <div className="widget join-widget">
                                 <div className="widget-title">
                                     <h3>Gửi thư cho chúng tôi</h3>
@@ -50,18 +50,6 @@ const Footer = (props) => {
                             </div>
                         </div>
 
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
-                            <div className="widget link-widget">
-                                <div className="widget-title">
-                                    <h3>Dịch vụ</h3>
-                                </div>
-                                <ul>
-                                    {Services.slice(0, 6).map((service, srv) => (
-                                        <li key={srv}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

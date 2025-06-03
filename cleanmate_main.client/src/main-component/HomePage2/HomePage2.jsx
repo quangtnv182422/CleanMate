@@ -18,9 +18,9 @@ const HomePage2 =() => {
             <Hero2/>
             <ServiceSectionS2/>
             <WorkSection/>
-            <TeamSection/>
-            <Testimonial/>
-            <BlogSection/>
+            {/*<TeamSection/>*/}
+            {/*<Testimonial/>*/}
+            {/*<BlogSection/>*/}
             <PartnerSection/>
             <Footer/>
             <Scrollbar/>

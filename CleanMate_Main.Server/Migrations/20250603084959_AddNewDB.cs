@@ -481,23 +481,22 @@ namespace CleanMate_Main.Server.Migrations
                     TransactionType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())"),
-                    RelatedBookingId = table.Column<int>(type: "int", nullable: true),
-                    BookingId = table.Column<int>(type: "int", nullable: false)
+                    RelatedBookingId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Wallet_Transaction", x => x.TransactionId);
                     table.ForeignKey(
+                        name: "FK_WalletTransaction_Booking",
+                        column: x => x.RelatedBookingId,
+                        principalTable: "Booking",
+                        principalColumn: "BookingId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
                         name: "FK_WalletTransaction_Wallet",
                         column: x => x.WalletId,
                         principalTable: "User_Wallet",
                         principalColumn: "WalletId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Wallet_Transaction_Booking_BookingId",
-                        column: x => x.BookingId,
-                        principalTable: "Booking",
-                        principalColumn: "BookingId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -662,9 +661,9 @@ namespace CleanMate_Main.Server.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Wallet_Transaction_BookingId",
+                name: "IX_Wallet_Transaction_RelatedBookingId",
                 table: "Wallet_Transaction",
-                column: "BookingId");
+                column: "RelatedBookingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wallet_Transaction_WalletId",
@@ -735,10 +734,10 @@ namespace CleanMate_Main.Server.Migrations
                 name: "Wallet_Transaction");
 
             migrationBuilder.DropTable(
-                name: "User_Wallet");
+                name: "Booking");
 
             migrationBuilder.DropTable(
-                name: "Booking");
+                name: "User_Wallet");
 
             migrationBuilder.DropTable(
                 name: "Customer_Address");

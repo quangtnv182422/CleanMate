@@ -221,7 +221,18 @@ const BookingService = () => {
     }, []);
 
     const handleDaySelect = (day) => setSelectedDay(day);
-    const minTime = isToday ? now : dayjs(selectedDay, 'DD/MM/YYYY').startOf('day');
+
+    const getMinTime = () => {
+        if (isToday) {
+            const nextHour = now.add(1, 'hour');
+            const roundedUpMinutes = Math.ceil(nextHour.minute() / 15) * 15;
+            const adjustedTime = nextHour.minute(roundedUpMinutes).second(0);
+            return adjustedTime;
+        }
+        return dayjs(selectedDay, 'DD/MM/YYYY').startOf('day');
+    };
+
+    const minTime = getMinTime();
 
     const roundToNearest15Minutes = (time) => {
         const minutes = time.minute();
@@ -270,10 +281,18 @@ const BookingService = () => {
     };
 
     const handleSetDefaultAddress = (address) => { //hàm để đổi trạng thái default của địa chỉ
-        alert(`Đặt địa chỉ ${address.addressId} làm địa chỉ mặc định`) //sau này thay bằng API
+        setSelectedAddress(address);
 
-        setSelectedAddress(address); //Set địa chỉ để hiện thị trên booking service
+        if (address.isDefault !== true) {
+            alert(`Đặt địa chỉ ${address.addressId} làm địa chỉ mặc định`) //sau này thay bằng API
+        }
+
         toggleDropdown();
+    }
+
+    const handleSelectAddress = (address) => {
+        setSelectedAddress(address)
+        toggleDropdown()
     }
 
     return (
@@ -342,6 +361,7 @@ const BookingService = () => {
                                                         color: '#1565C0',
                                                     }
                                                 }}
+                                                    onClick={() => handleSelectAddress(item) }
                                                 >
                                                     <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
                                                     <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
@@ -357,14 +377,16 @@ const BookingService = () => {
                                                             Địa chỉ mặc định
                                                         </Button>
                                                     ) : (
-                                                        <Button
-                                                            variant="outlined"
-                                                            size="small"
+                                                        <>
+                                                            <Button
+                                                                variant="contained"
+                                                                size="small"
                                                                 sx={{ mt: 1 }}
                                                                 onClick={() => handleSetDefaultAddress(item)}
-                                                        >
-                                                            Đặt làm mặc định
-                                                        </Button>
+                                                            >
+                                                                Đặt làm mặc định
+                                                            </Button>
+                                                        </>
                                                     )}
                                                 </Box>
                                             );

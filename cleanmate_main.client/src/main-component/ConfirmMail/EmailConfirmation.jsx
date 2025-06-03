@@ -21,14 +21,11 @@ const EmailConfirmation = () => {
                 });
 
                 if (response.ok) {
-                    toast.success('✅ Xác nhận email thành công! Hãy đăng nhập.');
-                } else {
-                    toast.error('❌ Xác nhận thất bại! Mã xác nhận không hợp lệ hoặc đã hết hạn.');
+                    toast.success('Xác nhận email thành công! Hãy đăng nhập.');
+                    navigate('/login');
                 }
-
-                navigate('/login');
             } catch (error) {
-                toast.error('❌ Đã xảy ra lỗi kết nối khi xác nhận email.');
+                toast.error('Đã xảy ra lỗi kết nối khi xác nhận email.');
                 navigate('/login');
             }
         };
@@ -36,7 +33,7 @@ const EmailConfirmation = () => {
         if (userId && token) {
             confirmEmail();
         } else {
-            toast.error('❌ Thiếu thông tin xác nhận!');
+            toast.error('Thiếu thông tin xác nhận!');
             navigate('/login');
         }
     }, [userId, token, navigate]);

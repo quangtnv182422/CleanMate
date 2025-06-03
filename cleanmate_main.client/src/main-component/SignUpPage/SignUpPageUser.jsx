@@ -84,14 +84,14 @@ const SignUpPageUser = () => {
                     }),
                 });
 
-                const data = await response.json();
-                if (!response.ok) {
-                    if (data.errors && Array.isArray(data.errors)) {
-                        // Display all errors in a single toast
-                        throw new Error(data.errors.join('\n'));
-                    }
-                    throw new Error(data.message || 'Đăng ký thất bại.');
-                }
+                //const data = await response.json();
+                //if (!response.ok) {
+                //    if (data.errors && Array.isArray(data.errors)) {
+                //        // Display all errors in a single toast
+                //        throw new Error(data.errors.join('\n'));
+                //    }
+                //    throw new Error(data.message || 'Đăng ký thất bại.');
+                //}
 
                 setValue({
                     first_name: '',

@@ -132,15 +132,15 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     CreatedAt = DateTime.Now
                 };
 
-                await _paymentService.AddNewPaymentAsync(payment);
+                var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
 
                 // 3. Tạo URL thanh toán VNPay
                 var paymentModel = new PaymentInformationModel
                 {
+                    OrderType = "other",
                     Amount = (double)bookingDto.TotalPrice.Value,
-                    BookingId = createdBooking.BookingId,
-                    TypeTransaction = "Booking",
-                    OrderDescription = $"_Booking_{createdBooking.BookingId}_{bookingDto.TotalPrice}_"
+                    Name = "CleanMate Booking_",
+                    OrderDescription = $"_Booking_{createdBooking.BookingId}_{savedPayment.PaymentId}_"
                 };
 
                 var url = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
@@ -181,10 +181,10 @@ namespace CleanMate_Main.Server.Controllers.Payments
 
                     //Trường hợp thanh toán booking bằng vnPay
                     case "Booking":
-                        var bookingId = parts[1];
-                        /*  var bookingSuccess = await _bookingService.MarkBookingAsPaidAsync(bookingId, response.TransactionId);
-                          if (!bookingSuccess)
-                              return BadRequest(new { message = "Cập nhật trạng thái booking thất bại", response });*/
+                        var paymentId = int.Parse(parts[4]);
+                        var bookingSuccess = await _paymentService.MarkBookingAsPaidAsync(paymentId, response.TransactionId);
+                        if (bookingSuccess == null)
+                            return BadRequest(new { message = "Cập nhật trạng thái booking thất bại", response });
                         break;
 
                     default:

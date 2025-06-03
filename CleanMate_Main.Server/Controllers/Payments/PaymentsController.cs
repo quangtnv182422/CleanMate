@@ -211,7 +211,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
             var response = _vnPayService.PaymentExecute(Request.Query);
 
             if (!response.Success || response.VnPayResponseCode != "00")
-                return BadRequest(new { message = "Thanh toán thất bại", response });
+                return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
 
             try
             {
@@ -227,18 +227,43 @@ namespace CleanMate_Main.Server.Controllers.Payments
                         var updated = await _walletService.ExchangeMoneyForCoinsAsync(userId, amount, "vnPay", response.TransactionId);
                         if (!updated)
                             return BadRequest(new { message = "Cập nhật ví thất bại", response });
-                        break;
+                        // Redirect to deposit success page
+                        var depositQueryString = $"deposit=success&date={Uri.EscapeDataString(DateTime.Now.ToString("dd/MM/yyyy"))}&coin={Uri.EscapeDataString(amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND")}";
+                        return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-success?{depositQueryString}");
 
                     //Trường hợp thanh toán booking bằng vnPay
                     case "Booking":
                         var paymentId = int.Parse(parts[4]);
                         var bookingSuccess = await _paymentService.MarkBookingAsPaidAsync(paymentId, response.TransactionId);
                         if (bookingSuccess == null)
-                            return BadRequest(new { message = "Cập nhật trạng thái booking thất bại", response });
-                        break;
+                            return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail");
+
+                        // Lấy chi tiết booking từ BookingService
+                        var booking = await _bookingService.GetBookingByIdAsync(bookingSuccess.BookingId);
+                        if (booking == null)
+                            return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail");
+
+                        // Chuẩn bị dữ liệu để gửi về frontend
+                        var bookingDetails = new
+                        {
+                            Date = booking.Date.ToString("dd/MM/yyyy"),
+                            Time = $"{booking.StartTime:hh:mm tt} - {booking.StartTime.AddHours(booking.ServicePrice?.Duration?.DurationTime ?? 2):hh:mm tt}",
+                            Service = booking.ServicePrice?.Service?.Name ?? "Dịch vụ vệ sinh",
+                            Cleaner = booking.Cleaner?.FullName ?? "Chưa phân công",
+                            Payment = bookingSuccess.Amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"
+                        };
+
+                        // Redirect tới trang BookingSuccess với query parameters
+                        var queryString = $"success=true&date={Uri.EscapeDataString(bookingDetails.Date)}" +
+                                         $"&time={Uri.EscapeDataString(bookingDetails.Time)}" +
+                                         $"&service={Uri.EscapeDataString(bookingDetails.Service)}" +
+                                         $"&cleaner={Uri.EscapeDataString(bookingDetails.Cleaner)}" +
+                                         $"&payment={Uri.EscapeDataString(bookingDetails.Payment)}";
+                        var redirectUrl = $"{_configuration["SettingDomain:BaseUrl"]}/booking-success?{queryString}";
+                        return Redirect(redirectUrl);
 
                     default:
-                        return BadRequest(new { message = "Mục đích giao dịch không xác định", response });
+                        return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail");
                 }
 
                 return Ok(new { message = "Thanh toán thành công", response });

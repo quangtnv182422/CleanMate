@@ -31,8 +31,8 @@ namespace CleanMate_Main.Server.Controllers.Wallet
 
             var user = await _userManager.FindByEmailAsync(userEmail);
 
-            if (User.Identity?.Name != user.Id && !User.IsInRole("Admin"))
-                return Unauthorized(new { message = "Bạn không có quyền truy cập ví này." });
+            //if (User.Identity?.Name != user.Id && !User.IsInRole("Admin"))
+            //    return Unauthorized(new { message = "Bạn không có quyền truy cập ví này." });
 
             try
             {

@@ -240,6 +240,13 @@ const GoogleMapAutocomplete = () => {
 
             <div style={style.selectAddressButton}>
                 <Button
+                    variant="outlined"
+                    onClick={() => navigate(`/booking-service?service=${serviceId}`)}
+                    sx={{mr:1}}
+                >
+                    Quay lại
+                </Button>
+                <Button
                     variant={selectedPlace ? 'contained' : 'disabled'}
                     onClick={handleOpen}
                     sx={style.selectButtonMain}

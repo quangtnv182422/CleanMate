@@ -25,6 +25,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
 import dayjs from 'dayjs';
 import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
 
 const primaryColor = '#1565C0';
 const style = {
@@ -122,8 +123,8 @@ const style = {
 };
 
 const BookingService = () => {
-    const { userAddress, refetchUserAddress } = useContext(BookingContext);
-
+    const { userAddress, setUserAddress, refetchUserAddress } = useContext(BookingContext);
+    const { user } = useAuth();
     useEffect(() => {
         refetchUserAddress(); // fetch lại địa chỉ
     }, []);
@@ -176,6 +177,42 @@ const BookingService = () => {
             setSelectedAddress(defaultAddress);
         }
     }, [userAddress]);
+
+    const updateDefaultAddress = async (address) => {
+        try {
+            await fetch('/address/edit-address', {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    addressId: address.addressId,
+                    userId: user.id,
+                    gG_FormattedAddress: address.gG_FormattedAddress,
+                    gG_DispalyName: address.gG_DispalyName,
+                    gG_PlaceId: address.gG_PlaceId,
+                    addressNo: address.addressNo,
+                    isInUse: true,
+                    isDefault: true,
+                    latitude: address.latitude,
+                    longitude: address.longtitude
+                })
+            });
+
+            const updatedAddresses = userAddress.map((addr) => ({
+                ...addr,
+                isDefault: addr.addressId === address.addressId ? true : false, // Set the selected address as default, others as non-default
+            }));
+            setUserAddress(updatedAddresses);
+
+            // Show success message (optional)
+            toast.success('Cập nhật địa chỉ mặc định thành công!');
+
+        } catch (err) {
+            toast.error(`Lỗi đặt địa chỉ: ${err}`);
+        }
+    };
 
     // Fetch service details and update on navigation or serviceId change
     useEffect(() => {
@@ -280,16 +317,6 @@ const BookingService = () => {
         }
     };
 
-    const handleSetDefaultAddress = (address) => { //hàm để đổi trạng thái default của địa chỉ
-        setSelectedAddress(address);
-
-        if (address.isDefault !== true) {
-            alert(`Đặt địa chỉ ${address.addressId} làm địa chỉ mặc định`) //sau này thay bằng API
-        }
-
-        toggleDropdown();
-    }
-
     const handleSelectAddress = (address) => {
         setSelectedAddress(address)
         toggleDropdown()
@@ -346,7 +373,7 @@ const BookingService = () => {
                                         </Box>
                                         {userAddress.map((item) => {
                                             const isSelected = selectedAddress?.addressId === item.addressId;
-
+                                            console.log(item)
                                             return (
                                                 <Box key={item.addressId} sx={{
                                                     mt: 1,
@@ -361,7 +388,7 @@ const BookingService = () => {
                                                         color: '#1565C0',
                                                     }
                                                 }}
-                                                    onClick={() => handleSelectAddress(item) }
+                                                    onClick={() => handleSelectAddress(item)}
                                                 >
                                                     <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
                                                     <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
@@ -382,7 +409,7 @@ const BookingService = () => {
                                                                 variant="contained"
                                                                 size="small"
                                                                 sx={{ mt: 1 }}
-                                                                onClick={() => handleSetDefaultAddress(item)}
+                                                                onClick={() => updateDefaultAddress(item)}
                                                             >
                                                                 Đặt làm mặc định
                                                             </Button>
@@ -506,6 +533,7 @@ const BookingService = () => {
                                 <DemoContainer components={['TimePicker']}>
                                     <TimePicker
                                         label="Hãy chọn giờ cụ thể"
+                                        ampm={false}
                                         value={selectedSpecificTimes}
                                         onChange={handleTimeChange}
                                         minutesStep={15}

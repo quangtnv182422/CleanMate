@@ -75,8 +75,10 @@ namespace CleanMate_Main.Server.Services.Authentication
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
+            var baseUrl = _configuration["SettingDomain:BaseUrl"];
+
             //NOTE: cái này đang fix cứng tạm thời
-            var confirmationLink = $"https://localhost:60391/email-confirmation?userId={user.Id}&token={encodedToken}";
+            var confirmationLink = $"{baseUrl}/email-confirmation?userId={user.Id}&token={encodedToken}";
 
             await _emailService.SendConfirmEmail(user.Email, confirmationLink);
 
@@ -158,9 +160,11 @@ namespace CleanMate_Main.Server.Services.Authentication
                             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-                            // Generate confirmation link (hardcoded for now, same as RegisterCustomerAsync)
-                            var confirmationLink = $"https://localhost:60391/email-confirmation?userId={user.Id}&token={encodedToken}";
 
+                            var baseUrl = _configuration["SettingDomain:BaseUrl"];
+
+                            // Generate confirmation link (hardcoded for now, same as RegisterCustomerAsync)
+                            var confirmationLink = $"{baseUrl}/email-confirmation?userId={user.Id}&token={encodedToken}";
                             // Send confirmation email
                             await _emailService.SendConfirmEmail(user.Email, confirmationLink);
                         }

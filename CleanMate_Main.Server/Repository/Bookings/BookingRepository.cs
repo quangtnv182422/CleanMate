@@ -23,7 +23,16 @@ namespace CleanMate_Main.Server.Repository.Bookings
 
         public async Task<Booking?> GetBookingByIdAsync(int bookingId)
         {
-            var booking = await _context.Bookings.FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            var booking = await _context.Bookings
+                                        .Include(x => x.ServicePrice)
+                                            .ThenInclude(x => x.Duration)
+                                        .Include(x => x.ServicePrice)
+                                            .ThenInclude(x => x.Service) 
+                                        .Include(x => x.BookingStatus)
+                                        .Include(x => x.Address)
+                                        .Include(x => x.Cleaner)
+                                        .Include(x => x.User)
+                                        .FirstOrDefaultAsync(x => x.BookingId == bookingId);
             return booking;
         }
     }

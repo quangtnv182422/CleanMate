@@ -104,38 +104,47 @@ const Payment = () => {
     console.log(selectedAddress)
 
     const handlePayment = async () => {
-        if (selectedMethod === 'vnpay') {
-            const isoDate = convertToISODate(selectedDay);
-            try {
-                const response = await fetch('/payments/booking-create-vnpay', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        ServicePriceId: priceId,
-                        userId: user?.id,
-                        note: note,
-                        AddressId: selectedAddress.addressId,
-                        date: isoDate,
-                        StartTime: formatSpecificTime,
-                        TotalPrice: price
-                    })
-                });
+        const isoDate = convertToISODate(selectedDay);
+        const bookingData = {
+            ServicePriceId: priceId,
+            UserId: user?.id,
+            Note: note,
+            AddressId: selectedAddress.addressId,
+            Date: isoDate,
+            StartTime: formatSpecificTime,
+            TotalPrice: price
+        };
 
-                const result = await response.json();
-
-                if (response.ok && result.url) {
-                    window.location.href = result.url; // Redirect đến VNPay
-                } else {
-                    alert(result.message || 'Thanh toán thất bại');
-                }
-            } catch (error) {
-                alert('Lỗi khi gửi yêu cầu thanh toán');
-                console.error(error);
+        try {
+            let endpoint;
+            if (selectedMethod === 'vnpay') {
+                endpoint = '/payments/booking-create-vnpay';
+            } else if (selectedMethod === 'bank') {
+                endpoint = '/payments/booking-create-payos';
+            } else {
+                alert(`Thanh toán qua: ${selectedMethod} hiện chưa được hỗ trợ.`);
+                return;
             }
-        } else {
-            alert(`Thanh toán qua: ${selectedMethod}`);
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(bookingData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.url) {
+                window.location.href = result.url;
+            } else {
+                alert(result.message || 'Thanh toán thất bại');
+            }
+        } catch (error) {
+            alert('Lỗi khi gửi yêu cầu thanh toán');
+            console.error(error);
         }
     };
 

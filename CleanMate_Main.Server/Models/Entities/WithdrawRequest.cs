@@ -7,6 +7,7 @@ namespace CleanMate_Main.Server.Models.Entities
     {
         Pending,
         Approved,
+        Done,
         Rejected
     }
 

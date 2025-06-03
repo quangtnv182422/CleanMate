@@ -1,4 +1,5 @@
 ﻿import { createContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
 export const BookingContext = createContext();
@@ -9,6 +10,7 @@ const BookingProvider = ({ children }) => {
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
     const [userAddress, setUserAddress] = useState([]);
+    const location = useLocation();
     const { user } = useAuth()
     const role = user?.roles?.[0] || '';
 
@@ -29,30 +31,38 @@ const BookingProvider = ({ children }) => {
         fetchServices();
     }, []);
 
-   
-        const fetchUserAddress = async () => {
-            if (!user || role !== "Customer") return;
-            try {
-                const res = await fetch('/address/get-address', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    setUserAddress(data);
-                } else {
-                    throw new Error('Failed to fetch');
-                }
-            } catch (error) {
-                console.error('Fetch user address error:', error);
+    const fetchUserAddress = async () => {
+        if (!user || role !== "Customer") return;
+        try {
+            const res = await fetch('/address/get-address', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setUserAddress(data);
+            } else {
+                throw new Error('Failed to fetch');
             }
-        };
+        } catch (error) {
+            console.error('Fetch user address error:', error);
+        }
+    };
 
-        // gọi khi app load
+    // gọi khi app load
     useEffect(() => {
-        fetchUserAddress();
+        if (user && role === "Customer") {
+            fetchUserAddress();
+        }
     }, [user, role]);
+
+    useEffect(() => {
+        if (location.pathname === '/booking-service' && user && role === "Customer") {
+            fetchUserAddress();
+        }
+    }, [location, user, role]);
 
     return <BookingContext.Provider value={{
         services,
@@ -63,7 +73,8 @@ const BookingProvider = ({ children }) => {
         houseNumber,
         setHouseNumber,
         userAddress,
-        refetchUserAddress: fetchUserAddress 
+        setUserAddress,
+        refetchUserAddress: fetchUserAddress
     }}>{children}</BookingContext.Provider>
 }
 

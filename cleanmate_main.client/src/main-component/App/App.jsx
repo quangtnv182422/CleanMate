@@ -7,21 +7,24 @@ import AuthProvider from '../../../src/context/AuthContext';
 import BookingProvider from '../../context/BookingProvider';
 import BookingStatusProvider from '../../context/BookingStatusProvider';
 import WorkProvider from '../../context/WorkProvider';
+import { BrowserRouter } from 'react-router-dom';
 
 const App = () => {
 
     return (
         <div className="App" id='scrool'>
-            <AuthProvider>
-                <BookingProvider>
-                    <WorkProvider>
-                        <BookingStatusProvider>
-                            <AllRoute />
-                            <ToastContainer />
-                        </BookingStatusProvider>
-                    </WorkProvider>
-                </BookingProvider>
-            </AuthProvider>
+            <BrowserRouter>
+                <AuthProvider>
+                    <BookingProvider>
+                        <WorkProvider>
+                            <BookingStatusProvider>
+                                <AllRoute />
+                                <ToastContainer />
+                            </BookingStatusProvider>
+                        </WorkProvider>
+                    </BookingProvider>
+                </AuthProvider>
+            </BrowserRouter>
         </div>
     );
 }

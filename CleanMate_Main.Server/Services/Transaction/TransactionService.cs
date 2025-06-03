@@ -58,9 +58,12 @@ namespace CleanMate_Main.Server.Services.Transaction
             }
 
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
-            if (wallet.Balance < amount)
+            var pendingWithdrawAmount = await _transactionRepo.GetPendingWithdrawAmountAsync(userId);
+            var totalRequestedAmount = pendingWithdrawAmount + amount;
+
+            if (totalRequestedAmount > wallet.Balance)
             {
-                throw new InvalidOperationException("Số dư không đủ để thực hiện yêu cầu rút tiền.");
+                throw new InvalidOperationException($"Tổng số tiền yêu cầu rút ({CommonConstants.ChangeMoneyType(totalRequestedAmount)}) vượt quá số dư ví ({CommonConstants.ChangeMoneyType(wallet.Balance)}).");
             }
 
             var request = new WithdrawRequest
@@ -134,12 +137,18 @@ namespace CleanMate_Main.Server.Services.Transaction
 
 
             // Execute the transaction
-            return await _transactionRepo.ExecuteWithdrawTransactionAsync(
+             bool check = await _transactionRepo.ExecuteWithdrawTransactionAsync(
                 requestId,
                 adminId,
                 request.Amount,
                 request.UserId
             );
+            if (!check)
+            {
+                throw new InvalidOperationException("Không thể hoàn tất giao dịch rút tiền.");
+            }
+            request.Status = WithdrawStatus.Done;
+            return await _transactionRepo.UpdateWithdrawRequestAsync(requestId, request);
         }
         public async Task<bool> RejectWithdrawRequestAsync(int requestId, string adminId, string? adminNote)
         {

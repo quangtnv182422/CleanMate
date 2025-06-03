@@ -113,5 +113,11 @@ namespace CleanMate_Main.Server.Repository.Transaction
                 throw; // Re-throw for service handling
             }
         }
+        public async Task<decimal> GetPendingWithdrawAmountAsync(string userId)
+        {
+            return await _context.WithdrawRequests
+                .Where(r => r.UserId == userId && r.Status == WithdrawStatus.Pending)
+                .SumAsync(r => r.Amount);
+        }
     }
 }

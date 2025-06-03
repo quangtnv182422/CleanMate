@@ -23,7 +23,7 @@ namespace CleanMate_Main.Server.Repository.Payments
 
         public async Task<Payment> UpdatePaymentAsync(Payment newPayment)
         {
-            var existingPayment = await _context.Payments.FindAsync(newPayment.BookingId);
+            var existingPayment = await _context.Payments.FirstOrDefaultAsync(x => x.BookingId == newPayment.BookingId);
             if (existingPayment == null)
                 return null;
 

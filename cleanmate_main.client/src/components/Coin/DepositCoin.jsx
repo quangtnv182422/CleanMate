@@ -19,6 +19,8 @@ import { toast } from "react-toastify";
 
 import vnpayLogo from "../../images/vnpay-logo.png";
 import payosLogo from "../../images/payos-logo.png";
+import bankLogo from '../../images/bank-transfer-logo.png';
+import qrLogo from '../../images/qr-transfer-logo.png';
 import axios from "axios";
 import useAuth from "../../hooks/useAuth"
 
@@ -29,9 +31,14 @@ const paymentMethods = [
         logo: vnpayLogo,
     },
     {
-        id: "payos",
-        name: "PayOS",
-        logo: payosLogo,
+        id: "bank",
+        name: "Chuyển khoản qua ngân hàng",
+        logo: bankLogo,
+    },
+    {
+        id: "qr",
+        name: "Quét QR",
+        logo: qrLogo,
     },
 ];
 
@@ -68,14 +75,6 @@ const DepositCoin = () => {
         setAmount(e.target.value);
         validator.showMessages();
     }
-
-   /* const handleTopUp = () => {
-        if (validator.allValid()) {
-            toast.success('Bạn đã thanh toán thành công')
-        } else {
-            validator.showMessages();
-        }
-    };*/
 
     const handleVnPay = async () => {
         if (validator.allValid()) {
@@ -232,12 +231,13 @@ const DepositCoin = () => {
                                             boxShadow:
                                                 selectedMethod === method.id ? 3 : "none",
                                             cursor: "pointer",
+                                            height: '120px',
                                         }}
                                     >
-                                        <CardActionArea onClick={() => setSelectedMethod(method.id)}>
+                                        <CardActionArea sx={{height: '100%'}} onClick={() => setSelectedMethod(method.id)}>
                                             <CardMedia
                                                 component="img"
-                                                height="40"
+                                                height="60"
                                                 image={method.logo}
                                                 alt={method.name}
                                                 sx={{ objectFit: "contain", mt: 1 }}

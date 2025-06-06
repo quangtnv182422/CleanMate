@@ -35,5 +35,25 @@ namespace CleanMate_Main.Server.Repository.Bookings
                                         .FirstOrDefaultAsync(x => x.BookingId == bookingId);
             return booking;
         }
+        public async Task<List<Booking>> GetBookingsByUserIdAsync(string userId, int? statusId)
+        {
+            var query = _context.Bookings
+                                .Include(x => x.ServicePrice)
+                                    .ThenInclude(x => x.Duration)
+                                .Include(x => x.ServicePrice)
+                                    .ThenInclude(x => x.Service)
+                                .Include(x => x.BookingStatus)
+                                .Include(x => x.Address)
+                                .Include(x => x.Cleaner)
+                                .Include(x => x.User)
+                                .Where(x => x.UserId == userId);
+
+            if (statusId.HasValue)
+            {
+                query = query.Where(x => x.BookingStatusId == statusId.Value);
+            }
+
+            return await query.OrderByDescending(x => x.CreatedAt).ToListAsync();
+        }
     }
 }

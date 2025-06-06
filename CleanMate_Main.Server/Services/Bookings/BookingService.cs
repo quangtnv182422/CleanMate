@@ -43,5 +43,36 @@ namespace CleanMate_Main.Server.Services.Bookings
         {
            return await _bookingRepo.GetBookingByIdAsync(bookingId);
         }
+
+        public async Task<List<BookingDTO>> GetBookingsByUserIdAsync(string userId, int? statusId)
+        {
+            var bookings = await _bookingRepo.GetBookingsByUserIdAsync(userId, statusId);
+
+            var bookingDtos = bookings.Select(b => new BookingDTO
+            {
+                BookingId = b.BookingId,
+                ServicePriceId = b.ServicePriceId,
+                ServiceName = b.ServicePrice.Service.Name,
+                DurationDescription = b.ServicePrice.Duration.SquareMeterSpecific,
+                Price = b.ServicePrice.Price,
+                CleanerId = b.CleanerId,
+                CleanerName = b.Cleaner?.UserName ?? "Chưa phân công",
+                UserId = b.UserId,
+                UserName = b.User.UserName,
+                BookingStatusId = b.BookingStatusId,
+                Status = CommonConstants.GetStatusString(b.BookingStatusId),
+                StatusDescription = b.BookingStatus.StatusDescription,
+                Note = b.Note,
+                AddressId = b.AddressId,
+                AddressFormatted = b.Address?.GG_FormattedAddress ?? "Chưa có địa chỉ",
+                Date = b.Date,
+                StartTime = b.StartTime,
+                TotalPrice = b.TotalPrice,
+                CreatedAt = b.CreatedAt,
+                UpdatedAt = b.UpdatedAt
+            }).ToList();
+
+            return bookingDtos;
+        }
     }
 }

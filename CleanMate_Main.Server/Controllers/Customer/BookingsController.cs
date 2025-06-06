@@ -10,7 +10,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Customer")]
+    //[Authorize(Roles = "Customer")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -20,37 +20,60 @@ namespace CleanMate_Main.Server.Controllers.Customer
             _bookingService = bookingService;
         }
 
-        [HttpPost("add-booking")]
-        public async Task<ActionResult<Booking>> AddBooking([FromBody] BookingCreateDTO dto)
+        /* [HttpPost("add-booking")]
+         public async Task<ActionResult<Booking>> AddBooking([FromBody] BookingCreateDTO dto)
+         {
+             if (dto == null)
+             {
+                 return BadRequest("Thông tin đặt lịch không hợp lệ.");
+             }
+
+             try
+             {
+                 var booking = await _bookingService.AddNewBookingAsync(dto);
+
+                 return CreatedAtAction(nameof(GetBookingById), new { bookingId = booking.BookingId }, booking);
+             }
+             catch (Exception ex)
+             {
+                 return StatusCode(500, $"Lỗi server: {ex.Message}");
+             }
+         }
+
+
+         [HttpGet("get-booking-id/{bookingId}")]
+         public async Task<ActionResult<Booking>> GetBookingById(int bookingId)
+         {
+             var booking = await _bookingService.GetBookingByIdAsync(bookingId);
+
+             if (booking != null)
+             {
+                 return Ok(booking);
+             }
+             return NotFound();
+         }*/
+
+        [HttpGet("get-bookings")]
+        public async Task<ActionResult<List<BookingDTO>>> GetBookingsByUserId([FromQuery] string userId, [FromQuery] int? statusId = null)
         {
-            if (dto == null)
+            if (string.IsNullOrEmpty(userId))
             {
-                return BadRequest("Thông tin đặt lịch không hợp lệ.");
+                return BadRequest("UserId không hợp lệ.");
             }
 
             try
             {
-                var booking = await _bookingService.AddNewBookingAsync(dto);
-
-                return CreatedAtAction(nameof(GetBookingById), new { bookingId = booking.BookingId }, booking);
+                var bookings = await _bookingService.GetBookingsByUserIdAsync(userId, statusId);
+                if (bookings == null || bookings.Count == 0)
+                {
+                    return NotFound("Không tìm thấy booking nào.");
+                }
+                return Ok(bookings);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Lỗi server: {ex.Message}");
             }
-        }
-
-
-        [HttpGet("get-booking-id/{bookingId}")]
-        public async Task<ActionResult<Booking>> GetBookingById(int bookingId)
-        {
-            var booking = await _bookingService.GetBookingByIdAsync(bookingId);
-
-            if (booking != null)
-            {
-                return Ok(booking);
-            }
-            return NotFound();
         }
     }
 }

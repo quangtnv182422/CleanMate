@@ -7,5 +7,6 @@ namespace CleanMate_Main.Server.Services.Bookings
     {
         Task<Booking> AddNewBookingAsync(BookingCreateDTO booking);
         Task<Booking?> GetBookingByIdAsync(int bookingId);
+        Task<List<BookingDTO>> GetBookingsByUserIdAsync(string userId, int? statusId);
     }
 }

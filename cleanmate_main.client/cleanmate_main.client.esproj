@@ -14,7 +14,6 @@
     <Folder Include="src\components\BookingConfirmation\" />
     <Folder Include="src\components\GoogleMap\" />
     <Folder Include="src\components\EmployeeWorkDetails\" />
-    <Folder Include="src\components\AccpetWork\" />
     <Folder Include="src\components\Loading\" />
     <Folder Include="src\main-component\ConfirmMail\" />
     <Folder Include="src\main-component\OrderDetails\" />

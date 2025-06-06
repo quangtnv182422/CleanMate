@@ -10,7 +10,7 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 const HeaderTopbar = () => {
     const { user, loading } = useAuth();
     const navigate = useNavigate();
-    const [coin, setCoin] = useState(null);
+    const [coin, setCoin] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -39,7 +39,7 @@ const HeaderTopbar = () => {
                 });
 
                 const walletData = await response.json();
-                setCoin(walletData);
+                setCoin(walletData?.balance);
             } catch (error) {
                 console.error('Error fetching wallet:', error);
             }
@@ -49,6 +49,7 @@ const HeaderTopbar = () => {
     }, []);
 
     const formatCoin = (coin) => {
+        if (coin == null || isNaN(coin)) return '0';
         return coin.toLocaleString('vi-VN', {
             style: 'currency',
             currency: 'VND'
@@ -88,7 +89,7 @@ const HeaderTopbar = () => {
                                 <ul style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                                     <li style={{cursor: 'pointer'}} onClick={() => navigate('/terms') }>Chính sách & Điều khoản</li>
                                     {user && (
-                                        <li>Ví CleanMate: {formatCoin(coin?.balance)}</li>
+                                        <li>Ví CleanMate: {formatCoin(coin)}</li>
                                     )}
                                 </ul>
                             </div>
@@ -129,7 +130,7 @@ const HeaderTopbar = () => {
                                                         Ví CleanMate
                                                     </div>
                                                     <div className="cleanmate-wallet-content">
-                                                        <p className="cleanmate-wallet-balance">Số dư hiện tại: {formatCoin(coin.balance)}</p>
+                                                        <p className="cleanmate-wallet-balance">Số dư hiện tại: {formatCoin(coin)}</p>
                                                         <button className="btn deposit-button" onClick={() => navigate('/coin/deposit')}>Nạp Tiền</button>
                                                     </div>
                                                 </div>
@@ -143,7 +144,7 @@ const HeaderTopbar = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="login-cta col col-lg-6 col-md-5 col-sm-12 col-12 ">
+                                <div className="login-cta col col-lg-5 col-md-5 col-sm-12 col-12 ">
                                     <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
                                     <div className="dropdown-container" ref={dropdownRef}>
                                         <button className="btn sign-up-btn" onClick={toggleDropdown}>

@@ -64,8 +64,6 @@ const MobileMenu = () => {
     const [menuActive, setMenuState] = useState(false);
     const navigate = useNavigate();
 
-    console.log(openMenu)
-
     const handleToggleMenu = () => setOpenMenu(!openMenu);
 
     const ClickHandler = () => {

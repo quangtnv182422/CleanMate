@@ -58,8 +58,18 @@ const RevenuePage = () => (
 
 const drawerWidth = 300;
 
+const colorMap = {
+    'Việc mới': '#4DA8DA', // Việc mới - Xanh lam nhạt
+    'Đã hủy': '#A9A9A9', // Đã hủy - Xám
+    'Đã nhận': '#28A745', // Đã nhận - Xanh lá
+    'Đang thực hiện': '#FF8C00', // Đang thực hiện - Cam
+    'Chờ xác nhận': '#FFD700', // Chờ xác nhận - Vàng
+    'Hoàn thành': '#004085'  // Hoàn thành - Xanh dương đậm
+};
+
 const WorkList = () => {
     const { open, handleOpen, handleClose, selectedWork, data, setData } = useContext(WorkContext);
+    const { statusList } = useContext(BookingStatusContext);
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -67,11 +77,9 @@ const WorkList = () => {
     const [page, setPage] = useState(1);
     const [tabValue, setTabValue] = useState(0);
     const [status, setStatus] = useState('');
-    const { statusList } = useContext(BookingStatusContext);
     const { user, loading } = useAuth();
     const role = user?.roles?.[0] || '';
 
-    console.log(data)
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
@@ -100,6 +108,7 @@ const WorkList = () => {
 
                 const workItems = await response.json();
                 setData(workItems);
+                
             } catch (error) {
                 console.error('Error fetching work list:', error);
             }
@@ -247,21 +256,36 @@ const WorkList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedData.map((row) => (
-                            <TableRow key={row.bookingId}>
-                                <TableCell>{row.serviceName}</TableCell>
-                                <TableCell>{row.customerFullName}</TableCell>
-                                <TableCell>{`${row.date} ${row.startTime}`}</TableCell>
-                                <TableCell>{row.duration}</TableCell>
-                                <TableCell>{row.address}</TableCell>
-                                <TableCell>{row.note}</TableCell>
-                                <TableCell>{row.totalPrice}</TableCell>
-                                <TableCell>{row.status}</TableCell>
-                                <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                    <VisibilityOutlinedIcon onClick={() => handleOpen(row.bookingId)} />
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {paginatedData.map((row) => {
+
+                            return (
+                                <TableRow key={row.bookingId}>
+                                    <TableCell>{row.serviceName}</TableCell>
+                                    <TableCell>{row.customerFullName}</TableCell>
+                                    <TableCell>{`${row.date} ${row.startTime}`}</TableCell>
+                                    <TableCell>{row.duration}</TableCell>
+                                    <TableCell>{row.address}</TableCell>
+                                    <TableCell>{row.note}</TableCell>
+                                    <TableCell>{row.totalPrice}</TableCell>
+                                    <TableCell>
+                                        <span
+                                            style={{
+                                                backgroundColor: colorMap[row.status] || '#000000', 
+                                                color: '#FFFFFF',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                display: 'inline-block',
+                                            }}
+                                        >
+                                            {row.status}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
+                                        <VisibilityOutlinedIcon onClick={() => handleOpen(row.bookingId)} />
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -397,7 +421,7 @@ const WorkList = () => {
                                 backgroundColor: '#f1f1f1',
                             },
                         }}
-                        startIcon={<ExitToAppOutlinedIcon sx={{color: '#000'}} />}
+                        startIcon={<ExitToAppOutlinedIcon sx={{ color: '#000' }} />}
                     >
                         Đăng xuất
                     </Button>

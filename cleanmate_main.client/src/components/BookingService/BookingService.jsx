@@ -5,6 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { BookingContext } from '../../context/BookingProvider';
+import { style } from './style';
 import {
     Box,
     Button,
@@ -26,104 +27,10 @@ import WestIcon from '@mui/icons-material/West';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import useAuth from '../../hooks/useAuth';
-
-const primaryColor = '#1565C0';
-const style = {
-    container: {
-        width: '100%',
-        margin: '0 auto',
-        bgcolor: 'background.paper',
-        boxShadow: 24,
-        borderRadius: '5px',
-        boxSizing: 'border-box',
-        p: 2,
-    },
-    header: {
-        width: '100%',
-        height: '50px',
-        borderBottom: '1px solid #000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'relative',
-        marginBottom: '20px',
-    },
-    headerTitle: {
-        position: 'absolute',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        fontSize: '20px',
-        color: primaryColor,
-        fontWeight: 'bold',
-    },
-    backIcon: {
-        cursor: 'pointer',
-        color: primaryColor,
-    },
-    subHeaderTitle: {
-        fontSize: '16px',
-        color: '#1565C0'
-    },
-    footer: {
-        backgroundColor: '#fff',
-        borderTop: '1px solid #eee',
-        px: 2,
-        py: 1.5,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 1000,
-    },
-    durationSelectionButton: {
-        whiteSpace: "pre-line",
-        height: "70px",
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontSize: '14px',
-    },
-    durationSelectionText: {
-        margin: '0',
-        fontSize: '14px',
-    },
-    durationSelectionButtonText: {
-        fontSize: '14px',
-        color: '#1565C0',
-    },
-    chooseAddressContainer: {
-        position: 'absolute',
-        top: '55px',
-        left: '140px',
-        width: '350px',
-        backgroundColor: '#fff',
-        border: '1px solid #ccc',
-        borderRadius: '5px',
-        padding: 1.2,
-        zIndex: '1000',
-        '@media (max-width: 600px)': {
-            left: 0,
-            right: 0,
-            width: '90%',
-            margin: '0 auto',
-            top: '60px',
-        },
-    },
-    googleMapAddress: {
-        fontSize: '16px',
-        color: '#000',
-        fontWeight: 'bold',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-    },
-    specificAddress: {
-        color: '#666',
-    }
-};
+import ReactLoading from 'react-loading';
 
 const BookingService = () => {
-    const { userAddress, setUserAddress, refetchUserAddress } = useContext(BookingContext);
+    const { userAddress, setUserAddress, refetchUserAddress, loading } = useContext(BookingContext);
     const { user } = useAuth();
     useEffect(() => {
         refetchUserAddress(); // fetch lại địa chỉ
@@ -196,7 +103,7 @@ const BookingService = () => {
                     isInUse: true,
                     isDefault: true,
                     latitude: address.latitude,
-                    longitude: address.longtitude
+                    longitude: address.longitude
                 })
             });
 
@@ -323,10 +230,15 @@ const BookingService = () => {
     }
 
     return (
-        <div>
+        <div style={{ position: 'relative' }}>
+            {loading && (
+                <Box sx={style.spinnerContainer}>
+                    <ReactLoading type="spinningBubbles" color="#122B82" width={100} height={100} />
+                </Box>
+            )}
             <Box sx={style.container}>
                 <Box sx={style.header}>
-                    <WestIcon sx={style.backIcon} onClick={() => navigate(-1)} />
+                    <WestIcon sx={style.backIcon} onClick={() => navigate(`/service-single/${serviceId}`)} />
                     <Typography sx={style.headerTitle}>Dọn dẹp theo giờ</Typography>
                 </Box>
                 <Box sx={{ p: 1 }}>

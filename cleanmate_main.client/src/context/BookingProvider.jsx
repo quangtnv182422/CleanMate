@@ -10,6 +10,7 @@ const BookingProvider = ({ children }) => {
     const [houseType, setHouseType] = useState('house');
     const [houseNumber, setHouseNumber] = useState('');
     const [userAddress, setUserAddress] = useState([]);
+    const [loading, setLoading] = useState(false);
     const location = useLocation();
     const { user } = useAuth()
     const role = user?.roles?.[0] || '';
@@ -34,6 +35,7 @@ const BookingProvider = ({ children }) => {
 
     const fetchUserAddress = async () => {
         if (!user || role !== "Customer") return;
+        setLoading(true);
         try {
             const res = await fetch('/address/get-address', {
                 method: 'GET',
@@ -48,6 +50,8 @@ const BookingProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Fetch user address error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -74,7 +78,8 @@ const BookingProvider = ({ children }) => {
         setHouseNumber,
         userAddress,
         setUserAddress,
-        refetchUserAddress: fetchUserAddress
+        refetchUserAddress: fetchUserAddress,
+        loading
     }}>{children}</BookingContext.Provider>
 }
 

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box,
@@ -77,10 +77,8 @@ const style = {
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [coin, setCoin] = useState(null);
     const { selectedAddress,
-        selectedEmployee,
-        selectedDuration,
-        selectedSpecificArea,
         price,
         selectedDay,
         formatSpecificTime,
@@ -91,6 +89,24 @@ const Payment = () => {
     const [selectedMethod, setSelectedMethod] = useState('CleanMate');
     const { user } = useAuth();
 
+    useEffect(() => {
+        const fetchCoin = async () => {
+            try {
+                const response = await fetch('/wallet/get-wallet', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const walletData = await response.json();
+                setCoin(walletData);
+            } catch (error) {
+                console.error('Error fetching wallet:', error);
+            }
+        }
+
+        fetchCoin();
+    },[])
+
     const formatPrice = (price) => {
         return price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     }
@@ -99,9 +115,6 @@ const Payment = () => {
         const [day, month, year] = dateStr.split('/');
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
-
-    console.log(convertToISODate(selectedDay));
-    console.log(selectedAddress)
 
     const handlePayment = async () => {
         const isoDate = convertToISODate(selectedDay);
@@ -290,7 +303,7 @@ const Payment = () => {
                                 )}
                                 {method.id === 'CleanMate' && (
                                     <Typography sx={{ mt: 1, fontSize: 13 }}>
-                                        Số dư hiện tại: <strong>{method.balance}</strong>
+                                        Số dư hiện tại: <strong>{formatPrice(coin?.balance)}</strong>
                                     </Typography>
                                 )}
                             </Box>

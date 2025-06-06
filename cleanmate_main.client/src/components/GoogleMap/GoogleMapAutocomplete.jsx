@@ -4,6 +4,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Helmet } from 'react-helmet';
 import { BookingContext } from '../../context/BookingProvider';
 import { Modal, Box, Typography, Button, TextField } from '@mui/material';
+import { toast } from 'react-toastify';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
@@ -18,6 +19,7 @@ const GoogleMapAutocomplete = () => {
     const infoWindowRef = useRef(null);
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const {
+        userAddress,
         selectedPlace,
         setSelectedPlace,
         houseType,
@@ -41,6 +43,10 @@ const GoogleMapAutocomplete = () => {
         if (!selectedPlace || !houseNumber || !user) return;
 
         try {
+            const addressCount = userAddress.length;
+
+            const isDefault = addressCount === 0;
+
             const response = await axios.post(
                 `/address/add-address`,
                 {
@@ -52,24 +58,13 @@ const GoogleMapAutocomplete = () => {
                     latitude: selectedPlace.location.lat,
                     longitude: selectedPlace.location.lng,
                     isInUse: true,
-                    isDefault: false // đang fix cứng tạm sau sẽ làm button để đánh dấu isDefault
+                    isDefault: isDefault 
                 },
                 { withCredentials: true }
             );
 
 
-            console.log("✅ Địa chỉ đã được thêm:", response.data);
-           /* setTimeout(() => {
-                navigate(`/booking-service?service=${serviceId}`);
-            }, 200); 
-            handleClose();
-            */
-
-            //handleClose(); // đóng modal trước
-            //console.log("➡️ Chuyển hướng đến:", `/booking-service?service=${serviceId}`);
-            //setTimeout(() => {
-            //    navigate(`/booking-service?service=${serviceId}`);
-            //}, 100);
+            toast.success("Địa chỉ đã được thêm");
 
             if (mapRef.current) {
                 if (selectedPlace.viewport) {
@@ -100,13 +95,15 @@ const GoogleMapAutocomplete = () => {
                 infoWindowRef.current.open({ map: mapRef.current, anchor: markerRef.current });
             }
 
+            setHouseNumber('house')
+            setHouseNumber('')
             handleClose();
             setTimeout(() => {
                 navigate(`/booking-service?service=${serviceId}`);
             }, 100);
 
         } catch (error) {
-            console.error("❌ Lỗi khi thêm địa chỉ:", error);
+            toast.error("Lỗi khi thêm địa chỉ:", error);
         }
     };
 

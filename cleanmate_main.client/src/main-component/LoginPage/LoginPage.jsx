@@ -1,14 +1,17 @@
 ﻿import React, { useState } from 'react';
-import Grid from "@mui/material/Grid";
-import SimpleReactValidator from "simple-react-validator";
 import { toast } from "react-toastify";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import { Link, useNavigate } from "react-router-dom";
+import SimpleReactValidator from "simple-react-validator";
+import {
+    Grid,
+    TextField,
+    FormControlLabel,
+    Checkbox,
+    Button
+} from '@mui/material';
 import Logo from '../../images/logo-transparent.png';
 import './style.scss';
+
 
 
 
@@ -103,7 +106,7 @@ const LoginPage = (props) => {
                     } else if (roles.includes("Customer")) {
                         push("/home");
                     } else {
-                        push("/"); 
+                        push("/");
                     }
                 } else {
                     const error = await response.json();

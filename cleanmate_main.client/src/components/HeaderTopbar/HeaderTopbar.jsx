@@ -42,7 +42,6 @@ const HeaderTopbar = () => {
                 setCoin(walletData);
             } catch (error) {
                 console.error('Error fetching wallet:', error);
-                setCoin(null); 
             }
         };
 
@@ -75,7 +74,7 @@ const HeaderTopbar = () => {
         <div className="topbar">
             <div className="container">
                 <div className="row">
-                    <div className="col col-lg-6 col-md-5 col-sm-12 col-12">
+                    <div className="col col-lg-4 col-md-5 col-sm-12 col-12">
                         <div className="contact-intro">
                             <ul>
                                 <li><i className="fi ti-location-pin"></i>Hòa Lạc, Hà Nội, Việt Nam</li>
@@ -83,15 +82,18 @@ const HeaderTopbar = () => {
                         </div>
                     </div>
 
-                    <div className="col col-lg-6 col-md-7 col-sm-12 col-12">
+                    <div className="col col-lg-8 col-md-7 col-sm-12 col-12">
                         <div className="row">
-                            <div className="contact-info col col-lg-6 col-md-7 col-sm-12 col-12">
-                                <ul>
-                                    <li><Link to="/terms">Chính sách & Điều khoản</Link></li>
+                            <div className="contact-info col col-lg-7 col-md-7 col-sm-12 col-12">
+                                <ul style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                                    <li style={{cursor: 'pointer'}} onClick={() => navigate('/terms') }>Chính sách & Điều khoản</li>
+                                    {user && (
+                                        <li>Ví CleanMate: {formatCoin(coin?.balance)}</li>
+                                    )}
                                 </ul>
                             </div>
                             {user ? (
-                                <div className="user-avatar-container col col-lg-6 col-md-5 col-sm-12 col-12">
+                                <div className="user-avatar-container col col-lg-5 col-md-5 col-sm-12 col-12">
                                     <div className="user-avatar" onClick={toggleDropdown} ref={dropdownRef}>
                                         <img src={userImage} alt="Ảnh của bạn" />
                                         <div className="user-avatar-information">
@@ -128,7 +130,7 @@ const HeaderTopbar = () => {
                                                     </div>
                                                     <div className="cleanmate-wallet-content">
                                                         <p className="cleanmate-wallet-balance">Số dư hiện tại: {formatCoin(coin.balance)}</p>
-                                                        <button className="btn deposit-button" onClick={() => navigate('/coin/deposit') }>Nạp Tiền</button>
+                                                        <button className="btn deposit-button" onClick={() => navigate('/coin/deposit')}>Nạp Tiền</button>
                                                     </div>
                                                 </div>
                                                 <div className="dropdown-item logout-btn" onClick={handleLogout}>

@@ -1,9 +1,7 @@
 ﻿import React, { Fragment, useState, useEffect, useContext } from 'react';
+import { useParams, Link } from 'react-router-dom'
 import Navbar from '../../components/Navbar/Navbar'
 import Scrollbar from '../../components/scrollbar/scrollbar'
-import { useParams } from 'react-router-dom'
-import Services from '../../api/service';
-import { Link } from 'react-router-dom'
 import Benefits from './benefits'
 import ServiceSidebar from './sidebar'
 import Footer from '../../components/footer/Footer'
@@ -15,7 +13,6 @@ import { BookingContext } from '../../context/BookingProvider';
 
 const ServiceSinglePage = () => {
     const { id } = useParams();
-    const [service, setService] = useState({});
     const { services } = useContext(BookingContext);
     //use params to get the id from the url
     //use id to get the service details from the api

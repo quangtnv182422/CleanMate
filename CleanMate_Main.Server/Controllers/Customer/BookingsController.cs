@@ -10,7 +10,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;

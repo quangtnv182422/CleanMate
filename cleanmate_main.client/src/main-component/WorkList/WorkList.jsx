@@ -27,6 +27,8 @@ import {
     Divider,
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { WorkContext } from '../../context/WorkProvider';
+import { BookingStatusContext } from '../../context/BookingStatusProvider'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
@@ -34,12 +36,11 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import userImage from '../../images/user-image.png';
-import { BookingStatusContext } from '../../context/BookingStatusProvider'
 import useAuth from '../../hooks/useAuth';
-import { WorkContext } from '../../context/WorkProvider';
 import EmployeeWorkDetails from '../../components/EmployeeWorkDetails/EmployeeWorkDetails';
+import AccpetWork from '../../components/AccpetWork/AcceptWork';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -108,7 +109,7 @@ const WorkList = () => {
 
                 const workItems = await response.json();
                 setData(workItems);
-                
+
             } catch (error) {
                 console.error('Error fetching work list:', error);
             }
@@ -270,7 +271,7 @@ const WorkList = () => {
                                     <TableCell>
                                         <span
                                             style={{
-                                                backgroundColor: colorMap[row.status] || '#000000', 
+                                                backgroundColor: colorMap[row.status] || '#000000',
                                                 color: '#FFFFFF',
                                                 padding: '4px 8px',
                                                 borderRadius: '4px',
@@ -280,8 +281,14 @@ const WorkList = () => {
                                             {row.status}
                                         </span>
                                     </TableCell>
-                                    <TableCell sx={{ textAlign: 'center', cursor: 'pointer' }}>
-                                        <VisibilityOutlinedIcon onClick={() => handleOpen(row.bookingId)} />
+                                    <TableCell
+                                        sx={{
+                                            textAlign: 'center',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => handleOpen(row.bookingId)}
+                                    >
+                                        <VisibilityOutlinedIcon />
                                     </TableCell>
                                 </TableRow>
                             )
@@ -319,7 +326,7 @@ const WorkList = () => {
             case 0:
                 return <WorkListPage />;
             case 1:
-                return <ReportsPage />;
+                return <AccpetWork />;
             case 2:
                 return <RevenuePage />;
             case 3:

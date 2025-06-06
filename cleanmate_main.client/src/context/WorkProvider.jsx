@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+﻿import { createContext, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 export const WorkContext = createContext();
 
@@ -32,6 +32,48 @@ const WorkProvider = ({ children }) => {
         }
     };
 
+    const handleAcceptWork = async () => {
+        try {
+            const response = await fetch(`/worklist/${selectedWork.bookingId}/accept`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || `Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+
+            if (result.success) {
+                alert("Công việc đã được nhận thành công!");
+                handleClose();
+                const fetchWorkList = async () => {
+                    const url = status ? `/worklist?status=${status}` : '/api/worklist';
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    if (res.ok) {
+                        const workItems = await res.json();
+                        setData(workItems);
+                    }
+                };
+                fetchWorkList();
+            } else {
+                alert(result.message || "Không thể nhận công việc.");
+            }
+        } catch (error) {
+            console.error('Lỗi nhận công việc:', error);
+            alert(error.message || "Đã xảy ra lỗi khi nhận công việc.");
+        }
+    };
+
     const handleClose = () => {
         setOpen(false);
         setSelectedWork(null);
@@ -45,6 +87,7 @@ const WorkProvider = ({ children }) => {
         handleOpen,
         handleClose,
         open,
+        handleAcceptWork
     }}>{children}</WorkContext.Provider>
 }
 

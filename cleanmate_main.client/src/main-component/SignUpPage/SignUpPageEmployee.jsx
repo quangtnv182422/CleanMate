@@ -78,6 +78,7 @@ const SignUpPageEmployee = (props) => {
         e.preventDefault();
         if (validator.allValid()) {
             try {
+                navigate('/loading', {replace: true})
                 const response = await fetch('/Authen/registeremployee', {
                     method: 'POST',
                     headers: {
@@ -117,7 +118,7 @@ const SignUpPageEmployee = (props) => {
                 });
                 validator.hideMessages();
                 toast.success('Bạn đã đăng ký thành công! Hãy xác thực Email của bạn');
-                navigate('/login'); // Changed from push to navigate for consistency
+                navigate('/login', {replace: true}); 
             } catch (error) {
                 toast.error(error.message);
             }

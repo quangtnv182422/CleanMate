@@ -69,6 +69,7 @@ const SignUpPageUser = () => {
         e.preventDefault();
         if (validator.allValid()) {
             try {
+                navigate('/loading', {replace: true})
                 const response = await fetch('/Authen/registercustomer', {
                     method: 'POST',
                     headers: {
@@ -84,14 +85,14 @@ const SignUpPageUser = () => {
                     }),
                 });
 
-                //const data = await response.json();
-                //if (!response.ok) {
-                //    if (data.errors && Array.isArray(data.errors)) {
-                //        // Display all errors in a single toast
-                //        throw new Error(data.errors.join('\n'));
-                //    }
-                //    throw new Error(data.message || 'Đăng ký thất bại.');
-                //}
+                const data = await response.json();
+                if (!response.ok) {
+                    if (data.errors && Array.isArray(data.errors)) {
+                        // Display all errors in a single toast
+                        throw new Error(data.errors.join('\n'));
+                    }
+                    throw new Error(data.message || 'Đăng ký thất bại.');
+                }
 
                 setValue({
                     first_name: '',
@@ -103,7 +104,7 @@ const SignUpPageUser = () => {
                 });
                 validator.hideMessages();
                 toast.success('Đăng ký tài khoản thành công!  Hãy xác thực Email của bạn');
-                navigate('/login');
+                navigate('/login', {replace: true});
             } catch (error) {
                 toast.error(error.message);
             }

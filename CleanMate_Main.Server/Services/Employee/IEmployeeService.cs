@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.ViewModels.Employee;
+﻿using CleanMate_Main.Server.Models.ViewModels.Customer;
+using CleanMate_Main.Server.Models.ViewModels.Employee;
 
 namespace CleanMate_Main.Server.Services.Employee
 {
@@ -28,6 +29,12 @@ namespace CleanMate_Main.Server.Services.Employee
         Task<IEnumerable<object>> GetBookingStatusesAsync();
         Task<bool> CanCleanerAcceptWorkAsync(int bookingId, string employeeId);
         Task CreateCleanerProfileAsync(string userId);
+        Task<IEnumerable<WorkHistoryViewModel>> GetWorkHistoryAsync(string employeeId);
+        Task<EarningsSummaryViewModel> GetEarningsSummaryAsync(string employeeId);
+        Task<PersonalProfileViewModel> GetPersonalProfileAsync(string employeeId);
+        Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile);
+        Task<CustomerReviewSummaryViewModel> GetCustomerReviewsAsync(string employeeId);
+        Task<decimal> GetMonthlyEarningsAsync(string employeeId);
 
     }
 }

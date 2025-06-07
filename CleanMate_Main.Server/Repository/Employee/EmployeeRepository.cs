@@ -2,7 +2,9 @@
 using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
+using CleanMate_Main.Server.Models.ViewModels.Wallet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 namespace CleanMate_Main.Server.Repository.Employee
@@ -260,6 +262,174 @@ namespace CleanMate_Main.Server.Repository.Employee
             _context.CleanerProfiles.Add(cleanerProfile);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<WorkHistoryViewModel>> GetWorkHistoryAsync(string employeeId)
+        {
+            var query = from booking in _context.Bookings
+                        join servicePrice in _context.ServicePrices on booking.ServicePriceId equals servicePrice.PriceId
+                        join service in _context.Services on servicePrice.ServiceId equals service.ServiceId
+                        join duration in _context.Durations on servicePrice.DurationId equals duration.DurationId
+                        join customer in _context.Users on booking.UserId equals customer.Id
+                        join address in _context.CustomerAddresses on booking.AddressId equals address.AddressId
+                        join feedback in _context.Feedbacks on booking.BookingId equals feedback.BookingId into feedbacks
+                        from feedback in feedbacks.DefaultIfEmpty()
+                        where booking.CleanerId == employeeId
+                           && (booking.BookingStatusId == CommonConstants.BookingStatus.DONE
+                               || booking.BookingStatusId == CommonConstants.BookingStatus.CANCEL)
+                        select new WorkHistoryViewModel
+                        {
+                            BookingId = booking.BookingId,
+                            ServiceName = service.Name,
+                            CustomerFullName = customer.FullName,
+                            Date = booking.Date,
+                            StartTime = booking.StartTime,
+                            Duration = duration.DurationTime,
+                            Address = address.AddressNo + " " + address.GG_FormattedAddress,
+                            Note = booking.Note,
+                            Earnings = booking.TotalPrice.HasValue
+                                ? Math.Floor(booking.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
+                                : 0m,
+                            Rating = feedback != null ? feedback.Rating : null,
+                            Comment = feedback != null ? feedback.Content : null,
+                            Status = CommonConstants.GetStatusString(booking.BookingStatusId)
+                        };
 
+            return await query.ToListAsync();
+        }
+
+        public async Task<EarningsSummaryViewModel> GetEarningsSummaryAsync(string employeeId)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.CleanerId == employeeId && b.BookingStatusId == CommonConstants.BookingStatus.DONE)
+                .ToListAsync();
+
+            var totalEarnings = bookings
+                .Sum(b => b.TotalPrice.HasValue
+                    ? Math.Floor(b.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
+                    : 0m);
+
+            var wallet = await _context.UserWallets
+                .FirstOrDefaultAsync(w => w.UserId == employeeId);
+
+            var transactions = await _context.WalletTransactions
+                .Where(t => t.Wallet.UserId == employeeId)
+                .Select(t => new TransactionViewModel
+                {
+                    TransactionId = t.TransactionId,
+                    BookingId = t.RelatedBookingId,
+                    Amount = t.Amount,
+                    TransactionDate = t.CreatedAt,
+                    TransactionType = t.TransactionType.ToString(),
+                    Description = t.Description ?? ""
+                })
+                .ToListAsync();
+
+            var withdrawalRequests = await _context.WithdrawRequests
+                .Where(w => w.UserId == employeeId)
+                .Select(w => new WithdrawRequestViewModel
+                {
+                    WithdrawalId = w.RequestId,
+                    Amount = w.Amount,
+                    RequestDate = w.RequestedAt,
+                    Status = w.Status.ToString()
+                })
+                .ToListAsync();
+
+            return new EarningsSummaryViewModel
+            {
+                TotalEarnings = totalEarnings,
+                AvailableBalance = wallet?.Balance ?? 0m,
+                Transactions = transactions,
+                WithdrawalRequests = withdrawalRequests
+            };
+        }
+
+
+
+        public async Task<PersonalProfileViewModel> GetPersonalProfileAsync(string employeeId)
+        {
+            var query = from user in _context.Users
+                        join profile in _context.CleanerProfiles on user.Id equals profile.UserId
+                        where user.Id == employeeId
+                        select new PersonalProfileViewModel
+                        {
+                            UserId = user.Id,
+                            FullName = user.FullName ?? "",
+                            Email = user.Email ?? "",
+                            PhoneNumber = user.PhoneNumber ?? "",
+                            AvatarUrl = user.ProfileImage ?? "",
+                            IdCardNumber = user.CCCD ?? "",
+                            BankName = user.BankName ?? "",
+                            BankNo = user.BankNo ?? "",
+                            Gender = user.Gender,
+                            Dob = user.Dob,
+                            ActiveAreas = profile.Area ?? "",
+                            IsAvailable = profile.Available ?? false,
+                            ExperienceYears = profile.ExperienceYear ?? 0,
+                            AverageRating = profile.Rating ?? 0
+                        };
+
+            return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Profile for employee ID {employeeId} not found.");
+        }
+
+        public async Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile)
+        {
+            var user = await _context.Users.FindAsync(profile.UserId);
+            var cleanerProfile = await _context.CleanerProfiles
+                .FirstOrDefaultAsync(p => p.UserId == profile.UserId);
+
+            if (user == null || cleanerProfile == null)
+            {
+                return false;
+            }
+
+            user.FullName = profile.FullName;
+            user.Email = profile.Email;
+            user.PhoneNumber = profile.PhoneNumber;
+            user.ProfileImage = profile.AvatarUrl;
+            user.CCCD = profile.IdCardNumber;
+            user.BankName = profile.BankName;
+            user.BankNo = profile.BankNo;
+            user.Gender = profile.Gender;
+            user.Dob = profile.Dob;
+
+            cleanerProfile.Area = profile.ActiveAreas;
+            cleanerProfile.Available = profile.IsAvailable;
+            cleanerProfile.ExperienceYear = profile.ExperienceYears;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<CustomerReviewSummaryViewModel> GetCustomerReviewsAsync(string employeeId)
+        {
+            var reviews = await _context.Feedbacks
+                .Join(_context.Bookings, f => f.BookingId, b => b.BookingId, (f, b) => new { f, b })
+                .Join(_context.Users, fb => fb.b.UserId, u => u.Id, (fb, u) => new
+                {
+                    Feedback = fb.f,
+                    CustomerFullName = u.FullName,
+                    Booking = fb.b
+                })
+                .Where(fb => fb.Booking.CleanerId == employeeId)
+                .Select(fb => new CustomerReviewViewModel
+                {
+                    BookingId = fb.Feedback.BookingId,
+                    CustomerFullName = fb.CustomerFullName ?? "",
+                    Rating = fb.Feedback.Rating ?? 0,
+                    Comment = fb.Feedback.Content ?? "",
+                    ReviewDate = fb.Feedback.CreatedAt ?? DateTime.UtcNow
+                })
+                .ToListAsync();
+
+            var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+            var totalReviews = reviews.Count;
+
+            return new CustomerReviewSummaryViewModel
+            {
+                AverageRating = averageRating,
+                TotalReviews = totalReviews,
+                Reviews = reviews
+            };
+        }
     }
 }

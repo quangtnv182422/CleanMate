@@ -177,15 +177,6 @@ const DepositCoin = () => {
                     Quay lại
                 </Button>
 
-                <Typography variant="h6" sx={{
-                    position: 'absolute',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    margin: '0'
-                }}>
-                    Nạp tiền vào ví điện tử
-                </Typography>
-
             </Box>
             <Paper variant="outlined" sx={{ p: 3, mt: 3 }}>
                 <Grid container spacing={2}>
@@ -230,7 +221,9 @@ const DepositCoin = () => {
                                                 selectedMethod === method.id ? "primary.main" : "grey.300",
                                             boxShadow:
                                                 selectedMethod === method.id ? 3 : "none",
-                                            cursor: "pointer",
+                                            cursor: method.id === "bank" ? 'not-allowed' : 'pointer',
+                                            pointerEvents: method.id === "bank" ? 'none' : 'auto',
+                                            opacity: method.id === "bank" ? 0.5 : 1, 
                                             height: '120px',
                                         }}
                                     >

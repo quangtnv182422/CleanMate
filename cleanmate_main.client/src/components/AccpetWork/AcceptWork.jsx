@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useState, useEffect, useContext } from 'react'
 import {
     Box,
     Grid,
@@ -8,8 +8,14 @@ import {
     Pagination,
     Button,
     Modal,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import { style } from './style.js'
+import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WorkDetails from './WorkDetails/WorkDetails.jsx';
 import useAuth from '../../hooks/useAuth.jsx';
 
@@ -19,7 +25,10 @@ const AcceptWork = () => {
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
     const [work, setWork] = useState([]);
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState(3);
     const [selectedWork, setSelectedWork] = useState(null);
+    const { statusList } = useContext(BookingStatusContext);
     const { user } = useAuth();
     const role = user?.roles?.[0] || '';
 
@@ -27,7 +36,9 @@ const AcceptWork = () => {
         const fetchWorkList = async () => {
             if (role !== "Cleaner") return;
             try {
-                const url = '/worklist?status=3'
+                const url = status
+                    ? `/worklist?status=${status}`
+                    : '/worklist'
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -50,7 +61,7 @@ const AcceptWork = () => {
         };
 
         fetchWorkList();
-    }, [setWork, role]);
+    }, [setWork, role, status]);
 
     const handleOpenWorkDetails = (work) => {
         setOpen(true);
@@ -59,13 +70,20 @@ const AcceptWork = () => {
 
     const handleClose = () => setOpen(false);
 
-    const filteredWork = work;
+    const filteredWork = work.filter((work) => {
+        return work.customerFullName.toLowerCase().includes(search.toLowerCase());
+    });
 
     const totalPages = Math.ceil(filteredWork.length / WORKS_PER_PAGE);
     const displayedWork = filteredWork.slice(
         (page - 1) * WORKS_PER_PAGE,
         page * WORKS_PER_PAGE
     );
+
+    const handleStatusChange = (event) => {
+        setStatus(event.target.value);
+        setPage(1); // Reset to first page when status changes
+    };
 
     const formatPrice = (price) => {
         return price?.toLocaleString('vi-VN', {
@@ -83,40 +101,78 @@ const AcceptWork = () => {
     const formatDate = (input) => {
         const date = new Date(input);
         if (isNaN(date)) return '';
-        return date.toLocaleDateString('vi-VN'); 
+        return date.toLocaleDateString('vi-VN');
     }
 
     return (
         <Box sx={style.accpetWorkSection}>
             <Box className="container" sx={style.container}>
-                <Typography variant="h4">Danh sách công việc đã nhận</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <TextField
+                        label="Tìm công việc theo tên"
+                        variant="outlined"
+                        size="small"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        sx={{ width: 200 }}
+                    />
+                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                        <InputLabel id="status-select-label">Trạng thái</InputLabel>
+                        <Select
+                            labelId="status-select-label"
+                            value={status}
+                            onChange={handleStatusChange}
+                            label="Trạng thái"
+                        >
+                            {statusList.filter((statusItem) => statusItem.id >= 2).map((statusItem) => (
+                                <MenuItem key={statusItem.id} value={statusItem.id}>
+                                    {statusItem.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+                
                 <Grid container spacing={2} sx={{ mt: 1 }}>
-                    {displayedWork.map((work, idx) => (
-                        <Grid item xs={12} sm={6} md={4} key={idx}>
-                            <Card sx={style.workCard} onClick={() => handleOpenWorkDetails(work)}>
-                                <CardContent>
-                                    <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>Bắt đầu lúc {formatTime(work.startTime)} giờ ngày {formatDate(work.date)}</Typography>
-                                    <Typography sx={{ mt: 2, fontWeight: 500 }}>{work.customerFullName}</Typography>
-                                    <Typography variant="subtitle2" color="textSecondary">{work.address}</Typography>
-                                    <Box sx={style.priceSection}>
-                                        <Typography variant="h6" sx={{ color: '#1976D2' }}>Số tiền: {formatPrice(work.totalPrice)}</Typography>
-                                        <Typography
-                                            variant="subtitle2"
-                                            sx={{
-                                                ...style.status,
-                                                color: '#28A745',
-                                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                                borderColor: '#28A745',
-                                            }}
-                                        >
-                                            {work.status}
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Card>
+                    {displayedWork.length === 0 ? (
+                        <Grid item xs={12}>
+                            <Typography align="center" sx={{ mt: 4, color: 'gray' }}>
+                                Hiện tại chưa có công việc nào.
+                            </Typography>
                         </Grid>
-                    ))}
+                    ) : (
+                        displayedWork.map((work, idx) => (
+                            <Grid item xs={12} sm={6} md={4} key={idx}>
+                                <Card sx={style.workCard} onClick={() => handleOpenWorkDetails(work)}>
+                                    <CardContent>
+                                        <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
+                                            Bắt đầu lúc {formatTime(work.startTime)} giờ ngày {formatDate(work.date)}
+                                        </Typography>
+                                        <Typography sx={{ mt: 2, fontWeight: 500 }}>{work.customerFullName}</Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">{work.address}</Typography>
+                                        <Box sx={style.priceSection}>
+                                            <Typography variant="h6" sx={{ color: '#1976D2' }}>
+                                                Số tiền: {formatPrice(work.totalPrice)}
+                                            </Typography>
+                                            <Typography
+                                                variant="subtitle2"
+                                                sx={{
+                                                    ...style.status,
+                                                    color: '#28A745',
+                                                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                                    borderColor: '#28A745',
+                                                }}
+                                            >
+                                                {work.status}
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))
+                    )}
                 </Grid>
+
 
                 {open && (
                     <Modal

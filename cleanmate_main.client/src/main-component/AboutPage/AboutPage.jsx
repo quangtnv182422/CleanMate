@@ -17,13 +17,11 @@ const AboutPage = () => {
     return (
         <Fragment>
             <Navbar/>
-            <PageTitle pageTitle={'Về chúng tôi'} pagesub={'Về Chúng Tôi'} />
             <About />
             <ServiceSectionS2 />
             <WorkSection />
             <TeamSection />
             <Testimonial />
-            <FunFact />
             <PartnerSection />
             <Footer />
             <Scrollbar />

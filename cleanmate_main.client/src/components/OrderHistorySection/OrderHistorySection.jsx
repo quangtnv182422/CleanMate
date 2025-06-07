@@ -147,9 +147,12 @@ const OrderHistorySection = () => {
     const handleClose = () => setOpen(false);
 
     const stats = {
+        active: bookings.filter((o) => o.status === "active").length,
+        canceled: bookings.filter((o) => o.status === 'canceled').length,
+        accepted: bookings.filter((o) => o.status === 'accepted').length,
+        inProgress: bookings.filter((o) => o.status === "inProgress").length,
         pending: bookings.filter((o) => o.status === 'pending').length,
         completed: bookings.filter((o) => o.status === 'completed').length,
-        canceled: bookings.filter((o) => o.status === 'canceled').length,
         paymentFail: bookings.filter((o) => o.status === 'paymentFail').length,
     };
     stats.total = bookings.length;
@@ -193,7 +196,7 @@ const OrderHistorySection = () => {
             <Box className="container" sx={style.container}>
                 {/* Tabs */}
                 <Grid container spacing={2} sx={{ mb: 4 }}>
-                    {['total', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
+                    {['total', 'active', 'accepted', 'inProgress', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
                         const selected = selectedTab === type;
                         const colors = colorMap[type];
                         return (
@@ -227,13 +230,19 @@ const OrderHistorySection = () => {
                                             }}>
                                             {type === 'total'
                                                 ? 'Tổng số đơn'
-                                                : type === 'pending'
-                                                    ? 'Chờ xác nhận'
-                                                    : type === 'paymentFail'
-                                                        ? 'Thanh toán thất bại'
-                                                        : type === 'completed'
-                                                            ? 'Đơn hoàn thành'
-                                                            : 'Đơn đã hủy'}
+                                                : type === "active"
+                                                    ? "Việc mới"
+                                                    : type === "inProgress"
+                                                        ? "Đang thực hiện"
+                                                        : type === "accepted"
+                                                        ? "Đơn đã nhận"
+                                                        : type === 'pending'
+                                                            ? 'Chờ xác nhận'
+                                                            : type === 'paymentFail'
+                                                                ? 'Thanh toán thất bại'
+                                                                : type === 'completed'
+                                                                    ? 'Đơn hoàn thành'
+                                                                    : 'Đơn đã hủy'}
                                         </Typography>
                                         <Typography variant="h4" fontWeight={600} sx={{ color: 'inherit' }}>
                                             {stats[type]}

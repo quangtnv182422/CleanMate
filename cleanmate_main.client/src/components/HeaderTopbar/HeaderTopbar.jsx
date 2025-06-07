@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react'
+﻿import React, { useState, useRef, useEffect, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import userImage from '../../images/user-image.png'
 import useAuth from '../../hooks/useAuth';
@@ -6,6 +6,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import CleaningServicesOutlinedIcon from '@mui/icons-material/CleaningServicesOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import { AuthContext } from '../../context/AuthContext';
 
 const HeaderTopbar = () => {
     const { user, loading } = useAuth();
@@ -26,7 +27,7 @@ const HeaderTopbar = () => {
             method: 'POST',
             credentials: 'include'
         }).then(() => {
-            window.location.reload(); // hoặc gọi lại API /me
+            navigate('/home') // hoặc gọi lại API /me
         });
     };
 
@@ -78,7 +79,7 @@ const HeaderTopbar = () => {
                     <div className="col col-lg-4 col-md-5 col-sm-12 col-12">
                         <div className="contact-intro">
                             <ul>
-                                <li><i className="fi ti-location-pin"></i>Hòa Lạc, Hà Nội, Việt Nam</li>
+                                <li><i className="fi ti-location-pin"></i>Chỉ khả dụng ở Hòa Lạc, Hà Nội, Việt Nam</li>
                             </ul>
                         </div>
                     </div>

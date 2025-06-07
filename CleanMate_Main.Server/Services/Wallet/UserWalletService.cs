@@ -120,5 +120,41 @@ namespace CleanMate_Main.Server.Services.Wallet
 
             return true;
         }
+
+        //--Trừ tiền---
+        public async Task<bool> DeductMoneyAsync(string userId, decimal amount, string reason)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Số tiền cần trừ phải lớn hơn 0.");
+            }
+
+            var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
+            if (wallet == null)
+            {
+                throw new InvalidOperationException("Ví người dùng không tồn tại.");
+            }
+
+            if (wallet.Balance < amount)
+            {
+                throw new InvalidOperationException("Số dư không đủ để thực hiện giao dịch.");
+            }
+
+            // Deduct the amount from the wallet
+            bool balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(userId, -amount, $"Trừ tiền: {reason}");
+            if (!balanceUpdated)
+            {
+                throw new InvalidOperationException("Không thể cập nhật số dư ví.");
+            }
+
+            // Record the transaction
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Debit, $"Trừ tiền: {reason}");
+            if (transactionId <= 0)
+            {
+                throw new InvalidOperationException("Không thể ghi lại giao dịch.");
+            }
+
+            return true;
+        }
     }
 }

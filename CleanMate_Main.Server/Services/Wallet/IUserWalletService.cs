@@ -10,5 +10,6 @@ namespace CleanMate_Main.Server.Services.Wallet
         Task<UserWalletDTO> GetWalletAsync(string userId);
         Task<bool> ExchangeCoinsForMoneyAsync(string userId, decimal amount, string bankAccount, string bankName);
         Task<bool> ExchangeMoneyForCoinsAsync(string userId, decimal amount, string paymentMethod, string paymentId);
+        Task<bool> DeductMoneyAsync(string userId, decimal amount, string reason);
     }
 }

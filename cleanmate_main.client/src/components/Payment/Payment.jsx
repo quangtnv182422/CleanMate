@@ -135,9 +135,8 @@ const Payment = () => {
                 endpoint = '/payments/booking-create-vnpay';
             } else if (selectedMethod === 'bank') {
                 endpoint = '/payments/booking-create-payos';
-            } else {
-                alert(`Thanh toán qua: ${selectedMethod} hiện chưa được hỗ trợ.`);
-                return;
+            } else if (selectedMethod === 'CleanMate') {
+                endpoint = '/payments/booking-create-cmcoin';
             }
 
             const response = await fetch(endpoint, {
@@ -149,12 +148,33 @@ const Payment = () => {
                 body: JSON.stringify(bookingData)
             });
 
-            const result = await response.json();
+            if (!response.ok) {
+                const errorData = await response.json();
+                alert(errorData.message || 'Thanh toán thất bại');
+                return;
+            }
 
-            if (response.ok && result.url) {
-                window.location.href = result.url;
+            if (selectedMethod === 'CleanMate') {
+                // Không cần URL, redirect trực tiếp tới booking-success
+                const result = await response.json();
+                if (result.success) {
+                    const queryString = `success=true&date=${encodeURIComponent(result.date)}` +
+                        `&time=${encodeURIComponent(result.time)}` +
+                        `&service=${encodeURIComponent(result.service)}` +
+                        `&cleaner=${encodeURIComponent(result.cleaner)}` +
+                        `&payment=${encodeURIComponent(result.payment)}`;
+                    navigate(`/booking-success?${queryString}`);
+                } else {
+                    alert('Thanh toán bằng CleanMate thất bại');
+                }
             } else {
-                alert(result.message || 'Thanh toán thất bại');
+                // VNPay hoặc PayOS: redirect tới URL thanh toán
+                const result = await response.json();
+                if (result.url) {
+                    window.location.href = result.url;
+                } else {
+                    alert('Không nhận được URL thanh toán');
+                }
             }
         } catch (error) {
             alert('Lỗi khi gửi yêu cầu thanh toán');

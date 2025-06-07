@@ -36,7 +36,7 @@ const paymentMethods = [
         logo: bankLogo,
     },
     {
-        id: "qr",
+        id: "payos",
         name: "Quét QR",
         logo: qrLogo,
     },
@@ -60,7 +60,7 @@ const DepositCoin = () => {
             validators: {
                 min_amount: {
                     message: "Bạn phải nạp tối thiểu 200,000 đồng.",
-                    rule: (val) => parseFloat(val) >= 20000, /// tạm sửa thành 2k để test PayOS
+                    rule: (val) => parseFloat(val) >= 20000, /// tạm sửa thành 20k để test PayOS
                     required: true,
                 },
                 positive_number: {

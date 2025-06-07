@@ -205,6 +205,75 @@ namespace CleanMate_Main.Server.Controllers.Payments
         }
 
 
+        [HttpPost("booking-create-cmcoin")]
+        public async Task<IActionResult> CreateBookingAndPaymentByCoin([FromBody] BookingCreateDTO bookingDto)
+        {
+            if (bookingDto == null || bookingDto.TotalPrice == null || bookingDto.TotalPrice <= 0)
+                return BadRequest("Thông tin đặt lịch không hợp lệ.");
+
+            // Lấy userId từ Claims
+            var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userMail))
+                return Unauthorized("Không tìm thấy thông tin người dùng.");
+
+            var user = await _userManager.FindByEmailAsync(userMail);
+            if (user == null)
+                return Unauthorized("Người dùng không tồn tại.");
+
+            try
+            {
+                // 1. Tạo booking
+                var createdBooking = await _bookingService.AddNewBookingAsync(bookingDto);
+
+                // 2. Tạo payment với status = Paid
+                var payment = new Payment
+                {
+                    BookingId = createdBooking.BookingId,
+                    Amount = bookingDto.TotalPrice.Value,
+                    PaymentMethod = "CM-Coin",
+                    PaymentStatus = "Paid",
+                    CreatedAt = DateTime.Now
+                };
+
+                var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
+
+                // 3. Trừ tiền từ ví
+                var reason = $"Thanh toán booking {createdBooking.BookingId} bằng CM-Coin";
+                var deducted = await _walletService.DeductMoneyAsync(user.Id, bookingDto.TotalPrice.Value, reason);
+                if (!deducted)
+                {
+                    // Nếu trừ tiền thất bại, xóa payment và booking
+                    /*await _paymentService.DeletePaymentAsync(savedPayment.PaymentId);
+                    await _bookingService.DeleteBookingAsync(createdBooking.BookingId);*/
+                    return StatusCode(500, new { message = "Không thể trừ tiền từ ví." });
+                }
+
+                // 4. Lấy chi tiết booking
+                var booking = await _bookingService.GetBookingByIdAsync(createdBooking.BookingId);
+                if (booking == null)
+                {
+                    return StatusCode(500, new { message = "Không thể lấy thông tin booking." });
+                }
+
+                // 5. Chuẩn bị dữ liệu để gửi về frontend
+                var bookingDetails = new
+                {
+                    success = true,
+                    date = booking.Date.ToString("dd/MM/yyyy"),
+                    time = $"{booking.StartTime:hh:mm tt} - {booking.StartTime.AddHours(booking.ServicePrice?.Duration?.DurationTime ?? 2):hh:mm tt}",
+                    service = booking.ServicePrice?.Service?.Name ?? "Dịch vụ vệ sinh",
+                    cleaner = booking.Cleaner?.FullName ?? "Chưa phân công",
+                    payment = bookingDto.TotalPrice.Value.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"
+                };
+
+                return Ok(bookingDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi khi xử lý đặt lịch và thanh toán: {ex.Message}" });
+            }
+        }
+
         [HttpGet("callback-vnpay")]
         public async Task<IActionResult> PaymentCallbackVnpay()
         {
@@ -280,23 +349,19 @@ namespace CleanMate_Main.Server.Controllers.Payments
             // Lấy userMail từ Claims
             var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(userMail))
-                return Unauthorized();
+                return Unauthorized("Không tìm thấy thông tin người dùng.");
 
             var user = await _userManager.FindByEmailAsync(userMail);
             if (user == null)
-                return Unauthorized();
-            //Lấy response
-            var response = _payOsService.ProcessReturnUrl(Request.Query);
+                return Unauthorized("Người dùng không tồn tại.");
 
+            // Lấy response
+            var response = _payOsService.ProcessReturnUrl(Request.Query);
             if (response == null || response.Code != "00")
-            {
-                return BadRequest("Dữ liệu trả về không hợp lệ từ PayOS.");
-            }
+                return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
 
             if (!long.TryParse(response.OrderCode, out long paymentId))
-            {
-                return BadRequest("ID thanh toán không hợp lệ.");
-            }
+                return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
 
             try
             {
@@ -306,7 +371,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     var result = paymentInfor?.Result;
 
                     if (result == null)
-                        return BadRequest(new { message = "Không lấy được thông tin từ PayOS." });
+                        return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
 
                     // Lấy amount và transactionId từ result
                     var amount = (decimal)result.amount;
@@ -315,23 +380,31 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     // Cộng coin vào ví
                     var updated = await _walletService.ExchangeMoneyForCoinsAsync(user.Id, amount, "PayOS", transactionId);
                     if (!updated)
-                        return BadRequest(new { message = "Cập nhật ví thất bại", response });
+                        return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
 
-                    return Ok(new
+                    // Chuẩn bị dữ liệu để gửi về frontend
+                    var depositDetails = new
                     {
-                        message = "Thanh toán thành công",
-                        amount,
-                        transactionId
-                    });
+                        Date = DateTime.Now.ToString("dd/MM/yyyy"),
+                        Coin = amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"
+                    };
+
+                    // Redirect tới trang BookingSuccess với query parameters
+                    var queryString = $"deposit=success&date={Uri.EscapeDataString(depositDetails.Date)}" +
+                                     $"&coin={Uri.EscapeDataString(depositDetails.Coin)}";
+                    var redirectUrl = $"{_configuration["SettingDomain:BaseUrl"]}/booking-success?{queryString}";
+
+                    return Redirect(redirectUrl);
                 }
 
-                return BadRequest(new { message = "Giao dịch chưa hoàn tất.", response });
+                return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi xử lý callback", error = ex.Message });
+                return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-fail?deposit=fail");
             }
         }
+
 
         [HttpGet("callback-booking-payos")]
         public async Task<IActionResult> BookingPaymentCallbackPayOS()
@@ -390,7 +463,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     var bookingDetails = new
                     {
                         Date = booking.Date.ToString("dd/MM/yyyy"),
-                        Time = $"{booking.StartTime:hh:mm tt} - {booking.StartTime.AddHours(booking.ServicePrice.Duration.DurationTime):hh:mm tt}", 
+                        Time = $"{booking.StartTime:hh:mm tt} - {booking.StartTime.AddHours(booking.ServicePrice.Duration.DurationTime):hh:mm tt}",
                         Service = booking.ServicePrice?.Service.Name ?? "Dịch vụ vệ sinh",
                         Cleaner = booking.Cleaner?.FullName ?? "Chưa phân công",
                         Payment = amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
     Box,
     Grid,
@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { style } from './style';
 import OrderDetails from '../../main-component/OrderDetails/OrderDetails';
+import useAuth from '../../hooks/useAuth';
+import axios from 'axios';
 
 const mockOrders = Array(30).fill(null).map((_, index) => ({
     id: `#362689FG-${index + 1}`,
@@ -39,7 +41,7 @@ const colorMap = {
         border: '#e3f2fd',
         color: '#1976D2',
     },
-    active: {
+    pending: {
         background: '#FBC11B',
         border: '#FBC11B',
         blurBackground: '#FFF8E1',
@@ -63,6 +65,43 @@ const colorMap = {
         blurBackground: '#FFEBEE',
         color: '#fff',
     },
+    accepted: {
+        background: '#4FC3F7',
+        border: '#4FC3F7',
+        blurBackground: '#E1F5FE',
+        color: '#fff',
+    },
+    inProgress: {
+        background: '#9575CD',
+        border: '#9575CD',
+        blurBackground: '#EDE7F6',
+        color: '#fff',
+    },
+    active: {
+        background: '#1976D2',
+        border: '#1976D2',
+        blurBackground: '#E5EFFA',
+        color: '#fff',
+    },
+};
+
+const statusMap = {
+    1: 'active',         // Việc mới
+    2: 'canceled',       // Đã huỷ
+    3: 'accepted',       // Đã nhận
+    4: 'inProgress',     // Đang thực hiện
+    5: 'pending',        // Chờ xác nhận
+    6: 'completed',      // Hoàn thành
+};
+
+const statusLabelMap = {
+    active: "Việc mới",
+    canceled: 'Đã hủy',
+    accepted: 'Đã nhận',
+    inProgress: 'Đang thực hiện',
+    pending: 'Chờ xác nhận',
+    completed: 'Hoàn thành',
+    paymentFail: 'Thanh toán thất bại',
 };
 
 const OrderHistorySection = () => {
@@ -70,6 +109,36 @@ const OrderHistorySection = () => {
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [bookings, setBookings] = useState([]);
+    const { user } = useAuth();
+
+    console.log(bookings)
+
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                const response = await axios.get('/bookings/get-bookings', {
+                    params: {
+                        userId: user.id,
+                    },
+                });
+
+                const rawData = response.data;
+
+                // 3. Chuyển đổi status code thành status key
+                const convertedData = rawData.map(item => ({
+                    ...item,
+                    status: statusMap[item.bookingStatusId] || 'unknown',
+                }));
+
+                setBookings(convertedData);
+            } catch (error) {
+                console.error('Lỗi khi fetch bookings:', error);
+            }
+        };
+
+        fetchBookings();
+    }, [user])
 
     const handleOpenOrderDetails = (order) => {
         setOpen(true);
@@ -78,14 +147,14 @@ const OrderHistorySection = () => {
     const handleClose = () => setOpen(false);
 
     const stats = {
-        active: mockOrders.filter((o) => o.status === 'active').length,
-        completed: mockOrders.filter((o) => o.status === 'completed').length,
-        canceled: mockOrders.filter((o) => o.status === 'canceled').length,
-        paymentFail: mockOrders.filter((o) => o.status === 'paymentFail').length,
+        pending: bookings.filter((o) => o.status === 'pending').length,
+        completed: bookings.filter((o) => o.status === 'completed').length,
+        canceled: bookings.filter((o) => o.status === 'canceled').length,
+        paymentFail: bookings.filter((o) => o.status === 'paymentFail').length,
     };
-    stats.total = mockOrders.length;
+    stats.total = bookings.length;
 
-    const filteredOrders = mockOrders.filter(order =>
+    const filteredOrders = bookings.filter(order =>
         selectedTab === 'total' ? true : order.status === selectedTab
     );
 
@@ -107,12 +176,24 @@ const OrderHistorySection = () => {
         })
     }
 
+    const formatTime = (time) => {
+        if (!time) return '';
+        const [hour, minute] = time.split(':');
+        return `${hour}:${minute}`
+    }
+
+    const formatDate = (input) => {
+        const date = new Date(input);
+        if (isNaN(date)) return '';
+        return date.toLocaleDateString('vi-VN');
+    }
+
     return (
         <Box sx={style.orderHistorySection}>
             <Box className="container" sx={style.container}>
                 {/* Tabs */}
                 <Grid container spacing={2} sx={{ mb: 4 }}>
-                    {['total', 'active', 'completed', 'canceled', 'paymentFail'].map((type) => {
+                    {['total', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
                         const selected = selectedTab === type;
                         const colors = colorMap[type];
                         return (
@@ -146,7 +227,7 @@ const OrderHistorySection = () => {
                                             }}>
                                             {type === 'total'
                                                 ? 'Tổng số đơn'
-                                                : type === 'active'
+                                                : type === 'pending'
                                                     ? 'Chờ xác nhận'
                                                     : type === 'paymentFail'
                                                         ? 'Thanh toán thất bại'
@@ -167,7 +248,7 @@ const OrderHistorySection = () => {
                 {/* Stats Summary */}
                 <Box sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
                     <Typography variant="body1" color="textSecondary">
-                        Tổng: {stats.total} | Chờ xác nhận: {stats.active} | Đơn hoàn thành: {stats.completed} | Đơn đã hủy: {stats.canceled} | Thanh toán thất bại: {stats.paymentFail}
+                        Tổng: {stats.total} | Chờ xác nhận: {stats.pending} | Đơn hoàn thành: {stats.completed} | Đơn đã hủy: {stats.canceled} | Thanh toán thất bại: {stats.paymentFail}
                     </Typography>
                 </Box>
 
@@ -177,27 +258,29 @@ const OrderHistorySection = () => {
                         <Grid item xs={12} sm={6} md={4} key={idx}>
                             <Card sx={style.orderCard} onClick={() => handleOpenOrderDetails(order)}>
                                 <CardContent>
-                                    <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>Bắt đầu lúc {order.startTime} giờ ngày {order.date}</Typography>
-                                    <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.name}</Typography>
-                                    <Typography variant="subtitle2" color="textSecondary">{order.address}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>Bắt đầu lúc {formatTime(order.startTime)} giờ ngày {formatDate(order.date)}</Typography>
+                                    <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.userName}</Typography>
+                                    <Typography variant="subtitle2" color="textSecondary">{order.addressFormatted}</Typography>
                                     <Box sx={style.priceSection}>
-                                        <Typography variant="h6" sx={{ color: '#1976D2' }}>Số tiền: {formatPrice(order.price)}</Typography>
+                                        <Typography variant="h6" sx={{ color: '#1976D2' }}>Số tiền: {formatPrice(order.totalPrice)}</Typography>
                                         <Typography
                                             variant="subtitle2"
                                             sx={{
                                                 ...style.status,
-                                                color: order.status === 'active' ? '#FBC11B' : order.status === 'completed' ? '#5CBB52' : '#E4293D',
-                                                backgroundColor: colorMap[order.status].blurBackground,
-                                                borderColor: colorMap[order.status].border,
+                                                color:
+                                                    order.status === 'active' ? '#1976D2' :
+                                                        order.status === 'completed' ? '#5CBB52' :
+                                                            order.status === 'pending' ? '#FBC11B' :
+                                                                order.status === 'canceled' ? '#E4293D' :
+                                                                    order.status === 'paymentFail' ? '#E4293D' :
+                                                                        order.status === 'accepted' ? '#4FC3F7' :
+                                                                            order.status === 'inProgress' ? '#9575CD' :
+                                                                                '#E4293D',
+                                                backgroundColor: colorMap[order.status]?.blurBackground || "#fff",
+                                                borderColor: colorMap[order.status]?.border || "#ccc",
                                             }}
                                         >
-                                            {order.status === "active"
-                                                ? "Chờ xác nhận"
-                                                : order.status === "paymentFail"
-                                                    ? "Thanh toán thất bại"
-                                                    : order.status === "completed"
-                                                        ? "Hoàn thành"
-                                                        : "Đã hủy"}
+                                            {statusLabelMap[order.status] || 'Không xác định'}
                                         </Typography>
                                     </Box>
                                 </CardContent>

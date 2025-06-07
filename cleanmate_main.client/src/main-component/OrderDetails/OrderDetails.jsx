@@ -14,10 +14,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { styles } from './style';
 import serviceImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
 
 const OrderDetails = ({ selectedOrder }) => {
+    console.log(selectedOrder)
     const [openFeedback, setOpenFeedback] = useState(false);
     const handleOpenFeedback = () => {
         setOpenFeedback(true);
@@ -108,27 +110,48 @@ const OrderDetails = ({ selectedOrder }) => {
             currency: 'VND',
         })
     }
+
+    const formatTime = (time) => {
+        if (!time) return '';
+        const [hour, minute] = time.split(':');
+        return `${hour}:${minute}`
+    }
+
+    const formatDate = (input) => {
+        const date = new Date(input);
+        if (isNaN(date)) return '';
+        return date.toLocaleDateString('vi-VN');
+    }
+
     return (
         <Box sx={styles.modal}>
-            <Typography variant="h4" sx={styles.orderDetailTitle}>{selectedOrder.service}</Typography>
+            <Typography variant="h4" sx={styles.orderDetailTitle}>{selectedOrder.serviceName}</Typography>
 
             {/*Status*/}
             <Box sx={styles.statusContainer}>
                 {
                     selectedOrder.status === "active"
-                        ? (<PendingIcon sx={styles.iconLarge} color="warning" />)
-                        : selectedOrder.status === "completed"
+                        ? (<NoteAddIcon sx={styles.iconLarge} color="primary" />)
+                        : selectedOrder.status === "completed" || selectedOrder.status === "accepted"
                             ? (<CheckCircleIcon sx={styles.iconLarge} color="success" />)
-                            : (<CancelIcon sx={styles.iconLarge} color="error" />)
+                            : selectedOrder.status === "inProgress" || selectedOrder.status === "pending"
+                                ? (<PendingIcon sx={styles.iconLarge} color="warning" />)
+                                : (<CancelIcon sx={styles.iconLarge} color="error" />)
                 }
                 <Typography sx={styles.status}>
                     {selectedOrder.status === "active"
-                        ? "Chờ xác nhận"
+                        ? "Việc mới"
                         : selectedOrder.status === "paymentFail"
                             ? "Thanh toán thất bại"
                             : selectedOrder.status === "completed"
                                 ? "Hoàn thành"
-                                : "Đã hủy"}
+                                : selectedOrder.status === "accepted"
+                                    ? "Đã nhận"
+                                    : selectedOrder.status === "inProgress"
+                                        ? "Đang tiến hành"
+                                        : selectedOrder.status === "pending"
+                                            ? "Chờ xác nhận"
+                                            : "Đã hủy"}
                 </Typography>
             </Box>
 
@@ -140,16 +163,16 @@ const OrderDetails = ({ selectedOrder }) => {
             <Box sx={styles.informationContent}>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Ngày làm việc</Typography>
-                    <Typography sx={styles.content}>Bắt đầu lúc {selectedOrder.startTime} giờ ngày {selectedOrder.date}</Typography>
+                    <Typography sx={styles.content}>Bắt đầu lúc {formatTime(selectedOrder.startTime)} giờ ngày {formatDate(selectedOrder.date)}</Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Địa chỉ</Typography>
-                    <Typography sx={styles.content}>{selectedOrder.address}</Typography>
+                    <Typography sx={styles.content}>{selectedOrder.addressFormatted}</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Nhân viên</Typography>
-                    <Typography sx={styles.content}>{selectedOrder.employee} nhân viên làm trong {selectedOrder.duration} giờ</Typography>
+                    <Typography sx={styles.content}>1 nhân viên làm trong {selectedOrder.durationTime} giờ</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
@@ -167,7 +190,7 @@ const OrderDetails = ({ selectedOrder }) => {
             <Box sx={styles.informationContent}>
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Số giờ/buổi</Typography>
-                    <Typography sx={styles.content}>{selectedOrder.duration}h/buổi</Typography>
+                    <Typography sx={styles.content}>{selectedOrder.durationTime}h/buổi</Typography>
                 </Box>
 
                 <Box sx={styles.bookingContent}>
@@ -182,7 +205,7 @@ const OrderDetails = ({ selectedOrder }) => {
 
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Tổng tiền</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedOrder.price)}</Typography>
+                    <Typography sx={styles.content}>{formatPrice(selectedOrder.totalPrice)}</Typography>
                 </Box>
             </Box>
 

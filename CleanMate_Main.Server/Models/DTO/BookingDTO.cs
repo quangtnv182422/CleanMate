@@ -4,7 +4,8 @@
         public int BookingId { get; set; } 
         public int ServicePriceId { get; set; } 
         public string ServiceName { get; set; }
-        public string DurationDescription { get; set; }
+        public int DurationTime { get; set; }
+        public string DurationSquareMeter { get; set; }
         public decimal Price { get; set; }
         public string CleanerId { get; set; } 
         public string CleanerName { get; set; } 

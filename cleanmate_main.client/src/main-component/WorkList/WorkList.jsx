@@ -38,11 +38,15 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import userImage from '../../images/user-image.png';
 import useAuth from '../../hooks/useAuth';
 import EmployeeWorkDetails from '../../components/EmployeeWorkDetails/EmployeeWorkDetails';
 import AccpetWork from '../../components/AccpetWork/AcceptWork';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import PendingWork from '../../components/PendingWork/PendingWork';
+import InProgressWork from '../../components/InProgressWork/InProgressWork';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -347,8 +351,12 @@ const WorkList = () => {
             case 1:
                 return <AccpetWork />;
             case 2:
+                return <PendingWork />
+            case 3: 
+                return <InProgressWork />
+            case 4:
                 return <RevenuePage />;
-            case 3:
+            case 5:
                 return <RevenuePage />;
             default:
                 return <WorkListPage />;
@@ -376,6 +384,14 @@ const WorkList = () => {
         {
             title: 'Công việc đã nhận',
             icon: <PlaylistAddCheckOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Công việc chờ xác nhận',
+            icon: <PendingActionsIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Công việc đang thực hiện',
+            icon: <FormatListBulletedIcon sx={style.drawerIcon} />
         },
         {
             title: 'Thu nhập',

@@ -1,4 +1,4 @@
-﻿
+﻿/*
 import { useEffect, useState } from 'react';
 
 const useAuth = () => {
@@ -26,6 +26,44 @@ const useAuth = () => {
     }, []);
 
     return { user, loading };
+};
+
+export default useAuth;
+*/
+
+import { useState, useEffect } from 'react';
+
+const useAuth = () => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [refresh, setRefresh] = useState(0); // Thêm state để trigger fetch lại
+
+    const fetchUser = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('/Authen/me', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const userData = await response.json();
+                setUser(userData);
+            } else {
+                setUser(null);
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, [refresh]); // Fetch lại khi refresh thay đổi
+
+    return { user, loading, refreshAuth: () => setRefresh(prev => prev + 1) };
 };
 
 export default useAuth;

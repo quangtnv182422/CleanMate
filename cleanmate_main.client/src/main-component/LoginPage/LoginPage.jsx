@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useContext } from 'react';
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import SimpleReactValidator from "simple-react-validator";
+import { BookingContext } from '../../context/BookingProvider';
 import {
     Grid,
     TextField,
@@ -17,7 +18,8 @@ import './style.scss';
 
 const LoginPage = (props) => {
 
-    const push = useNavigate()
+    const push = useNavigate();
+    const { refreshAuth } = useContext(BookingContext);
 
     const [value, setValue] = useState({
         email: '',
@@ -94,6 +96,9 @@ const LoginPage = (props) => {
 
                 if (response.ok) {
                     toast.success('Bạn đã đăng nhập thành công vào CleanMate!');
+
+                    // Gọi refreshAuth để fetch lại thông tin người dùng
+                    await refreshAuth();
 
                     // Lấy thông tin người dùng
                     const userInfoRes = await fetch('/Authen/me', { credentials: 'include' });

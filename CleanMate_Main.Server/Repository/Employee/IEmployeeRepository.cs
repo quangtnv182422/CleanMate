@@ -25,7 +25,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         Task<PersonalProfileViewModel> GetPersonalProfileAsync(string employeeId);
         Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile);
         Task<CustomerReviewSummaryViewModel> GetCustomerReviewsAsync(string employeeId);
-        //Task<decimal> GetMonthlyEarningsAsync(string employeeId);
+        Task<decimal> GetMonthlyEarningsAsync(string employeeId);
 
     }
 }

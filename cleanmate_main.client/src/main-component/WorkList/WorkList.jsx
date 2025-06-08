@@ -97,10 +97,14 @@ const WorkList = () => {
 
     useEffect(() => {
         const fetchWorkList = async () => {
-            if (role !== "Cleaner") return;
+            if (loading) return null; // ⛔ Đợi loading xong
+            if (!user || user.roles?.[0] !== "Cleaner") {
+                navigate('/home'); // ⚠ Điều hướng sau khi user đã load
+                return null;
+            }
+
             try {
                 const url = `/worklist?status=1`;
-
                 const response = await fetch(url, {
                     method: 'GET',
                     credentials: 'include',
@@ -115,14 +119,14 @@ const WorkList = () => {
 
                 const workItems = await response.json();
                 setData(workItems);
-
             } catch (error) {
                 console.error('Error fetching work list:', error);
             }
         };
 
         fetchWorkList();
-    }, [setData, status, role]);
+    }, [setData, status, user, loading, navigate]);
+
 
     const handleSort = useCallback((vietnameseKey) => {
         const keyMapping = {

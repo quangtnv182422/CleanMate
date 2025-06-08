@@ -1,5 +1,5 @@
 ﻿import React from 'react'
-import abimg from '../../images/about.jpg'
+import abimg from '../../images/about-image.jpg'
 import sign from '../../images/signature.png'
 
 

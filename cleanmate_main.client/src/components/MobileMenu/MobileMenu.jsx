@@ -8,6 +8,7 @@ import BuildIcon from '@mui/icons-material/Build';
 import HistoryIcon from '@mui/icons-material/History';
 import ArticleIcon from '@mui/icons-material/Article';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
+import PaidIcon from '@mui/icons-material/Paid';
 import userAvatar from '../../images/user-image.png';
 import './style.css';
 import useAuth from '../../hooks/useAuth';
@@ -26,30 +27,36 @@ const menus = [
     },
     {
         id: 2,
+        title: 'Nạp ví CleanMate',
+        link: '/coin/deposit',
+        icon: <PaidIcon />,
+    },
+    {
+        id: 3,
         title: 'Về chúng tôi',
         link: '/about',
         icon: <InfoIcon />,
     },
     {
-        id: 3,
+        id: 4,
         title: 'Dịch vụ',
         link: '/service',
         icon: <BuildIcon />,
     },
     {
-        id: 4,
+        id: 5,
         title: 'Lịch sử đặt dịch vụ',
         link: '/order-history',
         icon: <HistoryIcon />,
     },
     {
-        id: 5,
+        id: 6,
         title: 'Blog',
         link: '/blog',
         icon: <ArticleIcon />,
     },
     {
-        id: 6,
+        id: 7,
         title: 'Liên hệ',
         link: '/contact',
         icon: <ContactMailIcon />,

@@ -11,13 +11,13 @@ namespace CleanMate_Main.Server.Controllers.Admin
     [Route("[controller]")]
     [ApiController]
     //[Authorize(Roles = "Admin")]
-    public class PaymentController : ControllerBase
+    public class WithdrawRequestController : ControllerBase
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly ITransactionService _transactionService;
         private readonly string DefaultAdmin = "87ae113a-bfa0-47fa-b580-f2d6a01185c9";
 
-        public PaymentController(
+        public WithdrawRequestController(
             UserManager<AspNetUser> userManager,
             ITransactionService transactionService)
         {

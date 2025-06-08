@@ -1,6 +1,7 @@
-﻿using CleanMate_Main.Server.Models.ViewModels.Employee;
+﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Models.ViewModels.Customer;
+using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Repository.Employee;
-using CleanMate_Main.Server.Common;
 
 namespace CleanMate_Main.Server.Services.Employee
 {
@@ -156,5 +157,38 @@ namespace CleanMate_Main.Server.Services.Employee
             await _employeeRepository.CreateCleanerProfileAsync(userId);
         }
 
+        public async Task<IEnumerable<WorkHistoryViewModel>> GetWorkHistoryAsync(string employeeId)
+        {
+            return await _employeeRepository.GetWorkHistoryAsync(employeeId);
+        }
+
+        public async Task<EarningsSummaryViewModel> GetEarningsSummaryAsync(string employeeId)
+        {
+            return await _employeeRepository.GetEarningsSummaryAsync(employeeId);
+        }
+
+        public async Task<PersonalProfileViewModel> GetPersonalProfileAsync(string employeeId)
+        {
+            return await _employeeRepository.GetPersonalProfileAsync(employeeId);
+        }
+
+        public async Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile)
+        {
+            if (string.IsNullOrEmpty(profile.UserId))
+            {
+                throw new ArgumentException("UserId không được để trống.");
+            }
+            var success = await _employeeRepository.UpdatePersonalProfileAsync(profile);
+            if (!success)
+            {
+                throw new InvalidOperationException("Cập nhật hồ sơ thất bại.");
+            }
+            return true;
+        }
+
+        public async Task<CustomerReviewSummaryViewModel> GetCustomerReviewsAsync(string employeeId)
+        {
+            return await _employeeRepository.GetCustomerReviewsAsync(employeeId);
+        }
     }
 }

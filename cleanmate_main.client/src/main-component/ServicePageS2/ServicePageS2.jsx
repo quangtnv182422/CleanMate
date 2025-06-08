@@ -10,7 +10,6 @@ const ServicePageS2 =() => {
     return(
         <Fragment>
             <Navbar/>
-            <PageTitle pageTitle={'Dịch vụ'} pagesub={'Dịch vụ'}/> 
             <ServiceSectionS2/>
             <PartnerSection tNone={'partners-section-s2'}/>
             <Footer/>

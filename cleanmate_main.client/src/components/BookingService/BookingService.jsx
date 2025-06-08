@@ -250,7 +250,7 @@ const BookingService = () => {
                         </Typography>
                         <Typography ml={4}>{userAddress.length === 0 ? "Hãy đặt địa chỉ đầu tiên" : (
                             <>
-                                <Typography sx={style.googleMapAddress}>{selectedAddress?.gG_FormattedAddress}</Typography>
+                                <Typography sx={style.googleMapAddress}>{selectedAddress?.gG_DispalyName}</Typography>
                                 <Typography sx={style.addressNo}>{selectedAddress?.addressNo}</Typography>
                             </>
                         )}</Typography>
@@ -302,7 +302,7 @@ const BookingService = () => {
                                                 }}
                                                     onClick={() => handleSelectAddress(item)}
                                                 >
-                                                    <Typography sx={style.googleMapAddress}>{item.gG_FormattedAddress}</Typography>
+                                                    <Typography sx={style.googleMapAddress}>{item.gG_DispalyName}</Typography>
                                                     <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
 
                                                     {/* Nút Đặt làm mặc định */}

@@ -84,7 +84,7 @@ export default defineConfig({
                 target,
                 secure: false
             },
-            '^/payment': {
+            '^/withdrawrequest': {
                 target,
                 secure: false
             },

@@ -72,7 +72,7 @@ const AllRoute = () => {
                 <Route path='/forgot-password' element={<ForgotPassword />} />
                 <Route path="/email-confirmation" element={<EmailConfirmation />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/work-list" element={<WorkList />} />
+                <Route path="/public-work" element={<WorkList />} />
                 <Route path="/order/booking-confirmation/:id" element={<BookingConfirmation />} />
                 <Route path="/booking-success" element={<BookingSuccess />} />
                 <Route path="/booking-fail" element={<BookingFail />} />

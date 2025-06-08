@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url';
+﻿import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
@@ -45,12 +45,13 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+    build: {
+        outDir: '../CleanMate_Main.Server/wwwroot', // Xuất file build vào wwwroot của backend
+        emptyOutDir: true, // Xóa nội dung thư mục đích trước khi build
+        assetsDir: 'assets', // Thư mục cho các file tĩnh (JS, CSS, hình ảnh)
+    },
     server: {
         proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            },
             '^/Authen': { 
                 target,
                 secure: false

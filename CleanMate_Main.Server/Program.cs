@@ -201,5 +201,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+/*app.MapFallback(context =>
+{
+    context.Response.ContentType = "text/html";
+    return context.Response.SendFileAsync("wwwroot/index.html");
+});*/
 
 app.Run();

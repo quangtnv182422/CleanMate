@@ -102,7 +102,7 @@ const LoginPage = (props) => {
                     const roles = userInfo.roles || [];
 
                     if (roles.includes("Cleaner")) {
-                        push("/work-list");
+                        push("/public-work");
                     } else if (roles.includes("Customer")) {
                         push("/home");
                     } else {

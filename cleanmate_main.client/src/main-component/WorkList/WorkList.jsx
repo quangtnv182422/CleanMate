@@ -81,7 +81,6 @@ const WorkList = () => {
     const { user, loading } = useAuth();
     const role = user?.roles?.[0] || '';
 
-
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
         setPage(1); // Reset to first page when status changes

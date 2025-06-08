@@ -29,6 +29,7 @@ import {
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { WorkContext } from '../../context/WorkProvider';
 import { BookingStatusContext } from '../../context/BookingStatusProvider'
+import { toast } from 'react-toastify';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
@@ -99,6 +100,7 @@ const WorkList = () => {
         const fetchWorkList = async () => {
             if (loading) return null; // ⛔ Đợi loading xong
             if (!user || user.roles?.[0] !== "Cleaner") {
+                toast.error("Bạn không có quyền truy cập vào trang này");
                 navigate('/home'); // ⚠ Điều hướng sau khi user đã load
                 return null;
             }

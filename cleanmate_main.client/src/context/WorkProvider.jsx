@@ -65,7 +65,8 @@ const WorkProvider = ({ children }) => {
                         setData(workItems);
                     }
                 };
-                fetchWorkList();
+                window.location.reload();
+
             } else {
                 toast.error(result.message || "Không thể nhận công việc.");
             }

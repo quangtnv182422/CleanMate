@@ -10,19 +10,17 @@ namespace CleanMate_Main.Server.Controllers.Employee
     [Route("[controller]")]
     [ApiController]
     [Authorize(Roles = "Cleaner")]
-    public class EmployeeProfileController : Controller
+    public class EarningController : Controller
     {
-
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
-        public EmployeeProfileController(IEmployeeService employeeService, UserManager<AspNetUser> userManager)
+        public EarningController(IEmployeeService employeeService, UserManager<AspNetUser> userManager)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetProfile()
+        public async Task<IActionResult> GetEarningsSummary()
         {
             try
             {
@@ -34,21 +32,17 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
-                return Ok(profile);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
+                var summary = await _employeeService.GetEarningsSummaryAsync(user.Id);
+                return Ok(summary);
             }
             catch (Exception)
             {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin hồ sơ." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin thu nhập." });
             }
         }
 
-        [HttpPut("edit")]
-        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileViewModel model)
+        [HttpGet("monthly")]
+        public async Task<IActionResult> GetMonthlyEarnings()
         {
             try
             {
@@ -60,34 +54,13 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
-                profile.AvatarUrl = model.ProfileImage ?? profile.AvatarUrl;
-                profile.BankName = model.BankName ?? profile.BankName;
-                profile.BankNo = model.BankNo ?? profile.BankNo;
-
-                var success = await _employeeService.UpdatePersonalProfileAsync(profile);
-                return Ok(new { success, message = success ? "Cập nhật hồ sơ thành công." : "Cập nhật hồ sơ thất bại." });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
+                var monthlyEarnings = await _employeeService.GetMonthlyEarningsAsync(user.Id);
+                return Ok(new { MonthlyEarnings = monthlyEarnings });
             }
             catch (Exception)
             {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật hồ sơ." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thu nhập tháng này." });
             }
         }
-    }
-
-    public class UpdateProfileViewModel
-    {
-        public string? ProfileImage { get; set; }
-        public string? BankName { get; set; }
-        public string? BankNo { get; set; }
     }
 }
-

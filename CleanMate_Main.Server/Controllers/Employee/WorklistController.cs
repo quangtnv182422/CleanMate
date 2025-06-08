@@ -1,9 +1,11 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace CleanMate_Main.Server.Controllers.Employee
@@ -15,11 +17,13 @@ namespace CleanMate_Main.Server.Controllers.Employee
     {
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly IHubContext<WorkHub> _hubContext;
 
-        public WorklistController(IEmployeeService employeeService, UserManager<AspNetUser> userManager)
+        public WorklistController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, IHubContext<WorkHub> hubContext)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -101,7 +105,11 @@ namespace CleanMate_Main.Server.Controllers.Employee
 
                 string employeeId = user.Id;
                 bool success = await _employeeService.AcceptWorkRequestAsync(id, employeeId);
-                return Ok(new { success, message = "Công việc đã được nhận thành công." });
+                if (success)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate", employeeId);
+                    return Ok(new { success, message = "Công việc đã được nhận thành công." });
+                }
             }
             catch (InvalidOperationException ex)
             {
@@ -115,6 +123,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
             {
                 return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi không mong muốn khi nhận công việc." });
             }
+            return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi không mong muốn khi nhận công việc." });
         }
     }
 }

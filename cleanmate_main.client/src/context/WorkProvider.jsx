@@ -7,7 +7,7 @@ const WorkProvider = ({ children }) => {
     const [data, setData] = useState([]);
     const [selectedWork, setSelectedWork] = useState(null);
     const [open, setOpen] = useState(false);
-    const { user } = useAuth()
+    const { user } = useAuth();
 
     const handleOpen = async (bookingId) => {
         try {
@@ -32,7 +32,23 @@ const WorkProvider = ({ children }) => {
             console.error('Error fetching work detail:', error);
         }
     };
-
+    const refetchWorkList = async () => {
+        try {
+            const response = await fetch('/worklist?status=1', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (response.ok) {
+                const workItems = await response.json();
+                setData(workItems); // Update the work list
+            } else {
+                throw new Error('Failed to fetch work list');
+            }
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    };
     const handleAcceptWork = async () => {
         try {
             const response = await fetch(`/worklist/${selectedWork.bookingId}/accept`, {
@@ -51,22 +67,7 @@ const WorkProvider = ({ children }) => {
             if (result.success) {
                 toast.success("Công việc đã được nhận thành công!");
                 handleClose();
-                const fetchWorkList = async () => {
-                    const url = status ? `/worklist?status=${status}` : '/api/worklist';
-                    const res = await fetch(url, {
-                        method: 'GET',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    if (res.ok) {
-                        const workItems = await res.json();
-                        setData(workItems);
-                    }
-                };
-                window.location.reload();
-
+                await refetchWorkList();
             } else {
                 toast.error(result.message || "Không thể nhận công việc.");
             }

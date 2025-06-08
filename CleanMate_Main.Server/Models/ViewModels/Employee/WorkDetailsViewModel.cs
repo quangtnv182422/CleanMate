@@ -18,5 +18,8 @@
         public string CustomerFullName { get; set; }
         public string CustomerPhoneNumber { get; set; }
         public string? EmployeeId { get; set; }
+        public string? PlaceID { get; set; }
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
     }
 }

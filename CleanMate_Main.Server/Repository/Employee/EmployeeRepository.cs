@@ -70,7 +70,10 @@ namespace CleanMate_Main.Server.Repository.Employee
                             IsRead = false,
                             CustomerFullName = customer.FullName,
                             CustomerPhoneNumber = customer.PhoneNumber,
-                            EmployeeId = booking.CleanerId
+                            EmployeeId = booking.CleanerId,
+                            PlaceID = address.GG_PlaceId,
+                            Latitude = address.Latitude.ToString(),
+                            Longitude = address.Longitude.ToString(),
                         };
 
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");

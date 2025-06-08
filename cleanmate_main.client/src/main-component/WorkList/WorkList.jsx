@@ -1,5 +1,6 @@
 ﻿import React, { useState, useMemo, useCallback, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 import {
     Box,
     Drawer,
@@ -28,7 +29,7 @@ import {
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { WorkContext } from '../../context/WorkProvider';
-import { BookingStatusContext } from '../../context/BookingStatusProvider'
+import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import { toast } from 'react-toastify';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
@@ -81,54 +82,75 @@ const WorkList = () => {
     const [status, setStatus] = useState('');
     const { user, loading } = useAuth();
     const role = user?.roles?.[0] || '';
-
+    const [connection, setConnection] = useState(null);
 
     const formatPrice = (price) => {
         return price.toLocaleString('vi-VN', {
             style: 'currency',
             currency: 'VND'
-        })
-    }
-
+        });
+    };
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
         setPage(1); // Reset to first page when status changes
     };
 
+    const fetchWorkList = useCallback(async () => {
+        if (loading) return;
+        if (!user || role !== 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập vào trang này");
+            navigate('/home');
+            return;
+        }
+
+        try {
+            const url = `/worklist?status=1`;
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const workItems = await response.json();
+            setData(workItems);
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    }, [loading, user, role, navigate, setData]);
+
     useEffect(() => {
-        const fetchWorkList = async () => {
-            if (loading) return null; // ⛔ Đợi loading xong
-            if (!user || user.roles?.[0] !== "Cleaner") {
-                toast.error("Bạn không có quyền truy cập vào trang này");
-                navigate('/home'); // ⚠ Điều hướng sau khi user đã load
-                return null;
-            }
-
-            try {
-                const url = `/worklist?status=1`;
-                const response = await fetch(url, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const workItems = await response.json();
-                setData(workItems);
-            } catch (error) {
-                console.error('Error fetching work list:', error);
-            }
-        };
-
         fetchWorkList();
-    }, [setData, status, user, loading, navigate]);
+    }, [fetchWorkList]);
 
+    useEffect(() => {
+        const newConnection = new HubConnectionBuilder()
+            .withUrl('/workHub')
+            .withAutomaticReconnect()
+            .build();
+        setConnection(newConnection);
+    }, []);
+
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => console.log('SignalR Connected'))
+                .catch(err => console.error('SignalR Connection Error: ', err));
+            connection.on('ReceiveWorkUpdate', () => {
+                fetchWorkList();
+            });
+            return () => {
+                connection.off('ReceiveWorkUpdate');
+                connection.stop();
+            };
+        }
+    }, [connection, fetchWorkList]);
 
     const handleSort = useCallback((vietnameseKey) => {
         const keyMapping = {
@@ -196,19 +218,17 @@ const WorkList = () => {
 
     function formatDate(dateString) {
         const date = new Date(dateString);
-
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
-
         return `${day}-${month}-${year}`;
     }
 
     const formatTime = (time) => {
         if (!time) return '';
         const [hour, minute] = time.split(':');
-        return `${hour}:${minute}`
-    }
+        return `${hour}:${minute}`;
+    };
 
     const WorkListPage = () => (
         <Box>
@@ -233,7 +253,6 @@ const WorkList = () => {
                 </Box>
             </Box>
 
-            {/* Table */}
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
@@ -260,42 +279,39 @@ const WorkList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedData.map((row) => {
-
-                            return (
-                                <TableRow key={row.bookingId}>
-                                    <TableCell>{row.serviceName}</TableCell>
-                                    <TableCell>{row.customerFullName}</TableCell>
-                                    <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
-                                    <TableCell>{row.duration}</TableCell>
-                                    <TableCell>{row.address}</TableCell>
-                                    <TableCell>{row.note}</TableCell>
-                                    <TableCell>{formatPrice(row.totalPrice)}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            style={{
-                                                backgroundColor: colorMap[row.status] || '#000000',
-                                                color: '#FFFFFF',
-                                                padding: '4px 8px',
-                                                borderRadius: '4px',
-                                                display: 'inline-block',
-                                            }}
-                                        >
-                                            {row.status}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
+                        {paginatedData.map((row) => (
+                            <TableRow key={row.bookingId}>
+                                <TableCell>{row.serviceName}</TableCell>
+                                <TableCell>{row.customerFullName}</TableCell>
+                                <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
+                                <TableCell>{row.duration}</TableCell>
+                                <TableCell>{row.address}</TableCell>
+                                <TableCell>{row.note}</TableCell>
+                                <TableCell>{formatPrice(row.totalPrice)}</TableCell>
+                                <TableCell>
+                                    <span
+                                        style={{
+                                            backgroundColor: colorMap[row.status] || '#000000',
+                                            color: '#FFFFFF',
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            display: 'inline-block',
                                         }}
-                                        onClick={() => handleOpen(row.bookingId)}
                                     >
-                                        <VisibilityOutlinedIcon />
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })}
+                                        {row.status}
+                                    </span>
+                                </TableCell>
+                                <TableCell
+                                    sx={{
+                                        textAlign: 'center',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => handleOpen(row.bookingId)}
+                                >
+                                    <VisibilityOutlinedIcon />
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -342,15 +358,15 @@ const WorkList = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
     const handleDrawerOpen = () => {
         setOpenDrawer(true);
-    }
+    };
 
     const handleCloseDrawer = () => {
-        setOpenDrawer(false)
-    }
+        setOpenDrawer(false);
+    };
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
-        setOpenDrawer(false)
+        setOpenDrawer(false);
     };
     const menuItems = [
         {
@@ -376,10 +392,10 @@ const WorkList = () => {
             <Drawer
                 open={openDrawer}
                 onClose={handleCloseDrawer}
-                variant="temporary" // giữ Drawer trên content
+                variant="temporary"
                 anchor="left"
                 modalProps={{
-                    keepMounted: true, // giúp Drawer hoạt động tốt trên mobile
+                    keepMounted: true,
                 }}
                 sx={{
                     zIndex: 1400,
@@ -438,7 +454,8 @@ const WorkList = () => {
                 </Box>
             </Drawer>
 
-            <IconButton onClick={handleDrawerOpen}
+            <IconButton
+                onClick={handleDrawerOpen}
                 sx={{
                     position: 'fixed',
                     top: 16,

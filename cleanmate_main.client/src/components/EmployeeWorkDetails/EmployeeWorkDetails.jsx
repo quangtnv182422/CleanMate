@@ -3,7 +3,7 @@ import { WorkContext } from '../../context/WorkProvider';
 import { Box, Typography, Button } from '@mui/material';    
 const EmployeeWorkDetails = () => {
     const { selectedWork, handleClose, handleAcceptWork } = useContext(WorkContext);
-
+    console.log(selectedWork)
     return (
         <Box sx={style.modal}>
             <Box sx={{ mb: 2 }}>

@@ -27,7 +27,7 @@ const HeaderTopbar = () => {
             method: 'POST',
             credentials: 'include'
         }).then(() => {
-            navigate('/home') // hoặc gọi lại API /me
+            window.location.href = '/home'; // hoặc gọi lại API /me
         });
     };
 

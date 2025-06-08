@@ -147,7 +147,7 @@ const BookingConfirmation = () => {
                 <button
                     className="btn text-white fw-bold w-100"
                     style={{ backgroundColor: primaryColor }}
-                    onClick={() => navigate(`/order/payment?orderId=${id}`, {
+                    onClick={() => navigate(`/order/payment`, {
                         state: {
                             selectedAddress,
                             selectedEmployee,

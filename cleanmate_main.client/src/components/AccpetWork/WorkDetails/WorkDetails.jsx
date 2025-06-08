@@ -8,7 +8,8 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
-const WorkDetails = ({ selectedWork }) => {
+const WorkDetails = ({ selectWork }) => {
+    console.log(selectWork)
     const formatPrice = (price) => {
         return price?.toLocaleString("vi-VN", {
             style: 'currency',
@@ -39,21 +40,21 @@ const WorkDetails = ({ selectedWork }) => {
             <Box sx={styles.informationContent}>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Ngày làm việc</Typography>
-                    <Typography sx={styles.content}>Bắt đầu lúc {formatTime(selectedWork.startTime)} giờ ngày {formatDate(selectedWork.date)}</Typography>
+                    <Typography sx={styles.content}>Bắt đầu lúc {selectWork.startTime} giờ ngày {formatDate(selectWork.date)}</Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Địa chỉ</Typography>
-                    <Typography sx={styles.content}>{selectedWork.address}</Typography>
+                    <Typography sx={styles.content}>{selectWork.address}</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Nhân viên</Typography>
-                    <Typography sx={styles.content}>{selectedWork.employee} nhân viên làm trong {selectedWork.duration} giờ</Typography>
+                    <Typography sx={styles.content}>{selectWork.employee} nhân viên làm trong {selectWork.duration}</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Ghi chú</Typography>
-                    <Typography sx={styles.content}>{selectedWork.note ? selectedWork.note : "Không có ghi chú"}</Typography>
+                    <Typography sx={styles.content}>{selectWork.note ? selectWork.note : "Không có ghi chú"}</Typography>
                 </Box>
             </Box>
 
@@ -66,22 +67,22 @@ const WorkDetails = ({ selectedWork }) => {
             <Box sx={styles.informationContent}>
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Số giờ/buổi</Typography>
-                    <Typography sx={styles.content}>{selectedWork.duration}h/buổi</Typography>
+                    <Typography sx={styles.content}>{selectWork.duration}/buổi</Typography>
                 </Box>
 
                 {/*<Box sx={styles.bookingContent}>*/}
                 {/*    <Typography sx={styles.bookingTitle}>Hình thức thanh toán</Typography>*/}
-                {/*    <Typography sx={styles.content}>{selectedWork.payment}</Typography>*/}
+                {/*    <Typography sx={styles.content}>{selectWork.payment}</Typography>*/}
                 {/*</Box>*/}
 
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Tiền ca làm</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedWork.totalPrice)}</Typography>
+                    <Typography sx={styles.content}>{selectWork.price}</Typography>
                 </Box>
 
                 <Box sx={styles.bookingContent}>
-                    <Typography sx={styles.bookingTitle}>Tổng tiền</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedWork.totalPrice)}</Typography>
+                    <Typography sx={styles.bookingTitle}>Hoa hồng</Typography>
+                    <Typography sx={styles.content}>{selectWork.commission}</Typography>
                 </Box>
             </Box>
         </Box>

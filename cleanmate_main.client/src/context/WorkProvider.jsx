@@ -67,11 +67,11 @@ const WorkProvider = ({ children }) => {
                 };
                 fetchWorkList();
             } else {
-                alert(result.message || "Không thể nhận công việc.");
+                toast.error(result.message || "Không thể nhận công việc.");
             }
         } catch (error) {
             console.error('Lỗi nhận công việc:', error);
-            alert(error.message || "Đã xảy ra lỗi khi nhận công việc.");
+            toast.error(error.message || "Đã xảy ra lỗi khi nhận công việc.");
         }
     };
 

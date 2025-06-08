@@ -25,7 +25,8 @@ const GoogleMapAutocomplete = () => {
         houseType,
         houseNumber,
         setHouseType,
-        setHouseNumber
+        setHouseNumber,
+        refetchUserAddress,
     } = useContext(BookingContext);
 
     const { user, loading } = useAuth();
@@ -58,14 +59,14 @@ const GoogleMapAutocomplete = () => {
                     latitude: selectedPlace.location.lat,
                     longitude: selectedPlace.location.lng,
                     isInUse: true,
-                    isDefault: isDefault 
+                    isDefault: isDefault
                 },
                 { withCredentials: true }
             );
 
 
             toast.success("Địa chỉ đã được thêm");
-
+            await refetchUserAddress();
             if (mapRef.current) {
                 if (selectedPlace.viewport) {
                     mapRef.current.fitBounds(selectedPlace.viewport);
@@ -239,7 +240,7 @@ const GoogleMapAutocomplete = () => {
                 <Button
                     variant="outlined"
                     onClick={() => navigate(`/booking-service?service=${serviceId}`)}
-                    sx={{mr:1}}
+                    sx={{ mr: 1 }}
                 >
                     Quay lại
                 </Button>

@@ -89,6 +89,30 @@ const AcceptWork = () => {
     }, [setWork, role, status]);
 
     const handleClose = () => setOpen(false);
+    const fetchWorkList = async () => {
+        if (role !== "Cleaner") return;
+        try {
+            const url = status ? `/worklist?status=${status}` : '/worklist';
+
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const workItems = await response.json();
+            setWork(workItems);
+
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    };
 
     const filteredWork = work.filter((work) => {
         return work.customerFullName.toLowerCase().includes(search.toLowerCase());

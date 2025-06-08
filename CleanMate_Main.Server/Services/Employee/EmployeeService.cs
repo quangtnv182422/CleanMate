@@ -106,6 +106,29 @@ namespace CleanMate_Main.Server.Services.Employee
 
             return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL, employeeId);
         }
+
+        public async Task<bool> ConfirmDoneWorkRequestAsync(int bookingId)
+        {
+            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Công việc không tồn tại.");
+            }
+
+            // Kiểm tra quyền: chỉ khách hàng (UserId) hoặc admin có thể xác nhận
+           /* if (booking.UserId != userId && !await IsAdminAsync(userId))
+            {
+                throw new InvalidOperationException("Bạn không có quyền xác nhận hoàn thành công việc này.");
+            }*/
+
+            if (booking.StatusId != CommonConstants.BookingStatus.PENDING_DONE)
+            {
+                throw new InvalidOperationException("Công việc phải ở trạng thái Chờ xác nhận để có thể xác nhận hoàn thành.");
+            }
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE);
+        }
+
         public async Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId)
         {
             return await _employeeRepository.GetCustomerDetailsAsync(bookingId);

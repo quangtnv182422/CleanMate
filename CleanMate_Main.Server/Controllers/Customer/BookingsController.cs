@@ -1,10 +1,12 @@
 ﻿using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Bookings;
+using CleanMate_Main.Server.Services.Employee;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CleanMate_Main.Server.Controllers.Customer
 {
@@ -14,10 +16,12 @@ namespace CleanMate_Main.Server.Controllers.Customer
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;
+        private readonly IEmployeeService _employeeService;
 
-        public BookingsController(IBookingService bookingService)
+        public BookingsController(IBookingService bookingService, IEmployeeService employeeService)
         {
             _bookingService = bookingService;
+            _employeeService = employeeService;
         }
 
         /* [HttpPost("add-booking")]
@@ -73,6 +77,34 @@ namespace CleanMate_Main.Server.Controllers.Customer
             catch (Exception ex)
             {
                 return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
+        }
+
+        [HttpPost("{id}/confirm-complete-work")]
+        public async Task<IActionResult> CompleteWork(int statusId)
+        {
+            try
+            {
+                bool success = await _employeeService.ConfirmDoneWorkRequestAsync(statusId);
+                if (success)
+                {
+                    //await _hubContext.Clients.All.SendAsync("WorkUpdated");
+                    return Ok(new { success, message = "Công việc đã được cập nhật thành trạng thái Chờ xác nhận." });
+                }
+                return BadRequest(new { success = false, message = "Không thể hoàn thành công việc." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi không mong muốn khi cập nhật trạng thái công việc." });
             }
         }
     }

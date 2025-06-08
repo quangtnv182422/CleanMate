@@ -30,8 +30,7 @@ const EmployeeWorkDetails = () => {
                 <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork.note}</strong></Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Button variant="outlined" color='error' onClick={handleClose}>Từ chối</Button>
-                <Button variant="outlined">Google Maps</Button>
+                <Button variant="outlined" color='error' onClick={handleClose}>Đóng</Button>
                 <Button
                     variant="contained"
                     sx={style.confirmButton}

@@ -23,6 +23,7 @@ using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Smtp;
 using CleanMate_Main.Server.Services.Transaction;
 using CleanMate_Main.Server.Services.Wallet;
+using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -61,7 +62,8 @@ builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
     .AddEntityFrameworkStores<CleanMateMainDbContext>()
     .AddDefaultTokenProviders();
 
-
+//SignalR
+builder.Services.AddSignalR();
 //AuthenService
 builder.Services.AddScoped<IAuthenService, AuthenService>();
 //CleanPerHour
@@ -191,12 +193,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.MapHub<WorkHub>("/workHub");
 
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowReactApp"); 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

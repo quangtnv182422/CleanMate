@@ -46,19 +46,13 @@ import AccpetWork from '../../components/AccpetWork/AcceptWork';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PendingWork from '../../components/PendingWork/PendingWork';
 import InProgressWork from '../../components/InProgressWork/InProgressWork';
+import Revenue from '../../components/Revenue/Revenue';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
     <Box sx={{ p: 3 }}>
         <Typography variant="h5">Reports Page</Typography>
         <Typography>This is a placeholder for the Reports page.</Typography>
-    </Box>
-);
-
-const RevenuePage = () => (
-    <Box sx={{ p: 3 }}>
-        <Typography variant="h5">Revenue Page</Typography>
-        <Typography>This is a placeholder for the Revenue page.</Typography>
     </Box>
 );
 
@@ -339,7 +333,7 @@ const WorkList = () => {
             case 3: 
                 return <InProgressWork />
             case 4:
-                return <RevenuePage />;
+                return <Revenue />;
             case 5:
                 return <RevenuePage />;
             default:

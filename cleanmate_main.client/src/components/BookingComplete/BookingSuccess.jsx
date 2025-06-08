@@ -84,17 +84,19 @@ const BookingSuccess = () => {
                                 Dịch vụ của bạn đặt đã được xác nhận. Cảm ơn vì đã chọn chúng tôi!
                             </Typography>
                             <Box sx={{ mt: 2, textAlign: 'left' }}>
-                                <Typography variant="body2">Ngày: {bookingDetails.date}</Typography>
-                                <Typography variant="body2">Thời gian: {bookingDetails.time}</Typography>
-                                <Typography variant="body2">Dịch vụ: {bookingDetails.service}</Typography>
-                                <Typography variant="body2">Người chịu trách nhiệm dọn dẹp: {bookingDetails.cleaner}</Typography>
-                                <Typography variant="body2">Tổng tiền phải thanh toán: {bookingDetails.payment}</Typography>
+                                <Typography variant="body2"><span className={cx('booking-success-title')}>Ngày:</span> {bookingDetails.date}</Typography>
+                                <Typography variant="body2"><span className={cx('booking-success-title')}>Thời gian:</span> {bookingDetails.time}</Typography>
+                                <Typography variant="body2"><span className={cx('booking-success-title')}>Dịch vụ:</span> {bookingDetails.service}</Typography>
+                                <Typography variant="body2"><span className={cx('booking-success-title')}>Người chịu trách nhiệm dọn dẹp:</span> {bookingDetails.cleaner}</Typography>
+                                <Typography variant="body2"><span className={cx('booking-success-title')}>Tổng tiền phải thanh toán:</span> {bookingDetails.payment}</Typography>
                             </Box>
                             <Button
                                 variant="contained"
                                 color="primary"
                                 className={cx('view-booking-details-button')}
-                                onClick={() => navigate('/booking-details')} // Adjust route as needed
+                                onClick={() => navigate('/booking-details', {
+                                    state: bookingDetails
+                                })} // Adjust route as needed
                                 sx={{ mt: 3, mr: 1 }}
                             >
                                 Xem chi tiết đơn hàng

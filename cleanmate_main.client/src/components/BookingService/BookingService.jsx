@@ -109,7 +109,7 @@ const BookingService = () => {
 
             const updatedAddresses = userAddress.map((addr) => ({
                 ...addr,
-                isDefault: addr.addressId === address.addressId ? true : false, // Set the selected address as default, others as non-default
+                isDefault: addr.addressId === address.addressId ? true : false,
             }));
             setUserAddress(updatedAddresses);
 
@@ -285,7 +285,6 @@ const BookingService = () => {
                                         </Box>
                                         {userAddress.map((item) => {
                                             const isSelected = selectedAddress?.addressId === item.addressId;
-                                            console.log(item)
                                             return (
                                                 <Box key={item.addressId} sx={{
                                                     mt: 1,

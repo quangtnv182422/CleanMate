@@ -15,6 +15,7 @@
     <Folder Include="src\components\GoogleMap\" />
     <Folder Include="src\components\EmployeeWorkDetails\" />
     <Folder Include="src\components\Loading\" />
+    <Folder Include="src\components\BookingDetails\" />
     <Folder Include="src\main-component\ConfirmMail\" />
     <Folder Include="src\main-component\ProtectedRoute\" />
     <Folder Include="src\main-component\OrderDetails\" />

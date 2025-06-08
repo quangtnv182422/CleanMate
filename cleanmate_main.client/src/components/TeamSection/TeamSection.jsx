@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Link } from 'react-router-dom'
 import Team from '../../api/team'
 
@@ -13,9 +13,8 @@ const TeamSection = (props) => {
                 <div className="row align-items-center justify-content-center">
                     <div className="col-lg-5">
                         <div className="wpo-section-title">
-                            <h2>Expert Cleaners</h2>
-                            <p>It was popularised in the with the release desktop
-                                publishing software like versions .</p>
+                            <h2>Nhân viên dọn dẹp</h2>
+                            <p>Đội ngũ nhân viên dọn dẹp chuyên nghiệp, tận tâm, mang lại không gian sạch sẽ và an toàn với kỹ năng cao.</p>
                         </div>
                     </div>
                 </div>

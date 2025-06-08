@@ -82,7 +82,7 @@ const MobileMenu = () => {
             method: 'POST',
             credentials: 'include'
         }).then(() => {
-            window.location.reload(); // hoặc gọi lại API /me
+            window.location.href = "/home"; // hoặc gọi lại API /me
         });
     };
 

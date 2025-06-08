@@ -196,7 +196,7 @@ const OrderHistorySection = () => {
             <Box className="container" sx={style.container}>
                 {/* Tabs */}
                 <Grid container spacing={2} sx={{ mb: 4 }}>
-                    {['total', 'active', 'accepted', 'inProgress', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
+                    {['total', 'accepted', 'inProgress', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
                         const selected = selectedTab === type;
                         const colors = colorMap[type];
                         return (
@@ -230,11 +230,9 @@ const OrderHistorySection = () => {
                                             }}>
                                             {type === 'total'
                                                 ? 'Tổng số đơn'
-                                                : type === "active"
-                                                    ? "Việc mới"
-                                                    : type === "inProgress"
-                                                        ? "Đang thực hiện"
-                                                        : type === "accepted"
+                                                : type === "inProgress"
+                                                    ? "Đang thực hiện"
+                                                    : type === "accepted"
                                                         ? "Đơn đã nhận"
                                                         : type === 'pending'
                                                             ? 'Chờ xác nhận'

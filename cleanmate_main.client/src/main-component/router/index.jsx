@@ -39,6 +39,7 @@ import GoogleMapAutocomplete from '../../components/GoogleMap/GoogleMapAutocompl
 import DepositCoin from '../../components/Coin/DepositCoin';
 import OrderHistory from '../OrderHistory/OrderHistory';
 import Loading from '../../components/Loading/Loading';
+import BookingDetails from '../../components/BookingDetails/BookingDetails';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -82,6 +83,7 @@ const AllRoute = () => {
                 <Route path="/coin/deposit" element={<DepositCoin />} />
                 <Route path="/order-history" element={<OrderHistory />} />
                 <Route path="/loading" element={<Loading />} />
+                <Route path="/booking-details" element={<BookingDetails />} />
             </Routes>
         </div>
     );

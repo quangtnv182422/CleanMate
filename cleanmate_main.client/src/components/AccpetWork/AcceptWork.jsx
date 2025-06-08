@@ -18,6 +18,7 @@ import { style } from './style.js'
 import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WorkDetails from './WorkDetails/WorkDetails.jsx';
 import useAuth from '../../hooks/useAuth.jsx';
+import { WorkContext } from '../../context/WorkProvider.jsx';
 
 const WORKS_PER_PAGE = 6;
 
@@ -31,6 +32,30 @@ const AcceptWork = () => {
     const { statusList } = useContext(BookingStatusContext);
     const { user } = useAuth();
     const role = user?.roles?.[0] || '';
+
+    const handleOpen = async (bookingId) => {
+        try {
+            const response = await fetch(`/worklist/${bookingId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error(`HTTP error! status: ${response.status}, response: ${text}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const workDetail = await response.json();
+            setSelectedWork(workDetail);
+            setOpen(true);
+        } catch (error) {
+            console.error('Error fetching work detail:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchWorkList = async () => {
@@ -62,11 +87,6 @@ const AcceptWork = () => {
 
         fetchWorkList();
     }, [setWork, role, status]);
-
-    const handleOpenWorkDetails = (work) => {
-        setOpen(true);
-        setSelectedWork(work);
-    };
 
     const handleClose = () => setOpen(false);
 
@@ -143,7 +163,7 @@ const AcceptWork = () => {
                     ) : (
                         displayedWork.map((work, idx) => (
                             <Grid item xs={12} sm={6} md={4} key={idx}>
-                                <Card sx={style.workCard} onClick={() => handleOpenWorkDetails(work)}>
+                                <Card sx={style.workCard} onClick={() => handleOpen(work.bookingId)}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
                                             Bắt đầu lúc {formatTime(work.startTime)} giờ ngày {formatDate(work.date)}
@@ -180,7 +200,7 @@ const AcceptWork = () => {
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <WorkDetails selectedWork={selectedWork} />
+                        <WorkDetails selectWork={selectedWork} />
                     </Modal>
                 )}
 

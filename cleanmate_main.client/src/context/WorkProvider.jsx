@@ -1,4 +1,5 @@
 ﻿import { createContext, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth';
 export const WorkContext = createContext();
 
@@ -48,7 +49,7 @@ const WorkProvider = ({ children }) => {
             }
 
             if (result.success) {
-                alert("Công việc đã được nhận thành công!");
+                toast.success("Công việc đã được nhận thành công!");
                 handleClose();
                 const fetchWorkList = async () => {
                     const url = status ? `/worklist?status=${status}` : '/api/worklist';

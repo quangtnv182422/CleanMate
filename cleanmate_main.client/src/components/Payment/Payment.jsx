@@ -7,6 +7,11 @@ import {
     Paper,
     Divider,
     IconButton,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
 } from '@mui/material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -78,6 +83,7 @@ const style = {
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [openDialog, setOpenDialog] = useState(false);
     const [coin, setCoin] = useState(null);
     const { selectedAddress,
         price,
@@ -118,6 +124,10 @@ const Payment = () => {
     }
 
     const handlePayment = async () => {
+        setOpenDialog(true);
+    };
+
+    const processPayment = async () => {
         const isoDate = convertToISODate(selectedDay);
         const bookingData = {
             ServicePriceId: priceId,
@@ -180,7 +190,7 @@ const Payment = () => {
             alert('Lỗi khi gửi yêu cầu thanh toán');
             console.error(error);
         }
-    };
+    }
 
     return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f5f5' }}>
@@ -298,6 +308,34 @@ const Payment = () => {
                     Thanh toán
                 </Button>
             </Box>
+            {openDialog && (
+                <Dialog
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                >
+                    <DialogTitle>Xác nhận thanh toán</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Bạn có chắc chắn muốn thanh toán qua <strong>{selectedMethod === "CleanMate" ? "Ví CleanMate" : "Chuyển khoản ngân hàng"}</strong> với số tiền <strong>{price.toLocaleString()} VND</strong>?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenDialog(false)} color="inherit">
+                            Hủy
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setOpenDialog(false);
+                                processPayment();
+                            }}
+                            color="primary"
+                            variant="contained"
+                        >
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </Box>
     );
 };

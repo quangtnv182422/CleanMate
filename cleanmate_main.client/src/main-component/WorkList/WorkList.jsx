@@ -82,6 +82,14 @@ const WorkList = () => {
     const role = user?.roles?.[0] || '';
 
 
+    const formatPrice = (price) => {
+        return price.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        })
+    }
+
+
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
         setPage(1); // Reset to first page when status changes
@@ -91,9 +99,7 @@ const WorkList = () => {
         const fetchWorkList = async () => {
             if (role !== "Cleaner") return;
             try {
-                const url = status
-                    ? `/worklist?status=${status}`
-                    : '/worklist';
+                const url = `/worklist?status=1`;
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -164,7 +170,7 @@ const WorkList = () => {
 
     const filteredData = useMemo(() => {
         return data.filter((row) =>
-            row.serviceName.toLowerCase().includes(search.toLowerCase())
+            row.serviceName?.toLowerCase().includes(search.toLowerCase())
         );
     }, [data, search]);
 
@@ -182,34 +188,25 @@ const WorkList = () => {
         });
     };
 
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = date.getFullYear();
+
+        return `${day}-${month}-${year}`;
+    }
+
+    const formatTime = (time) => {
+        if (!time) return '';
+        const [hour, minute] = time.split(':');
+        return `${hour}:${minute}`
+    }
+
     const WorkListPage = () => (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <TextField
-                        label="Tìm công việc theo tên"
-                        variant="outlined"
-                        size="small"
-                        value={search ?? ''}
-                        onChange={(e) => setSearch(e.target.value)}
-                        sx={{ width: 200 }}
-                    />
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
-                        <InputLabel id="status-select-label">Trạng thái</InputLabel>
-                        <Select
-                            labelId="status-select-label"
-                            value={status}
-                            onChange={handleStatusChange}
-                            label="Trạng thái"
-                        >
-                            {statusList.map((statusItem) => (
-                                <MenuItem key={statusItem.id} value={statusItem.id}>
-                                    {statusItem.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Box>
                     <IconButton>
                         <FileDownload />
@@ -263,11 +260,11 @@ const WorkList = () => {
                                 <TableRow key={row.bookingId}>
                                     <TableCell>{row.serviceName}</TableCell>
                                     <TableCell>{row.customerFullName}</TableCell>
-                                    <TableCell>{`${row.date} ${row.startTime}`}</TableCell>
+                                    <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
                                     <TableCell>{row.duration}</TableCell>
                                     <TableCell>{row.address}</TableCell>
                                     <TableCell>{row.note}</TableCell>
-                                    <TableCell>{row.totalPrice}</TableCell>
+                                    <TableCell>{formatPrice(row.totalPrice)}</TableCell>
                                     <TableCell>
                                         <span
                                             style={{

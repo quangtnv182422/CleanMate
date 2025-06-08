@@ -81,6 +81,12 @@ const BookingConfirmation = () => {
         return price.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})
     }
 
+    const formatTime = (time) => {
+        if (!time) return '';
+        const [hour, minute] = time.split(':');
+        return `${hour}:${minute}`
+    }
+
     return (
         <div style={styles.wrapper}>
             <div style={styles.content}>
@@ -98,9 +104,9 @@ const BookingConfirmation = () => {
                         </h6>
                     </div>
                     <p className="mb-2">{selectedAddress.addressNo}</p>
-                    <p className="mb-2 pb-2" style={{ borderBottom: '1px solid #000' }}>{selectedAddress.gG_FormattedAddress}</p>
+                    <p className="mb-2 pb-2" style={{ borderBottom: '1px solid #000' }}>{selectedAddress.gG_DispalyName}</p>
                     <p className="mb-1">Ngày: {selectedDay}</p>
-                    <p className="mb-2 pb-2" style={{ borderBottom: '1px solid #000', fontSize: '16px', color: '#222', opacity: 0.8 }}>Bắt đầu lúc: {formatSpecificTime} / {selectedDuration}h</p>
+                    <p className="mb-2 pb-2" style={{ borderBottom: '1px solid #000', fontSize: '16px', color: '#222', opacity: 0.8 }}>Bắt đầu lúc: {formatTime(formatSpecificTime)} / {selectedDuration}h</p>
                     <p className="text-muted">{!note ? "Không có ghi chú" : note}</p>
                 </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -16,19 +16,19 @@ const settings = {
 
 const testimonial = [
     {
-        Des: "There are many variations of passages the majority have suffered alteration some form injected humour randomise words which don't look even slightly believable are going use a passage of need to be sure.",
-        Title: 'Robert William',
-        Sub: "CEO & Founder",
+        Des: "Là một giáo viên với lịch trình dày đặc, tôi rất trân trọng dịch vụ dọn dẹp của CleanMate. Đội ngũ luôn đúng giờ, làm việc cẩn thận và chu đáo, biến ngôi nhà của tôi trở nên sạch sẽ, gọn gàng. Nhờ họ, tôi có thêm thời gian để tập trung vào việc giảng dạy và chăm sóc gia đình!",
+        Title: 'Chị Trần Minh Phương',
+        Sub: "Giáo viên cấp 3",
     },
     {
-        Des: "There are many variations of passages the majority have suffered alteration some form injected humour randomise words which don't look even slightly believable are going use a passage of need to be sure.",
-        Title: 'Ken Williamson',
-        Sub: "CEO & Founder",
+        Des: "Với tư cách là một kỹ sư phần mềm, tôi thường làm việc tại nhà và cần một không gian sạch sẽ để tối ưu hóa sự tập trung. CleanMate đã vượt mong đợi với dịch vụ chuyên nghiệp, nhanh chóng và thân thiện. Họ không chỉ dọn dẹp kỹ lưỡng mà còn rất linh hoạt với lịch trình bận rộn của tôi. Rất đáng tin cậy!",
+        Title: 'Anh Hoành Trọng Hà',
+        Sub: "Kỹ sư phần mềm",
     },
     {
-        Des: "There are many variations of passages the majority have suffered alteration some form injected humour randomise words which don't look even slightly believable are going use a passage of need to be sure.",
-        Title: 'David Miller',
-        Sub: "CEO & Founder",
+        Des: "Công việc bác sĩ của tôi đòi hỏi sự tập trung cao độ và thường xuyên làm việc ca đêm, nên tôi không có nhiều thời gian để dọn dẹp nhà cửa. CleanMate đã trở thành cứu tinh với dịch vụ chất lượng cao, đội ngũ tận tâm và luôn chú ý đến từng chi tiết. Tôi hoàn toàn yên tâm giao phó ngôi nhà của mình cho họ!",
+        Title: 'Ông Nguyễn Hồng Quyến',
+        Sub: "Bác sĩ",
     }
 ]
 
@@ -39,9 +39,8 @@ const Testimonial = () => {
                 <div className="row align-items-center justify-content-center">
                     <div className="col-lg-5">
                         <div className="wpo-section-title">
-                            <h2>What Clients Say?</h2>
-                            <p>It was popularised in the with the release desktop
-                                publishing software like versions .</p>
+                            <h2>Khách hàng nói gì về dịch vụ của chúng tôi?</h2>
+                            <p>"Chúng tôi đánh giá cao dịch vụ chuyên nghiệp, nhanh chóng và thân thiện của CleanMate!"</p>
                         </div>
                     </div>
                 </div>

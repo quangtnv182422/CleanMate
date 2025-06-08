@@ -102,7 +102,7 @@ const LoginPage = (props) => {
                     const roles = userInfo.roles || [];
 
                     if (roles.includes("Cleaner")) {
-                        push("/work-list");
+                        push("/public-work");
                     } else if (roles.includes("Customer")) {
                         push("/home");
                     } else {
@@ -178,11 +178,6 @@ const LoginPage = (props) => {
                             </Grid>
                             <Grid className="formFooter">
                                 <Button fullWidth className="cBtnTheme" type="submit">Đăng nhập</Button>
-                            </Grid>
-                            <Grid className="loginWithSocial">
-                                <Button className="facebook"><i className="fa fa-facebook"></i></Button>
-                                <Button className="twitter"><i className="fa fa-twitter"></i></Button>
-                                <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
                             <p className="noteHelp">Bạn chưa có tài khoản? <Link to="/register/user">Đăng ký tài khoản ngay</Link>
                             </p>

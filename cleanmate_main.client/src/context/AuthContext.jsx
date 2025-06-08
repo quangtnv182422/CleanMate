@@ -1,9 +1,10 @@
-import React, { createContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [banks, setBanks] = useState([]);
+    
 
     useEffect(() => {
         const fetchBankData = async () => {

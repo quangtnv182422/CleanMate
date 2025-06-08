@@ -10,7 +10,6 @@ const ContactPage =() => {
     return(
         <Fragment>
             <Navbar Logo={Logo}/>
-            <PageTitle pageTitle={'Liên hệ với chúng tôi'} pagesub={'Liên hệ'}/> 
             <Contactpage/>
             <Footer/>
             <Scrollbar/>

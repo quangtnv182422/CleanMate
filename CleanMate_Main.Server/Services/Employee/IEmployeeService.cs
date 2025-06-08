@@ -17,7 +17,7 @@ namespace CleanMate_Main.Server.Services.Employee
         Task<bool> BeginWorkRequestAsync(int bookingId, string employeeId);
 
         Task<bool> CompleteWorkRequestAsync(int bookingId, string employeeId);
-
+        Task<bool> ConfirmDoneWorkRequestAsync(int bookingId);
         Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId);
 
 

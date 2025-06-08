@@ -95,6 +95,14 @@ export default defineConfig({
             '^/bookings': {
                 target,
                 secure: false
+            },
+            '^/feedback': {
+                target,
+                secure: false
+            },
+            '^/earning': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

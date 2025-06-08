@@ -9,6 +9,7 @@ using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Employee;
+using CleanMate_Main.Server.Repository.Feedbacks;
 using CleanMate_Main.Server.Repository.Payments;
 using CleanMate_Main.Server.Repository.Transaction;
 using CleanMate_Main.Server.Repository.Wallet;
@@ -19,6 +20,7 @@ using CleanMate_Main.Server.Services.Bookings;
 using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.Services.Feedbacks;
 using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Smtp;
 using CleanMate_Main.Server.Services.Transaction;
@@ -90,6 +92,9 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 //Payment
 builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+//Feedback
+builder.Services.AddScoped<IFeedbackRepo, FeedbackRepo>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 //PayOS
 builder.Services.AddScoped<IPayosService, PayosService>();
 //emailSender
@@ -205,10 +210,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
-/*app.MapFallback(context =>
-{
-    context.Response.ContentType = "text/html";
-    return context.Response.SendFileAsync("wwwroot/index.html");
-});*/
 
 app.Run();

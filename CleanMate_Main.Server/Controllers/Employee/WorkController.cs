@@ -36,6 +36,10 @@ namespace CleanMate_Main.Server.Controllers.Employee
             try
             {
                 string employeeId = await GetEmployeeIdAsync();
+                if(employeeId == null)
+                {
+                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
+                }
                 bool success = await _employeeService.BeginWorkRequestAsync(id, employeeId);
                 if (success)
                 {
@@ -65,6 +69,10 @@ namespace CleanMate_Main.Server.Controllers.Employee
             try
             {
                 string employeeId = await GetEmployeeIdAsync();
+                if (employeeId == null)
+                {
+                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
+                }
                 bool success = await _employeeService.CompleteWorkRequestAsync(id, employeeId);
                 if (success)
                 {
@@ -94,6 +102,10 @@ namespace CleanMate_Main.Server.Controllers.Employee
             try
             {
                 string employeeId = await GetEmployeeIdAsync();
+                if (employeeId == null)
+                {
+                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
+                }
                 bool success = await _employeeService.CancelWorkRequestAsync(id, employeeId);
                 if (success)
                 {
@@ -119,17 +131,17 @@ namespace CleanMate_Main.Server.Controllers.Employee
 
         private async Task<string> GetEmployeeIdAsync()
         {
-            string employeeId = DefaultCleanerId; // Default for testing
             var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userEmail))
             {
                 var user = await _userManager.FindByEmailAsync(userEmail);
+
                 if (user != null)
                 {
-                    employeeId = user.Id; // Use actual user ID if available
+                    return user.Id;
                 }
             }
-            return employeeId;
+            return null ;
         }
     }
 }

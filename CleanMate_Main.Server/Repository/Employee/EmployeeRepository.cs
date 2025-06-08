@@ -431,5 +431,23 @@ namespace CleanMate_Main.Server.Repository.Employee
                 Reviews = reviews
             };
         }
+        public async Task<decimal> GetMonthlyEarningsAsync(string employeeId)
+        {
+            var currentMonth = DateTime.UtcNow;
+            var startOfMonth = new DateTime(currentMonth.Year, currentMonth.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+
+            var bookings = await _context.Bookings
+                .Where(b => b.CleanerId == employeeId
+                    && b.BookingStatusId == CommonConstants.BookingStatus.DONE
+                    && b.CreatedAt >= startOfMonth
+                    && b.CreatedAt <= endOfMonth)
+                .ToListAsync();
+
+            return bookings
+                .Sum(b => b.TotalPrice.HasValue
+                    ? Math.Floor(b.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
+                    : 0m);
+        }
     }
 }

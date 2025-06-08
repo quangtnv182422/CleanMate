@@ -190,5 +190,9 @@ namespace CleanMate_Main.Server.Services.Employee
         {
             return await _employeeRepository.GetCustomerReviewsAsync(employeeId);
         }
+        public async Task<decimal> GetMonthlyEarningsAsync(string employeeId)
+        {
+            return await _employeeRepository.GetMonthlyEarningsAsync(employeeId);
+        }
     }
 }

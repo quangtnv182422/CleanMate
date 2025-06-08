@@ -12,7 +12,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Customer")]
+    //[Authorize(Roles = "Customer")]
     public class BookingsController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -80,7 +80,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
             }
         }
 
-        [HttpPost("{id}/confirm-complete-work")]
+        [HttpPost("{statusId}/confirm-complete-work")]
         public async Task<IActionResult> CompleteWork(int statusId)
         {
             try

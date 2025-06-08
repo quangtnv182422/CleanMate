@@ -15,7 +15,6 @@ namespace CleanMate_Main.Server.Controllers.Admin
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly ITransactionService _transactionService;
-        private readonly string DefaultAdmin = "87ae113a-bfa0-47fa-b580-f2d6a01185c9";
 
         public WithdrawRequestController(
             UserManager<AspNetUser> userManager,
@@ -64,18 +63,17 @@ namespace CleanMate_Main.Server.Controllers.Admin
         {
             try
             {
-                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(adminEmail))
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
+                var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(adminEmail))
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
 
-                //var admin = await _userManager.FindByEmailAsync(adminEmail);
-                //if (admin == null)
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
-                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var admin = await _userManager.FindByEmailAsync(adminEmail);
+                if (admin == null)
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
                 var qrCodeUrl = await _transactionService.AcceptWithdrawRequestAsync(id, admin.Id);
                 return Ok(new { success = true, message = "Yêu cầu rút tiền đã được chấp nhận.", qrCodeUrl });
             }
@@ -102,18 +100,17 @@ namespace CleanMate_Main.Server.Controllers.Admin
         {
             try
             {
-                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(adminEmail))
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
+                var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(adminEmail))
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
 
-                //var admin = await _userManager.FindByEmailAsync(adminEmail);
-                //if (admin == null)
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
-                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var admin = await _userManager.FindByEmailAsync(adminEmail);
+                if (admin == null)
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
                 var success = await _transactionService.CompleteWithdrawRequestAsync(id, admin.Id);
                 return Ok(new { success, message = "Yêu cầu rút tiền đã được hoàn tất." });
             }
@@ -137,18 +134,17 @@ namespace CleanMate_Main.Server.Controllers.Admin
         {
             try
             {
-                //var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(adminEmail))
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
+                var adminEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(adminEmail))
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
 
-                //var admin = await _userManager.FindByEmailAsync(adminEmail);
-                //if (admin == null)
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
-                //}
-                var admin = await _userManager.FindByIdAsync(DefaultAdmin);
+                var admin = await _userManager.FindByEmailAsync(adminEmail);
+                if (admin == null)
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
+                }
                 var success = await _transactionService.RejectWithdrawRequestAsync(id, admin.Id, model.AdminNote);
                 return Ok(new { success, message = "Yêu cầu rút tiền đã bị từ chối." });
             }

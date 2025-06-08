@@ -80,12 +80,12 @@ namespace CleanMate_Main.Server.Controllers.Customer
             }
         }
 
-        [HttpPost("{statusId}/confirm-complete-work")]
-        public async Task<IActionResult> CompleteWork(int statusId)
+        [HttpPost("{bookingId}/confirm-complete-work")]
+        public async Task<IActionResult> CompleteWork(int bookingId)
         {
             try
             {
-                bool success = await _employeeService.ConfirmDoneWorkRequestAsync(statusId);
+                bool success = await _employeeService.ConfirmDoneWorkRequestAsync(bookingId);
                 if (success)
                 {
                     //await _hubContext.Clients.All.SendAsync("WorkUpdated");

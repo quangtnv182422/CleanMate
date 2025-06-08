@@ -95,7 +95,7 @@ const Payment = () => {
         priceId
     } = location.state || {};
     const [isLoading, setIsLoading] = useState(false);
-    console.log(result)
+   // console.log(result)
     const [selectedMethod, setSelectedMethod] = useState('CleanMate');
     const { user } = useAuth();
 

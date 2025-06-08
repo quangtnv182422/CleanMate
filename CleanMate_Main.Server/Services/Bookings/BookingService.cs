@@ -59,7 +59,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 CleanerId = b.CleanerId,
                 CleanerName = b.Cleaner?.UserName ?? "Chưa phân công",
                 UserId = b.UserId,
-                UserName = b.User.UserName,
+                UserName = b.User.FullName,
                 BookingStatusId = b.BookingStatusId,
                 Status = CommonConstants.GetStatusString(b.BookingStatusId),
                 StatusDescription = b.BookingStatus.StatusDescription,

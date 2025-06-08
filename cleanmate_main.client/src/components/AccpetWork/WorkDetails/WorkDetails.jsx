@@ -47,8 +47,8 @@ const WorkDetails = ({ selectedWork }) => {
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
-                    <Typography sx={styles.contentTitle}>Nhân viên</Typography>
-                    <Typography sx={styles.content}>{selectedWork.employee} nhân viên làm trong {selectedWork.duration} giờ</Typography>
+                    <Typography sx={styles.contentTitle}>Thời gian làm</Typography>
+                    <Typography sx={styles.content}>Làm trong {selectedWork.duration} giờ</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>

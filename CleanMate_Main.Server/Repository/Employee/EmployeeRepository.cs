@@ -7,6 +7,7 @@ using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Models.ViewModels.Wallet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 namespace CleanMate_Main.Server.Repository.Employee
 {
     public class EmployeeRepository : IEmployeeRepository
@@ -451,6 +452,41 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .Sum(b => b.TotalPrice.HasValue
                     ? Math.Floor(b.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
                     : 0m);
+        }
+        public async Task<IEnumerable<MonthlyEarningViewModel>> GetEarningsByMonthAsync(string employeeId)
+        {
+            var currentDate = DateTime.UtcNow;
+            var currentYear = currentDate.Year;
+            var currentMonth = currentDate.Month;
+
+            var monthlyEarnings = new List<MonthlyEarningViewModel>();
+
+            for (int month = 1; month <= currentMonth; month++)
+            {
+                var startOfMonth = new DateTime(currentYear, month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+
+                var bookings = await _context.Bookings
+                    .Where(b => b.CleanerId == employeeId
+                        && b.BookingStatusId == CommonConstants.BookingStatus.DONE
+                        && b.CreatedAt >= startOfMonth
+                        && b.CreatedAt <= endOfMonth)
+                    .ToListAsync();
+
+                var earnings = bookings
+                    .Sum(b => b.TotalPrice.HasValue
+                        ? Math.Floor(b.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
+                        : 0m);
+
+                var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+                monthlyEarnings.Add(new MonthlyEarningViewModel
+                {
+                    Month = monthName,
+                    Earnings = earnings
+                });
+            }
+
+            return monthlyEarnings;
         }
     }
 }

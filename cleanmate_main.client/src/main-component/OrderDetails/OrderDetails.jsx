@@ -19,7 +19,6 @@ import { styles } from './style';
 import serviceImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
 
 const OrderDetails = ({ selectedOrder }) => {
-    console.log(selectedOrder)
     const [openFeedback, setOpenFeedback] = useState(false);
     const handleOpenFeedback = () => {
         setOpenFeedback(true);

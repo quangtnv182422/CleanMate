@@ -32,12 +32,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var summary = await _employeeService.GetEarningsSummaryAsync(user.Id);
-                return Ok(summary);
+                var earningsByMonth = await _employeeService.GetEarningsByMonthAsync(user.Id);
+                return Ok(earningsByMonth);
             }
             catch (Exception)
             {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin thu nhập." });
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin thu nhập theo tháng." });
             }
         }
 
@@ -60,6 +60,27 @@ namespace CleanMate_Main.Server.Controllers.Employee
             catch (Exception)
             {
                 return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thu nhập tháng này." });
+            }
+        }
+        [HttpGet("total")]
+        public async Task<IActionResult> GetEarningsTotal()
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
+
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null)
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+
+                var summary = await _employeeService.GetEarningsSummaryAsync(user.Id);
+                return Ok(summary);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin thu nhập." });
             }
         }
     }

@@ -110,8 +110,6 @@ namespace CleanMate_Main.Server.Controllers.Payments
             }
         }
 
-
-
         [HttpPost("booking-create-vnpay")]
         public async Task<IActionResult> CreateBookingAndPaymentVnPay([FromBody] BookingCreateDTO bookingDto)
         {
@@ -339,7 +337,6 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 return StatusCode(500, new { message = $"Lỗi khi xử lý đặt lịch và thanh toán: {ex.Message}" });
             }
         }
-
 
 
         [HttpGet("callback-vnpay")]

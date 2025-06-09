@@ -17,13 +17,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     
 
     const userRole = user?.roles?.[0]
-    console.log(userRole)
 
     // Kiểm tra user có ít nhất 1 role trong allowedRoles không
     const isAllowed = Array.isArray(allowedRoles)
         ? allowedRoles.includes(userRole)
         : userRole === allowedRoles;
-    console.log(isAllowed);
+    
 
    
 

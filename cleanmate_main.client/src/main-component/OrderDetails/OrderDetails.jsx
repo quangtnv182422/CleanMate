@@ -45,11 +45,9 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
     useEffect(() => {
         if (connection) {
             connection.start()
-                .then(() => console.log('SignalR Conne`cted Successfully'))
                 .catch(err => console.error('SignalR Connection Error: ', err));
 
             connection.on('ReceiveWorkUpdate', () => {
-                console.log('WorkUpdated event received');
                 //fetchWorkDetails(); // Refetch data for this component
                 if (onOrderListRefresh) onOrderListRefresh(); // Notify parent to refresh list
             });

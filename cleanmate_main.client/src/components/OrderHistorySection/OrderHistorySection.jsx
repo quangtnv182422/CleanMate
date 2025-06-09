@@ -140,7 +140,6 @@ const OrderHistorySection = () => {
         if (connection) {
             if (connection.state === signalR.HubConnectionState.Disconnected) {
                 connection.start()
-                    .then(() => console.log('SignalR Connected'))
                     .catch(err => console.error('SignalR Connection Error: ', err));
             }
 

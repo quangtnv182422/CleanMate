@@ -22,12 +22,14 @@ import useAuth from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { Circles } from 'react-loader-spinner';
 const paymentMethods = [
+
     {
-        id: 'CleanMate',
-        label: 'Tài khoản CleanMate',
-        subLabel: 'Từ số dư tài khoản CleanMate',
-        balance: '0 ₫',
-        icon: <AccountBalanceWalletIcon sx={{ color: '#43A047' }} />,
+        id: 'cash',
+        label: 'Tiền mặt',
+        subLabel: 'Thanh toán bằng tiền mặt hoặc chuyển khoản trực tiếp cho người dọn',
+        icon: <AttachMoneyIcon sx={{ color: '#1565C0' }} />,
+        available: true,
+        isRecommend: true,
     },
     {
         id: 'vnpay',
@@ -35,19 +37,25 @@ const paymentMethods = [
         subLabel: '',
         icon: <CreditCardIcon sx={{ color: '#1565C0' }} />,
         available: false,
+        isRecommend: false,
     },
     {
         id: 'bank',
         label: 'Chuyển khoản',
         subLabel: 'Qua ngân hàng',
         icon: <AccountBalanceIcon sx={{ color: '#1565C0' }} />,
+        available: false,
+        isRecommend: false,
     },
     {
-        id: 'cash',
-        label: 'Tiền mặt',
-        subLabel: 'Thanh toán bằng tiền mặt',
-        icon: <AttachMoneyIcon sx={{ color: '#1565C0' }} />
-    }
+        id: 'CleanMate',
+        label: 'Tài khoản CleanMate',
+        subLabel: 'Từ số dư tài khoản CleanMate',
+        balance: '0 ₫',
+        icon: <AccountBalanceWalletIcon sx={{ color: '#43A047' }} />,
+        available: true,
+        isRecommend: false,
+    },
 ];
 
 const primaryColor = '#1565C0';
@@ -101,7 +109,7 @@ const Payment = () => {
         priceId
     } = location.state || {};
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedMethod, setSelectedMethod] = useState('CleanMate');
+    const [selectedMethod, setSelectedMethod] = useState('cash');
     const { user } = useAuth();
 
     useEffect(() => {
@@ -239,7 +247,7 @@ const Payment = () => {
                     </Box>
 
                     {/* Scrollable content */}
-                    <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+                    <Box sx={{ flex: 1, overflowY: 'auto', p: 2, width: '100%' }}>
                         {paymentMethods.map((method) => {
                             const isSelected = selectedMethod === method.id;
                             const isDisabled = method.available === false;
@@ -314,6 +322,12 @@ const Payment = () => {
                                         >
                                             Nạp tiền
                                         </Button>
+                                    )}
+
+                                    {method.isRecommend && (
+                                        <Typography variant="body1" color="error">
+                                            Khuyên dùng
+                                        </Typography>
                                     )}
                                 </Paper>
                             );

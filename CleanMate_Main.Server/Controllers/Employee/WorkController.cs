@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Wallet;
@@ -85,20 +86,24 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 {
                     var booking = await _employeeService.GetWorkDetailsAsync(id);
                     var payment = await _paymentService.GetPaymentsByBookingIdAsync(id);
-                    //switch (paymentMethod) // Corrected switch statement syntax
-                    //{
-                    //    case "CM-Coin":
-                    //        await _userWalletService.DeductMoneyAsync(employeeId, );
-                    //        break;
-                    //    case "vnPay":
-                    //        await _paymentService.ProcessBankTransferAsync(id, employeeId);
-                    //        break;
-                    //    case "":
-                    //        await _paymentService.ProcessOnlinePaymentAsync(id, employeeId);
-                    //        break;
-                    //    default:
-                    //        return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
-                    //}
+                    switch (payment.PaymentMethod) // Corrected switch statement syntax
+                    {
+                        case PaymentType.Cash:
+                            await _userWalletService.DeductMoneyAsync(employeeId, (booking.decimalPrice - booking.decimalCommission), $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            await _paymentService.MarkBookingAsPaidAsync(payment.PaymentId,null);
+                            break;
+                        case PaymentType.vnPay:
+                            await _userWalletService.AddMoneyAsync(employeeId,booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            break;
+                        case PaymentType.PayOS:
+                            await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            break;
+                        case PaymentType.CleanMate_Coin:
+                            await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            break;
+                        default:
+                            return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
+                    }
                     await _hubContext.Clients.All.SendAsync("WorkUpdated");
                     return Ok(new { success, message = "Công việc đã được cập nhật thành trạng thái Chờ xác nhận." });
                 }

@@ -21,5 +21,7 @@
         public string? PlaceID { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
+        public decimal decimalPrice { get; set; }
+        public decimal decimalCommission { get; set; }
     }
 }

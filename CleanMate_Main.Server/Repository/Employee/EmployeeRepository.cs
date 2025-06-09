@@ -75,6 +75,8 @@ namespace CleanMate_Main.Server.Repository.Employee
                             PlaceID = address.GG_PlaceId,
                             Latitude = address.Latitude.ToString(),
                             Longitude = address.Longitude.ToString(),
+                            decimalCommission = Math.Floor(servicePrice.Price * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000,
+                            decimalPrice = servicePrice.Price
                         };
 
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");

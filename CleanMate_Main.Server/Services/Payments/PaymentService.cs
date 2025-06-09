@@ -21,7 +21,7 @@ namespace CleanMate_Main.Server.Services.Payments
             return await _paymentRepo.AddNewPaymentAsync(newPayment);
         }
 
-        public async Task<IEnumerable<Payment>> GetPaymentsByBookingIdAsync(int bookingId)
+        public async Task<Payment> GetPaymentsByBookingIdAsync(int bookingId)
         {
             return await _paymentRepo.GetPaymentsByBookingIdAsync(bookingId);
         }

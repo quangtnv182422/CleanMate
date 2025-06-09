@@ -220,6 +220,13 @@ namespace CleanMate_Main.Server.Controllers.Payments
             if (user == null)
                 return Unauthorized("Người dùng không tồn tại.");
 
+            var wallet = await _walletService.GetWalletAsync(user.Id);
+            if (wallet == null)
+                return NotFound(new { message = "Không tìm thấy ví cho người dùng này." });
+
+            if (wallet.Balance < bookingDto.TotalPrice)
+                return BadRequest(new { message = "Số dư ví không đủ để thực hiện." });
+
             try
             {
                 // 1. Tạo booking

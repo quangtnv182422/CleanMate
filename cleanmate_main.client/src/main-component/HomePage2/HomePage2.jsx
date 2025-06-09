@@ -50,6 +50,7 @@ const HomePage2 = () => {
                 onClose={() => setOpenModal(false)}
                 aria-labelledby="maintenance-title"
                 aria-describedby="maintenance-description"
+                disableAutoFocus
             >
                 <Box
                     sx={{

@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 const MonthlyEarnings = () => {
     const [data, setData] = useState([]);
     const [monthlyEarnings, setMonthlyEarnings] = useState(0);
-    const [selectedMonth, setSelectedMonth] = useState(new Date().toLocaleString('en-US', { month: 'long' }))
+    const [selectedMonth, setSelectedMonth] = useState(new Date().toLocaleString('vi-VN', { month: 'long' }))
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 

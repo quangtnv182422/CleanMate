@@ -3,6 +3,16 @@
         backgroundColor: "#fff",
         padding: '50px 0',
     },
+    spinnerContainer: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: '1000',
+    },
     container: {
         maxWidth: '1200px',
         margin: '0 auto',

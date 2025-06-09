@@ -164,20 +164,22 @@ const DepositCoin = () => {
 
     return (
         <Box maxWidth={600} mx="auto" mt={4} p={2}>
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                position: 'relative',
-            }}>
-                <Button
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate(-1)}
-                >
-                    Quay lại
-                </Button>
+            {user?.roles?.[0] === "Customer" && (
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    position: 'relative',
+                }}>
+                    <Button
+                        startIcon={<ArrowBackIcon />}
+                        onClick={() => navigate(-1)}
+                    >
+                        Quay lại
+                    </Button>
 
-            </Box>
+                </Box>
+            )}
             <Paper variant="outlined" sx={{ p: 3, mt: 3 }}>
                 <Grid container spacing={2}>
                     {/* Nhập số tiền */}

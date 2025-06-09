@@ -2,16 +2,20 @@
 using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Repository.Employee;
+using CleanMate_Main.Server.Repository.Wallet;
 
 namespace CleanMate_Main.Server.Services.Employee
 {
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUserWalletRepo _userWalletRepo;
 
-        public EmployeeService(IEmployeeRepository employeeRepository)
+
+        public EmployeeService(IEmployeeRepository employeeRepository, IUserWalletRepo userWalletRepo)
         {
             _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
+            _userWalletRepo = userWalletRepo ?? throw new ArgumentNullException(nameof(_userWalletRepo));
         }
 
         public async Task<IEnumerable<WorkListViewModel>> GetAllWorkAsync(int? status = null, string? employeeId = null)
@@ -31,6 +35,11 @@ namespace CleanMate_Main.Server.Services.Employee
 
         public async Task<bool> AcceptWorkRequestAsync(int bookingId, string employeeId)
         {
+            var wallet = await _userWalletRepo.GetWalletByUserIdAsync(employeeId);
+            if (wallet.Balance < CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK)
+            {
+                throw new InvalidOperationException($"Số dư ví không đủ. Bạn cần tối thiểu {CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK.ToString("N0")} coins để nhận công việc.");
+            }
             var isValid = await ValidateWorkAcceptanceAsync(bookingId, employeeId);
             if (!isValid)
             {

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useContext } from 'react'
+﻿import { useState, useEffect, useContext } from 'react';
 import {
     Box,
     Grid,
@@ -14,11 +14,12 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import { style } from './style.js'
+import { style } from './style.js';
 import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WorkDetails from './WorkDetails/WorkDetails.jsx';
 import useAuth from '../../hooks/useAuth.jsx';
 import { WorkContext } from '../../context/WorkProvider.jsx';
+import * as signalR from '@microsoft/signalr'; // Import SignalR
 
 const WORKS_PER_PAGE = 6;
 
@@ -32,6 +33,8 @@ const AcceptWork = () => {
     const { statusList } = useContext(BookingStatusContext);
     const { user } = useAuth();
     const role = user?.roles?.[0] || '';
+    const { setData } = useContext(WorkContext); // Access setData to update work list if needed
+    const [connection, setConnection] = useState(null); // State for SignalR connection
 
     const handleOpen = async (bookingId) => {
         try {
@@ -57,42 +60,12 @@ const AcceptWork = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchWorkList = async () => {
-            if (role !== "Cleaner") return;
-            try {
-                const url = status
-                    ? `/worklist?status=${status}`
-                    : '/worklist'
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const workItems = await response.json();
-                setWork(workItems);
-
-            } catch (error) {
-                console.error('Error fetching work list:', error);
-            }
-        };
-
-        fetchWorkList();
-    }, [setWork, role, status]);
-
-    const handleClose = () => setOpen(false);
     const fetchWorkList = async () => {
         if (role !== "Cleaner") return;
         try {
-            const url = status ? `/worklist?status=${status}` : '/worklist';
+            const url = status
+                ? `/worklist?status=${status}`
+                : '/worklist';
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -108,15 +81,53 @@ const AcceptWork = () => {
 
             const workItems = await response.json();
             setWork(workItems);
-
         } catch (error) {
             console.error('Error fetching work list:', error);
         }
     };
 
-    const filteredWork = work.filter((work) => {
-        return work.customerFullName.toLowerCase().includes(search.toLowerCase());
-    });
+    useEffect(() => {
+        fetchWorkList();
+    }, [status, role]);
+
+    // Initialize SignalR connection
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl('/workHub') // Ensure this matches your server's SignalR hub endpoint
+            .withAutomaticReconnect()
+            .configureLogging('debug') // Enable debug logging for SignalR
+            .build();
+        setConnection(newConnection);
+    }, []);
+
+    // Start SignalR connection and listen for updates
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => console.log('SignalR Connected Successfully'))
+                .catch(err => console.error('SignalR Connection Error: ', err));
+
+            connection.on('ReceiveWorkUpdate', () => {
+                console.log('WorkUpdated event received');
+                fetchWorkList(); // Refresh the work list on update
+            });
+
+            // Cleanup on unmount
+            return () => {
+                connection.off('ReceiveWorkUpdate');
+                connection.stop();
+            };
+        }
+    }, [connection]);
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedWork(null);
+    };
+
+    const filteredWork = work.filter((work) =>
+        work.customerFullName.toLowerCase().includes(search.toLowerCase())
+    );
 
     const totalPages = Math.ceil(filteredWork.length / WORKS_PER_PAGE);
     const displayedWork = filteredWork.slice(
@@ -133,20 +144,20 @@ const AcceptWork = () => {
         return price?.toLocaleString('vi-VN', {
             style: 'currency',
             currency: 'VND',
-        })
+        });
     };
 
     const formatTime = (time) => {
         if (!time) return '';
         const [hour, minute] = time.split(':');
-        return `${hour}:${minute}`
-    }
+        return `${hour}:${minute}`;
+    };
 
     const formatDate = (input) => {
         const date = new Date(input);
         if (isNaN(date)) return '';
         return date.toLocaleDateString('vi-VN');
-    }
+    };
 
     return (
         <Box sx={style.accpetWorkSection}>
@@ -168,7 +179,7 @@ const AcceptWork = () => {
                             onChange={handleStatusChange}
                             label="Trạng thái"
                         >
-                            {statusList.filter((statusItem) => statusItem.id >= 2).map((statusItem) => (
+                            {statusList.filter((statusItem) => statusItem.id !== 2 && statusItem.id !== 6 && statusItem.id !== 1).map((statusItem) => (
                                 <MenuItem key={statusItem.id} value={statusItem.id}>
                                     {statusItem.name}
                                 </MenuItem>
@@ -176,7 +187,7 @@ const AcceptWork = () => {
                         </Select>
                     </FormControl>
                 </Box>
-                
+
                 <Grid container spacing={2} sx={{ mt: 1 }}>
                     {displayedWork.length === 0 ? (
                         <Grid item xs={12}>
@@ -217,14 +228,13 @@ const AcceptWork = () => {
                     )}
                 </Grid>
 
-
                 {open && (
                     <Modal
                         open={open}
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <WorkDetails selectWork={selectedWork} />
+                        <WorkDetails selectWork={selectedWork} onWorkListRefresh={fetchWorkList} handleClose={handleClose} />
                     </Modal>
                 )}
 
@@ -239,7 +249,7 @@ const AcceptWork = () => {
                 </Box>
             </Box>
         </Box>
-    )
-}
+    );
+};
 
 export default AcceptWork;

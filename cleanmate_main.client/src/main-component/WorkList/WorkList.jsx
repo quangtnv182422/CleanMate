@@ -794,7 +794,17 @@ const WorkList = () => {
 
     const WorkListPage = () => (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                mb: 1,
+                '@media (max-width: 915px)': {
+                    width: '100%', 
+                    justifyContent: 'flex-start',
+                    mt: 1, 
+                },
+            }}>
                 <Box>
                     <IconButton>
                         <FileDownload />
@@ -815,7 +825,18 @@ const WorkList = () => {
                 </Box>
             </Box>
 
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{
+                overflowX: 'auto', 
+                maxWidth: '100%', 
+                '& .MuiTable-root': {
+                    minWidth: 915, 
+                },
+                '@media (max-width: 915px)': { 
+                    width: '100vw', 
+                    marginLeft: '-16px', 
+                    marginRight: '-16px',
+                },
+            }}>
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
                         <TableRow>

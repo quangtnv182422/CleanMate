@@ -23,6 +23,17 @@ export const styles = {
         },
     },
 
+    spinnerContainer: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: '1000',
+    },
+
     orderDetailTitle: {
         position: 'sticky',
         top: 0,

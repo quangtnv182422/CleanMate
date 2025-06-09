@@ -97,8 +97,6 @@ const OrderHistorySection = () => {
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
-    console.log(bookings)
-
     const fetchBookings = useCallback(async () => {
         try {
             setLoading(true);

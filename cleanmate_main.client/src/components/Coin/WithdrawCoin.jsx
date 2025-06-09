@@ -331,7 +331,9 @@ const WithdrawCoin = () => {
                             }}
                         >
                             <Button variant="outlined" color="error">Từ chối</Button>
-                            <Button variant="contained" color="success">Đồng ý</Button>
+                            <Button variant="contained" color="success" onClick={handleSubmit}>
+                                Đồng ý
+                            </Button>
                         </Box>
                     </DialogContent>
                 </Dialog>

@@ -82,7 +82,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             }
             
             //Record the transaction
-            int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Debit, $"Yêu cầu rút tiền từ tài khoản {bankAccount} ({bankName})");
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, -amount, TransactionType.Debit, $"Yêu cầu rút tiền từ tài khoản {bankAccount} ({bankName})", null);
             if (transactionId <= 0)
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");
@@ -112,7 +112,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             }
 
             // Record the transaction
-            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Credit, $"Nạp tiền từ {paymentMethod}, mã giao dịch: {paymentId}");
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Credit, $"Nạp tiền từ {paymentMethod}, mã giao dịch: {paymentId}",null);
             if (transactionId <= 0)
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");
@@ -122,7 +122,7 @@ namespace CleanMate_Main.Server.Services.Wallet
         }
 
         //--Trừ tiền---
-        public async Task<bool> DeductMoneyAsync(string userId, decimal amount, string reason)
+        public async Task<bool> DeductMoneyAsync(string userId, decimal amount, string reason, int bookingId)
         {
             if (amount <= 0)
             {
@@ -148,7 +148,36 @@ namespace CleanMate_Main.Server.Services.Wallet
             }
 
             // Record the transaction
-            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Debit, $"Trừ tiền: {reason}");
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Debit, $"Trừ tiền: {reason}", bookingId);
+            if (transactionId <= 0)
+            {
+                throw new InvalidOperationException("Không thể ghi lại giao dịch.");
+            }
+
+            return true;
+        }
+        public async Task<bool> AddMoneyAsync(string userId, decimal amount, string reason, int bookingId)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Số tiền cần thêm phải lớn hơn 0.");
+            }
+
+            var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
+            if (wallet == null)
+            {
+                throw new InvalidOperationException("Ví người dùng không tồn tại.");
+            }
+
+            // Add the amount to the wallet
+            bool balanceUpdated = await _walletRepo.UpdateWalletBalanceAsync(userId, amount, $"Thêm tiền: {reason}");
+            if (!balanceUpdated)
+            {
+                throw new InvalidOperationException("Không thể cập nhật số dư ví.");
+            }
+
+            // Record the transaction
+            int transactionId = await _transactionService.RecordTransactionAsync(userId, amount, TransactionType.Credit, $"Thêm tiền: {reason}", bookingId);
             if (transactionId <= 0)
             {
                 throw new InvalidOperationException("Không thể ghi lại giao dịch.");

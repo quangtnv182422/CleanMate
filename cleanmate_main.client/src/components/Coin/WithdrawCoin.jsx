@@ -66,13 +66,37 @@ const WithdrawCoin = () => {
         })
     );
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (validator.allValid()) {
-            toast.success(`Bạn đã rút ${amount} qua ngân hàng ${selectedBank.name}`)
+            try {
+                const response = await fetch('request/withdraw', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                    }),
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    toast.success(`Bạn đã rút ${amount} qua ngân hàng ${user?.bankName} về số tài khoản: ${user?.bankNo}`);
+                    setOpenConfirmDialog(false); // Close the dialog on success
+                    setAmount(0); // Reset amount
+                } else {
+                    toast.error(result.message || 'Yêu cầu rút tiền thất bại.');
+                }
+            } catch (error) {
+                console.error('Error submitting withdraw request:', error);
+                toast.error('Đã xảy ra lỗi khi gửi yêu cầu rút tiền.');
+            }
         } else {
             validator.showMessages();
+            toast.error('Vui lòng kiểm tra lại thông tin.');
         }
-    }
+    };
 
     const handleAmountChange = (e) => {
         setAmount(e.target.value);

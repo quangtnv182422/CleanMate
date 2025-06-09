@@ -7,7 +7,7 @@ namespace CleanMate_Main.Server.Services.Transaction
 {
     public interface ITransactionService
     {
-        Task<int> RecordTransactionAsync(string userId, decimal amount, TransactionType transactionType, string description);
+        Task<int> RecordTransactionAsync(string userId, decimal amount, TransactionType transactionType, string description, int? bookingId);
         Task<int> CreateWithdrawRequestAsync(string userId, decimal amount);
         Task<IEnumerable<WithdrawRequest>> GetAllWithdrawRequestsAsync();
         Task<WithdrawRequest> GetWithdrawRequestByIdAsync(int requestId);

@@ -7,5 +7,6 @@ namespace CleanMate_Main.Server.Repository.Payments
         Task<Payment> AddNewPaymentAsync(Payment newPayment);
         Task<Payment> UpdatePaymentAsync(Payment newPayment);
         Task<Payment?> FindPaymentById(int paymentId);
+        Task<IEnumerable<Payment>> GetPaymentsByBookingIdAsync(int bookingId);
     }
 }

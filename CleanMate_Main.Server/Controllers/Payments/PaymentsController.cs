@@ -239,7 +239,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
 
                 // 3. Trừ tiền từ ví
                 var reason = $"Thanh toán booking {createdBooking.BookingId} bằng CM-Coin";
-                var deducted = await _walletService.DeductMoneyAsync(user.Id, bookingDto.TotalPrice.Value, reason);
+                var deducted = await _walletService.DeductMoneyAsync(user.Id, bookingDto.TotalPrice.Value, reason, createdBooking.BookingId);
                 if (!deducted)
                 {
                     // Nếu trừ tiền thất bại, xóa payment và booking

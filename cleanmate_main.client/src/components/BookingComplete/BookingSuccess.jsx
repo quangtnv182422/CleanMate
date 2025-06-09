@@ -28,8 +28,8 @@ const BookingSuccess = () => {
     };
 
     const depositDetails = {
-        date: '22/05/2025', // Replace with dynamic data if needed
-        coin: '200000'
+        date: searchParams.get('date') || 'N/A',
+        coin: searchParams.get('coin') || 'N/A',
     };
 
     return (

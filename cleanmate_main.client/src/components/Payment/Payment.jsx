@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import PaymentIcon from '@mui/icons-material/Payment';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import WestIcon from '@mui/icons-material/West';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import useAuth from '../../hooks/useAuth';
@@ -42,6 +42,12 @@ const paymentMethods = [
         subLabel: 'Qua ngân hàng',
         icon: <AccountBalanceIcon sx={{ color: '#1565C0' }} />,
     },
+    {
+        id: 'cash',
+        label: 'Tiền mặt',
+        subLabel: 'Thanh toán bằng tiền mặt',
+        icon: <AttachMoneyIcon sx={{ color: '#1565C0' }} />
+    }
 ];
 
 const primaryColor = '#1565C0';

@@ -6,6 +6,8 @@ namespace CleanMate_Main.Server.Services.Payments
     public interface IPaymentService
     {
         Task<Payment> AddNewPaymentAsync(Payment newPayment);
-        Task<PaymentDTO?> MarkBookingAsPaidAsync(int paymentId, string? transaction);
+        Task<PaymentDTO?> MarkBookingAsPaidAsync(int paymentId, string transaction);
+        Task<IEnumerable<Payment>> GetPaymentsByBookingIdAsync(int bookingId);
+
     }
 }

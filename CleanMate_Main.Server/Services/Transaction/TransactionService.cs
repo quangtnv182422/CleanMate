@@ -31,7 +31,7 @@ namespace CleanMate_Main.Server.Services.Transaction
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
-        public async Task<int> RecordTransactionAsync(string userId, decimal amount, TransactionType transactionType, string description)
+        public async Task<int> RecordTransactionAsync(string userId, decimal amount, TransactionType transactionType, string description, int? bookingId)
         {
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
             var transaction = new WalletTransaction
@@ -40,7 +40,8 @@ namespace CleanMate_Main.Server.Services.Transaction
                 Amount = amount,
                 TransactionType = transactionType,
                 Description = description,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                RelatedBookingId = bookingId ?? null
             };
 
             return await _transactionRepo.AddTransactionAsync(transaction);

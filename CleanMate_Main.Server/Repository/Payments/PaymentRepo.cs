@@ -40,7 +40,13 @@ namespace CleanMate_Main.Server.Repository.Payments
 
             return payment;
         }
+        public async Task<IEnumerable<Payment>> GetPaymentsByBookingIdAsync(int bookingId)
+        {
+            var payments = await _context.Payments
+                .Where(p => p.BookingId == bookingId)
+                .ToListAsync();
 
-
+            return payments;
+        }
     }
 }

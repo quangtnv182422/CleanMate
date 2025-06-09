@@ -1,5 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.Services.Payments;
+using CleanMate_Main.Server.Services.Wallet;
 using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,16 +20,20 @@ namespace CleanMate_Main.Server.Controllers.Employee
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IHubContext<WorkHub> _hubContext;
-        private const string DefaultCleanerId = "3333f99d-7afd-4d40-aa4b-8fa86d7a39b";
-
+        private readonly IPaymentService _paymentService;
+        private readonly IUserWalletService _userWalletService;
         public WorkController(
             IEmployeeService employeeService,
             UserManager<AspNetUser> userManager,
-            IHubContext<WorkHub> hubContext)
+            IHubContext<WorkHub> hubContext,
+            IPaymentService paymentService,
+            IUserWalletService userWalletService)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
+            _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
+            _userWalletService = userWalletService ?? throw new ArgumentNullException(nameof(userWalletService));
         }
 
         [HttpPost("{id}/start")]
@@ -73,9 +79,26 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 {
                     return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
                 }
+                 
                 bool success = await _employeeService.CompleteWorkRequestAsync(id, employeeId);
                 if (success)
                 {
+                    var booking = await _employeeService.GetWorkDetailsAsync(id);
+                    var payment = await _paymentService.GetPaymentsByBookingIdAsync(id);
+                    //switch (paymentMethod) // Corrected switch statement syntax
+                    //{
+                    //    case "CM-Coin":
+                    //        await _userWalletService.DeductMoneyAsync(employeeId, );
+                    //        break;
+                    //    case "vnPay":
+                    //        await _paymentService.ProcessBankTransferAsync(id, employeeId);
+                    //        break;
+                    //    case "":
+                    //        await _paymentService.ProcessOnlinePaymentAsync(id, employeeId);
+                    //        break;
+                    //    default:
+                    //        return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
+                    //}
                     await _hubContext.Clients.All.SendAsync("WorkUpdated");
                     return Ok(new { success, message = "Công việc đã được cập nhật thành trạng thái Chờ xác nhận." });
                 }

@@ -16,7 +16,6 @@ namespace CleanMate_Main.Server.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly UserManager<AspNetUser> _userManager;
-        private readonly string DefaulUser = "3333f99d-7afd-4d40-aa4b-8fa86d7a39be";
 
         public RequestController(ITransactionService transactionService, UserManager<AspNetUser> userManager)
         {
@@ -29,18 +28,18 @@ namespace CleanMate_Main.Server.Controllers
         {
             try
             {
-                //var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(userEmail))
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                //}
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
+                }
 
-                //var user = await _userManager.FindByEmailAsync(userEmail);
-                //if (user == null)
-                //{
-                //    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                //}
-                var user = await _userManager.FindByIdAsync(DefaulUser);
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                if (user == null)
+                {
+                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
+                }
+
 
                 // Validate bank details
                 if (string.IsNullOrEmpty(user.BankName) || string.IsNullOrEmpty(user.BankNo))

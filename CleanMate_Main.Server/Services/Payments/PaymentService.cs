@@ -9,7 +9,6 @@ namespace CleanMate_Main.Server.Services.Payments
 {
     public class PaymentService : IPaymentService
     {
-
         private readonly IPaymentRepo _paymentRepo;
 
         public PaymentService(IPaymentRepo paymentRepo)
@@ -19,7 +18,12 @@ namespace CleanMate_Main.Server.Services.Payments
 
         public async Task<Payment> AddNewPaymentAsync(Payment newPayment)
         {
-          return await _paymentRepo.AddNewPaymentAsync(newPayment);
+            return await _paymentRepo.AddNewPaymentAsync(newPayment);
+        }
+
+        public async Task<IEnumerable<Payment>> GetPaymentsByBookingIdAsync(int bookingId)
+        {
+            return await _paymentRepo.GetPaymentsByBookingIdAsync(bookingId);
         }
 
         public async Task<PaymentDTO?> MarkBookingAsPaidAsync(int paymentId, string? transaction)
@@ -49,6 +53,5 @@ namespace CleanMate_Main.Server.Services.Payments
 
             return resultDto;
         }
-
     }
 }

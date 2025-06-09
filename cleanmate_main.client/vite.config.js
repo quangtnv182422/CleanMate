@@ -103,6 +103,10 @@ export default defineConfig({
             '^/earning': {
                 target,
                 secure: false
+            },
+            '^/request': {
+                target,
+                secure: false
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),

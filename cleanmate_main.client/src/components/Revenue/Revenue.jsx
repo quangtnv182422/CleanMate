@@ -11,7 +11,7 @@ const MonthlyEarnings = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch('/earning/monthly', {
+                const response = await fetch('/earning', {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

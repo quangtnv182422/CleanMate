@@ -438,14 +438,14 @@ namespace CleanMate_Main.Server.Repository.Employee
         public async Task<decimal> GetMonthlyEarningsAsync(string employeeId)
         {
             var currentMonth = DateTime.UtcNow;
-            var startOfMonth = new DateTime(currentMonth.Year, currentMonth.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+            var startOfMonth = new DateOnly(currentMonth.Year, currentMonth.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             var bookings = await _context.Bookings
                 .Where(b => b.CleanerId == employeeId
                     && b.BookingStatusId == CommonConstants.BookingStatus.DONE
-                    && b.CreatedAt >= startOfMonth
-                    && b.CreatedAt <= endOfMonth)
+                    && b.Date >= startOfMonth
+                    && b.Date <= endOfMonth)
                 .ToListAsync();
 
             return bookings
@@ -463,22 +463,21 @@ namespace CleanMate_Main.Server.Repository.Employee
 
             for (int month = 1; month <= currentMonth; month++)
             {
-                var startOfMonth = new DateTime(currentYear, month, 1);
-                var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+                var startOfMonth = new DateOnly(currentYear, month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
                 var bookings = await _context.Bookings
                     .Where(b => b.CleanerId == employeeId
                         && b.BookingStatusId == CommonConstants.BookingStatus.DONE
-                        && b.CreatedAt >= startOfMonth
-                        && b.CreatedAt <= endOfMonth)
+                        && b.Date >= startOfMonth
+                        && b.Date <= endOfMonth)
                     .ToListAsync();
 
                 var earnings = bookings
                     .Sum(b => b.TotalPrice.HasValue
-                        ? Math.Floor(b.TotalPrice.Value * (1 - CommonConstants.COMMISSION_PERCENTAGE / 100) / 1000) * 1000
-                        : 0m);
+                        ? Math.Floor(b.TotalPrice.Value * CommonConstants.COMMISSION_PERCENTAGE) :0m);
 
-                var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+                var monthName = new CultureInfo("vi-VN").DateTimeFormat.GetMonthName(month);
                 monthlyEarnings.Add(new MonthlyEarningViewModel
                 {
                     Month = monthName,

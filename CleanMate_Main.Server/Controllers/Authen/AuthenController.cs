@@ -133,7 +133,9 @@ namespace CleanMate_Main.Server.Controllers.Authen
                 email = user.Email,
                 fullName = user.FullName,
                 avatar = user.ProfileImage,  
-                roles = roles
+                roles = roles,
+                bankName = user.BankName,
+                bankNo = user.BankNo
             });
         }
 

@@ -27,6 +27,7 @@ import useAuth from "../../hooks/useAuth";
 
 const WithdrawCoin = () => {
     const { user } = useAuth();
+    console.log(user)
     const userRole = user?.roles?.[0];
     const { banks } = useContext(AuthContext);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -294,7 +295,7 @@ const WithdrawCoin = () => {
                     <DialogTitle>Xác nhận rút tiền</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {`Bạn có xác nhận muốn rút ${Number(amount).toLocaleString("vi-VN")} đ`}
+                            {`Bạn có xác nhận muốn rút ${Number(amount).toLocaleString("vi-VN")}đ qua ngân hàng: ${user?.bankName} về số tài khoản: ${user?.bankNo}`}
                         </DialogContentText>
                         <Box
                             mt={1}

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useContext } from 'react'
+﻿import { useState, useEffect, useContext } from 'react';
 import {
     Box,
     Grid,
@@ -14,11 +14,12 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import { style } from './style.js'
+import { style } from './style.js';
 import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WorkDetails from './WorkDetails/WorkDetails.jsx';
 import useAuth from '../../hooks/useAuth.jsx';
 import { WorkContext } from '../../context/WorkProvider.jsx';
+import * as signalR from '@microsoft/signalr'; // Import SignalR
 
 const WORKS_PER_PAGE = 6;
 
@@ -32,6 +33,8 @@ const AcceptWork = () => {
     const { statusList } = useContext(BookingStatusContext);
     const { user } = useAuth();
     const role = user?.roles?.[0] || '';
+    const { setData } = useContext(WorkContext); // Access setData to update work list if needed
+    const [connection, setConnection] = useState(null); // State for SignalR connection
 
     const handleOpen = async (bookingId) => {
         try {
@@ -57,42 +60,74 @@ const AcceptWork = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchWorkList = async () => {
-            if (role !== "Cleaner") return;
-            try {
-                const url = status
-                    ? `/worklist?status=${status}`
-                    : '/worklist'
+    const fetchWorkList = async () => {
+        if (role !== "Cleaner") return;
+        try {
+            const url = status
+                ? `/worklist?status=${status}`
+                : '/worklist';
 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const workItems = await response.json();
-                setWork(workItems);
-
-            } catch (error) {
-                console.error('Error fetching work list:', error);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
 
+            const workItems = await response.json();
+            setWork(workItems);
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    };
+
+    useEffect(() => {
         fetchWorkList();
-    }, [setWork, role, status]);
+    }, [status, role]);
 
-    const handleClose = () => setOpen(false);
+    // Initialize SignalR connection
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl('/workHub') // Ensure this matches your server's SignalR hub endpoint
+            .withAutomaticReconnect()
+            .configureLogging('debug') // Enable debug logging for SignalR
+            .build();
+        setConnection(newConnection);
+    }, []);
 
-    const filteredWork = work.filter((work) => {
-        return work.customerFullName.toLowerCase().includes(search.toLowerCase());
-    });
+    // Start SignalR connection and listen for updates
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => console.log('SignalR Connected Successfully'))
+                .catch(err => console.error('SignalR Connection Error: ', err));
+
+            connection.on('ReceiveWorkUpdate', () => {
+                console.log('WorkUpdated event received');
+                fetchWorkList(); // Refresh the work list on update
+            });
+
+            // Cleanup on unmount
+            return () => {
+                connection.off('ReceiveWorkUpdate');
+                connection.stop();
+            };
+        }
+    }, [connection]);
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedWork(null);
+    };
+
+    const filteredWork = work.filter((work) =>
+        work.customerFullName.toLowerCase().includes(search.toLowerCase())
+    );
 
     const totalPages = Math.ceil(filteredWork.length / WORKS_PER_PAGE);
     const displayedWork = filteredWork.slice(
@@ -109,20 +144,20 @@ const AcceptWork = () => {
         return price?.toLocaleString('vi-VN', {
             style: 'currency',
             currency: 'VND',
-        })
+        });
     };
 
     const formatTime = (time) => {
         if (!time) return '';
         const [hour, minute] = time.split(':');
-        return `${hour}:${minute}`
-    }
+        return `${hour}:${minute}`;
+    };
 
     const formatDate = (input) => {
         const date = new Date(input);
         if (isNaN(date)) return '';
         return date.toLocaleDateString('vi-VN');
-    }
+    };
 
     return (
         <Box sx={style.accpetWorkSection}>
@@ -193,14 +228,13 @@ const AcceptWork = () => {
                     )}
                 </Grid>
 
-
                 {open && (
                     <Modal
                         open={open}
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <WorkDetails selectWork={selectedWork} handleClose={handleClose} />
+                        <WorkDetails selectWork={selectedWork} onWorkListRefresh={fetchWorkList} handleClose={handleClose} />
                     </Modal>
                 )}
 
@@ -215,7 +249,7 @@ const AcceptWork = () => {
                 </Box>
             </Box>
         </Box>
-    )
-}
+    );
+};
 
 export default AcceptWork;

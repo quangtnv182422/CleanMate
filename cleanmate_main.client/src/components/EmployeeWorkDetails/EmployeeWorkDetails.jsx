@@ -58,7 +58,6 @@ const EmployeeWorkDetails = () => {
     const onAcceptWork = async () => {
         try {
             await handleAcceptWork();
-            toast.success("Công việc đã được nhận thành công!");
         } catch (error) {
             toast.error("Đã xảy ra lỗi khi nhận công việc.");
         }

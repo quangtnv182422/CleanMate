@@ -9,8 +9,9 @@ namespace CleanMate_Main.Server.Common
         // time interval between each work shift calculated in minutes
         public static readonly decimal COMMISSION_PERCENTAGE = 0.55m; 
         //Commission percentage 
-        public static readonly decimal MINIMUM_DEBIT_AMOUNT = 500000; //toi thieu can 500k coin
-        public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000; //nap toi thieu 200k coin
+        public static readonly decimal MINIMUM_DEBIT_AMOUNT = 200000m; //toi thieu can 200k coin
+        public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000m; //nap toi thieu 200k coin
+        public static readonly decimal MINIMUM_COINS_TO_ACCEPT_WORK = 200000m; //toi thieu 200k coin de nhan viec
         public static readonly string DEFAULT_ADMIN = "";
         public static readonly string DEFAULT_CUSTOMER = "";
         public static readonly string DEFAULT_CLEANER = "";
@@ -32,7 +33,7 @@ namespace CleanMate_Main.Server.Common
                 CommonConstants.BookingStatus.CANCEL => "Đã huỷ",
                 CommonConstants.BookingStatus.ACCEPT => "Đã nhận",
                 CommonConstants.BookingStatus.IN_PROGRESS => "Đang thực hiện",
-                CommonConstants.BookingStatus.PENDING_DONE => "Chờ xác nhận",
+                CommonConstants.BookingStatus.PENDING_DONE => "Chờ khách hàng xác nhận",
                 CommonConstants.BookingStatus.DONE => "Hoàn thành",
                 _ => "Không xác định"
             };

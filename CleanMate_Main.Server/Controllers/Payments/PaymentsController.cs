@@ -2,6 +2,7 @@
 using CleanMate_Main.Server.Models.DTO.Payos;
 using CleanMate_Main.Server.Models.DTO.vnPay;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Proxy.Payos;
 using CleanMate_Main.Server.Proxy.vnPay;
 using CleanMate_Main.Server.Services.Bookings;
@@ -127,7 +128,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 {
                     BookingId = createdBooking.BookingId,
                     Amount = bookingDto.TotalPrice.Value,
-                    PaymentMethod = "vnPay",
+                    PaymentMethod = PaymentType.vnPay,
                     PaymentStatus = "Unpaid",
                     CreatedAt = DateTime.Now
                 };
@@ -170,7 +171,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 {
                     BookingId = createdBooking.BookingId,
                     Amount = bookingDto.TotalPrice.Value,
-                    PaymentMethod = "PayOS",
+                    PaymentMethod = PaymentType.PayOS,
                     PaymentStatus = "Unpaid",
                     CreatedAt = DateTime.Now
                 };
@@ -237,7 +238,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 {
                     BookingId = createdBooking.BookingId,
                     Amount = bookingDto.TotalPrice.Value,
-                    PaymentMethod = "CM-Coin",
+                    PaymentMethod = PaymentType.CleanMate_Coin,
                     PaymentStatus = "Paid",
                     CreatedAt = DateTime.Now
                 };
@@ -280,6 +281,66 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 return StatusCode(500, new { message = $"Lỗi khi xử lý đặt lịch và thanh toán: {ex.Message}" });
             }
         }
+
+        [HttpPost("booking-create-cash")]
+        public async Task<IActionResult> CreateBookingAndPaymentByCash([FromBody] BookingCreateDTO bookingDto)
+        {
+            if (bookingDto == null || bookingDto.TotalPrice == null || bookingDto.TotalPrice <= 0)
+                return BadRequest("Thông tin đặt lịch không hợp lệ.");
+
+            // Lấy userId từ Claims
+            var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userMail))
+                return Unauthorized("Không tìm thấy thông tin người dùng.");
+
+            var user = await _userManager.FindByEmailAsync(userMail);
+            if (user == null)
+                return Unauthorized("Người dùng không tồn tại.");
+
+            try
+            {
+                // 1. Tạo booking
+                var createdBooking = await _bookingService.AddNewBookingAsync(bookingDto);
+
+                // 2. Tạo payment với status = Paid
+                var payment = new Payment
+                {
+                    BookingId = createdBooking.BookingId,
+                    Amount = bookingDto.TotalPrice.Value,
+                    PaymentMethod = PaymentType.Cash,
+                    PaymentStatus = "Unpaid",
+                    CreatedAt = DateTime.Now
+                };
+
+                var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
+
+                // 4. Lấy chi tiết booking
+                var booking = await _bookingService.GetBookingByIdAsync(createdBooking.BookingId);
+                if (booking == null)
+                {
+                    return StatusCode(500, new { message = "Không thể lấy thông tin booking." });
+                }
+
+                // 5. Chuẩn bị dữ liệu để gửi về frontend
+                var bookingDetails = new
+                {
+                    success = true,
+                    date = booking.Date.ToString("dd/MM/yyyy"),
+                    time = $"{booking.StartTime:hh:mm tt} - {booking.StartTime.AddHours(booking.ServicePrice?.Duration?.DurationTime ?? 2):hh:mm tt}",
+                    service = booking.ServicePrice?.Service?.Name ?? "Dịch vụ vệ sinh",
+                    cleaner = booking.Cleaner?.FullName ?? "Chưa phân công",
+                    payment = bookingDto.TotalPrice.Value.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"
+                };
+
+                return Ok(bookingDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi khi xử lý đặt lịch và thanh toán: {ex.Message}" });
+            }
+        }
+
+
 
         [HttpGet("callback-vnpay")]
         public async Task<IActionResult> PaymentCallbackVnpay()

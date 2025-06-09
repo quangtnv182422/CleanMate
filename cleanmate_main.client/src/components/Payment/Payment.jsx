@@ -157,6 +157,8 @@ const Payment = () => {
                 endpoint = '/payments/booking-create-payos';
             } else if (selectedMethod === 'CleanMate') {
                 endpoint = '/payments/booking-create-cmcoin';
+            } else if (selectedMethod === 'cash') {
+                endpoint = '/payments/booking-create-cash';
             }
 
             const response = await fetch(endpoint, {
@@ -174,7 +176,7 @@ const Payment = () => {
                 return;
             }
 
-            if (selectedMethod === 'CleanMate') {
+            if (selectedMethod === 'CleanMate' || selectedMethod === 'cash') {
                 // Không cần URL, redirect trực tiếp tới booking-success
                 const result = await response.json();
                 if (result.success) {

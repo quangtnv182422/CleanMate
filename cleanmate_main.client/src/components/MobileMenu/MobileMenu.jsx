@@ -32,12 +32,12 @@ const menus = [
         link: '/coin/deposit',
         icon: <PaidIcon />,
     },
-    {
-        id: 3,
-        title: "Rút tiền",
-        link: '/coin/withdraw',
-        icon: <CurrencyExchangeIcon />,
-    },
+    //{
+    //    id: 3,
+    //    title: "Rút tiền",
+    //    link: '/coin/withdraw',
+    //    icon: <CurrencyExchangeIcon />,
+    //},
     {
         id: 4,
         title: 'Về chúng tôi',

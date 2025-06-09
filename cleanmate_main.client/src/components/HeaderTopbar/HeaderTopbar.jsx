@@ -133,7 +133,7 @@ const HeaderTopbar = () => {
                                                     <div className="cleanmate-wallet-content">
                                                         <p className="cleanmate-wallet-balance">Số dư hiện tại: {formatCoin(coin)}</p>
                                                         <div className="cleanmate-wallet-button">
-                                                            <button className="btn withdraw-button" onClick={() => navigate('/coin/withdraw')}>Rút Tiền</button>
+                                                            {/*<button className="btn withdraw-button" style={{}} onClick={() => navigate('/coin/withdraw')}>Rút Tiền</button>*/}
                                                             <button className="btn deposit-button" onClick={() => navigate('/coin/deposit')}>Nạp Tiền</button>
                                                         </div>
                                                     </div>

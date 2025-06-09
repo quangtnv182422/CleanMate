@@ -210,7 +210,9 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
-                entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+                entity.Property(e => e.PaymentMethod)
+                     .HasConversion<string>()
+                     .HasMaxLength(50);
                 entity.Property(e => e.PaymentStatus)
                     .HasMaxLength(50)
                     .HasColumnName("Payment_Status");

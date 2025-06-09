@@ -26,14 +26,17 @@ namespace CleanMate_Main.Server.Services.Payments
             return await _paymentRepo.GetPaymentsByBookingIdAsync(bookingId);
         }
 
-        public async Task<PaymentDTO?> MarkBookingAsPaidAsync(int paymentId, string transaction)
+        public async Task<PaymentDTO?> MarkBookingAsPaidAsync(int paymentId, string? transaction)
         {
             var payment = await _paymentRepo.FindPaymentById(paymentId);
             if (payment == null)
                 return null;
 
             payment.PaymentStatus = "Paid";
-            payment.TransactionId = transaction;
+            if (transaction != null)
+            {
+                payment.TransactionId = transaction;
+            }
 
             var updatedPayment = await _paymentRepo.UpdatePaymentAsync(payment);
 

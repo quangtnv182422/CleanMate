@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -7,19 +7,84 @@ import {
     Rating,
     Chip,
     Divider,
-    TextField
+    TextField,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@mui/material';
+import { styles } from './style';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import { toast } from 'react-toastify';
 import PendingIcon from '@mui/icons-material/Pending';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { styles } from './style';
 import serviceImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
 
-const OrderDetails = ({ selectedOrder }) => {
+const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
     const [openFeedback, setOpenFeedback] = useState(false);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [connection, setConnection] = useState(null);
+
+    useEffect(() => {
+        const newConnection = new HubConnectionBuilder()
+            .withUrl('/workHub') // Ensure this matches your server's SignalR hub endpoint
+            .withAutomaticReconnect()
+            .configureLogging('debug') // Enable debug logging for SignalR
+            .build();
+        setConnection(newConnection);
+    }, []);
+
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => console.log('SignalR Conne`cted Successfully'))
+                .catch(err => console.error('SignalR Connection Error: ', err));
+
+            connection.on('ReceiveWorkUpdate', () => {
+                console.log('WorkUpdated event received');
+                //fetchWorkDetails(); // Refetch data for this component
+                if (onOrderListRefresh) onOrderListRefresh(); // Notify parent to refresh list
+            });
+
+            // Cleanup on unmount
+            return () => {
+                connection.off('ReceiveWorkUpdate');
+                connection.stop();
+            };
+        }
+    }, [connection, onOrderListRefresh]);
+    console.log(selectedOrder)
+
+    const handleConfirmCompleteWork = async () => {
+        try {
+            const res = await fetch(`/bookings/${selectedOrder.bookingId}/confirm-complete-work`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = await res.json();
+            if (res.ok && result.success) {
+                toast.success('Bạn đã xác nhận công việc thành công.');
+                //fetchWorkDetails(); // Manual refresh as a fallback
+                if (onOrderListRefresh) onOrderListRefresh(); // Trigger list refresh manually
+                
+            } else {
+                toast.error(result.message || 'Không thể xác nhận công việc.');
+            }
+        } catch (error) {
+            console.error('Lỗi khi xác nhận công việc:', error);
+            toast.error('Có lỗi xảy ra khi gọi API.');
+        }
+    }
+
     const handleOpenFeedback = () => {
         setOpenFeedback(true);
     }
@@ -54,8 +119,8 @@ const OrderDetails = ({ selectedOrder }) => {
                 "Không sạch sẽ",
                 "Không đúng giờ",
                 "Không mặc đồng phục",
-                "Khác",
             ],
+            inputText: true,
         },
         {
             star: 2,
@@ -65,8 +130,8 @@ const OrderDetails = ({ selectedOrder }) => {
                 "Làm chưa kỹ",
                 "Không sạch sẽ",
                 "Không mặc đồng phục",
-                "Khác",
             ],
+            inputText: true,
         },
         {
             star: 3,
@@ -75,8 +140,8 @@ const OrderDetails = ({ selectedOrder }) => {
                 "Làm chưa kỹ",
                 "Chưa thân thiện",
                 "Không mặc đồng phục",
-                "Khác",
             ],
+            inputText: true,
         },
         {
             star: 4,
@@ -84,8 +149,8 @@ const OrderDetails = ({ selectedOrder }) => {
                 "Cần cải thiện thái độ",
                 "Cần sạch sẽ hơn",
                 "Cần đúng giờ hơn",
-                "Khác",
             ],
+            inputText: true,
         },
         {
             star: 5,
@@ -95,8 +160,8 @@ const OrderDetails = ({ selectedOrder }) => {
                 "Thái độ chuyên nghiệp",
                 "Rất sạch sẽ",
                 "Sẽ giới thiệu cho người khác",
-                "Khác",
             ],
+            inputText: false,
         },
     ];
 
@@ -170,8 +235,13 @@ const OrderDetails = ({ selectedOrder }) => {
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
-                    <Typography sx={styles.contentTitle}>Nhân viên</Typography>
+                    <Typography sx={styles.contentTitle}>Số lượng Nhân viên</Typography>
                     <Typography sx={styles.content}>1 nhân viên làm trong {selectedOrder.durationTime} giờ</Typography>
+                </Box>
+
+                <Box sx={{ mb: 1 }}>
+                    <Typography sx={styles.contentTitle}>Nhân viên</Typography>
+                    <Typography sx={styles.content}>{selectedOrder?.cleanerName}</Typography>
                 </Box>
 
                 <Box sx={{ mb: 1 }}>
@@ -208,9 +278,9 @@ const OrderDetails = ({ selectedOrder }) => {
                 </Box>
             </Box>
 
-            {selectedOrder.status === 'completed' && (
+            {selectedOrder.status === 'pending' && (
                 <Box sx={styles.paymentButton}>
-                    <Button variant="contained" color="primary" onClick={handleOpenFeedback}>Đánh giá dịch vụ</Button>
+                    <Button variant="contained" color="primary" onClick={() => setOpenConfirm(true)}>Xác nhận hoàn thành</Button>
                 </Box>
             )}
 
@@ -278,17 +348,23 @@ const OrderDetails = ({ selectedOrder }) => {
                                     ))
                                 }
                             </Box>
-                            {selectedReasons.includes("Khác") && (
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    minRows={3}
-                                    sx={{ mt: 2 }}
-                                    placeholder="Vui lòng nhập lý do khác..."
-                                    value={otherReason}
-                                    onChange={(e) => setOtherReason(e.target.value)}
-                                />
-                            )}
+                            {(() => {
+                                const selectedFeedback = feedbackReason.find(item => item.star === ratingValue);
+                                if (selectedFeedback?.inputText) {
+                                    return (
+                                        <TextField
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                            sx={{ mt: 2 }}
+                                            placeholder="Vui lòng nhập lý do khác..."
+                                            value={otherReason}
+                                            onChange={(e) => setOtherReason(e.target.value)}
+                                        />
+                                    );
+                                }
+                                return null;
+                            })()}
                         </Box>
                     )}
 
@@ -309,6 +385,30 @@ const OrderDetails = ({ selectedOrder }) => {
                     <Button variant="contained" color="primary">Thanh toán lại</Button>
                 </Box>
             )}
+            {/* Confirmation Dialog */}
+            <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+                <DialogTitle>Xác nhận hoàn thành</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn có chắc chắn xác nhận công việc này đã hoàn thành?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenConfirm(false)} color="error">
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            handleConfirmCompleteWork();
+                            handleOpenFeedback();
+                        }}
+                        color="primary"
+                        variant="contained"
+                    >
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     )
 }

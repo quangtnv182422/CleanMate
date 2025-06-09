@@ -11,10 +11,11 @@ import {
     DialogContentText,
     DialogActions
 } from '@mui/material';
+import { toast } from 'react-toastify';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
-const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
+const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [connection, setConnection] = useState(null);
     const [workData, setWorkData] = useState(selectWork); // State to hold work data
@@ -98,7 +99,7 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
         } else if (workData.address) {
             window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(workData.address)}`, '_blank');
         } else {
-            alert("Không tìm thấy thông tin địa điểm.");
+            toast.error("Không tìm thấy thông tin địa điểm.");
         }
     };
 
@@ -114,15 +115,16 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
 
             const result = await res.json();
             if (res.ok && result.success) {
-                alert('Bạn đã bắt đầu công việc.');
+                toast.success('Bạn đã bắt đầu công việc.');
                 fetchWorkDetails(); // Manual refresh as a fallback
                 if (onWorkListRefresh) onWorkListRefresh(); // Trigger list refresh manually
+                handleClose();
             } else {
-                alert(result.message || 'Không thể bắt đầu công việc.');
+                toast.error(result.message || 'Không thể bắt đầu công việc.');
             }
         } catch (error) {
             console.error('Lỗi khi bắt đầu công việc:', error);
-            alert('Có lỗi xảy ra khi gọi API.');
+            toast.error('Có lỗi xảy ra khi gọi API.');
         }
     };
 
@@ -136,16 +138,17 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
             });
 
             if (response.ok) {
-                alert("Công việc đã được xác nhận hoàn thành!");
+                toast.success("Công việc đã được xác nhận hoàn thành!");
                 fetchWorkDetails(); // Manual refresh as a fallback
                 if (onWorkListRefresh) onWorkListRefresh(); // Trigger list refresh manually
+                handleClose();
             } else {
                 const error = await response.text();
-                alert(`Có lỗi xảy ra: ${error}`);
+                toast.error(`Có lỗi xảy ra: ${error}`);
             }
         } catch (error) {
             console.error("Error completing work:", error);
-            alert("Không thể kết nối tới máy chủ.");
+            toast.error("Không thể kết nối tới máy chủ.");
         }
     };
 
@@ -159,16 +162,32 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
             </Box>
             <Box sx={styles.informationContent}>
                 <Box sx={{ mb: 1 }}>
+                    <Typography sx={styles.contentTitle}>Dịch vụ</Typography>
+                    <Typography sx={styles.content}>khách hàng chọn {workData.serviceName}</Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                    <Typography sx={styles.contentTitle}>Thông tin dịch vụ</Typography>
+                    <Typography sx={styles.content}>Dọn {workData.serviceDescription}</Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Ngày làm việc</Typography>
-                    <Typography sx={styles.content}>Bắt đầu lúc {formatTime(workData.startTime)} giờ ngày {formatDate(workData.date)}</Typography>
+                    <Typography sx={styles.content}>Bắt đầu lúc {workData.startTime} ngày {workData.date}</Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                    <Typography sx={styles.contentTitle}>Khách hàng</Typography>
+                    <Typography sx={styles.content}>{workData.customerFullName}</Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                    <Typography sx={styles.contentTitle}>Số điện thoại</Typography>
+                    <Typography sx={styles.content}>{workData.customerPhoneNumber}</Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Địa chỉ</Typography>
                     <Typography sx={styles.content}>{workData.address}</Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
-                    <Typography sx={styles.contentTitle}>Nhân viên</Typography>
-                    <Typography sx={styles.content}>{workData.employee} nhân viên làm trong {workData.duration}</Typography>
+                    <Typography sx={styles.contentTitle}>Số lượng nhân viên</Typography>
+                    <Typography sx={styles.content}>1 nhân viên làm trong {workData.duration}</Typography>
                 </Box>
                 <Box sx={{ mb: 1 }}>
                     <Typography sx={styles.contentTitle}>Ghi chú</Typography>
@@ -198,7 +217,7 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
 
             {/* Buttons based on status */}
             {workData.statusId === 3 && (
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 3, mb: 3, mx: 1 }}>
                     <Button variant="outlined" color="error">
                         Hủy việc
                     </Button>
@@ -211,7 +230,7 @@ const WorkDetails = ({ selectWork, onWorkListRefresh }) => {
                 </Box>
             )}
             {workData.statusId === 4 && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 3 }}>
                     <Button variant="contained" color="success" onClick={() => setConfirmOpen(true)}>
                         Xác nhận hoàn thành công việc
                     </Button>

@@ -27,7 +27,7 @@ const InProgressWork = () => {
     const [open, setOpen] = useState(false);
     const [work, setWork] = useState([]);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState(4);
+    const [status, setStatus] = useState(2);
     const [selectedWork, setSelectedWork] = useState(null);
     const { statusList } = useContext(BookingStatusContext);
     const { user } = useAuth();
@@ -136,21 +136,6 @@ const InProgressWork = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         sx={{ width: 200 }}
                     />
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
-                        <InputLabel id="status-select-label">Trạng thái</InputLabel>
-                        <Select
-                            labelId="status-select-label"
-                            value={status}
-                            onChange={handleStatusChange}
-                            label="Trạng thái"
-                        >
-                            {statusList.filter((statusItem) => statusItem.id >= 2).map((statusItem) => (
-                                <MenuItem key={statusItem.id} value={statusItem.id}>
-                                    {statusItem.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Box>
 
                 <Grid container spacing={2} sx={{ mt: 1 }}>

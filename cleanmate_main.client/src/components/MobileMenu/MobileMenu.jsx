@@ -9,6 +9,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import ArticleIcon from '@mui/icons-material/Article';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import PaidIcon from '@mui/icons-material/Paid';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import userAvatar from '../../images/user-image.png';
 import './style.css';
 import useAuth from '../../hooks/useAuth';
@@ -33,30 +34,36 @@ const menus = [
     },
     {
         id: 3,
+        title: "Rút tiền",
+        link: '/coin/withdraw',
+        icon: <CurrencyExchangeIcon />,
+    },
+    {
+        id: 4,
         title: 'Về chúng tôi',
         link: '/about',
         icon: <InfoIcon />,
     },
     {
-        id: 4,
+        id: 5,
         title: 'Dịch vụ',
         link: '/service',
         icon: <BuildIcon />,
     },
     {
-        id: 5,
+        id: 6,
         title: 'Lịch sử đặt dịch vụ',
         link: '/order-history',
         icon: <HistoryIcon />,
     },
     {
-        id: 6,
+        id: 7,
         title: 'Blog',
         link: '/blog',
         icon: <ArticleIcon />,
     },
     {
-        id: 7,
+        id: 8,
         title: 'Liên hệ',
         link: '/contact',
         icon: <ContactMailIcon />,
@@ -121,7 +128,7 @@ const MobileMenu = () => {
 
                 <ul className="responsivemenu">
                     {menus.map((item, mn) => {
-                        const isProtected = item.link === '/order-history';
+                        const isProtected = item.link === '/order-history' || item.link === '/coin/deposit' || item.link === '/coin/withdraw';
                         return (
                             <Box sx={{ display: 'flex', alignItems: 'center', paddingLeft: 1 }}>
                                 <ListItemIcon sx={{ minWidth: 32, mr: 1 }}>{item.icon}</ListItemIcon>
@@ -130,7 +137,7 @@ const MobileMenu = () => {
                                         <Box
                                             onClick={() => {
                                                 if (!user) {
-                                                    toast.error("Vui lòng đăng nhập để xem lịch sử đặt dịch vụ");
+                                                    toast.error("Vui lòng đăng nhập để sử dụng chức năng này");
                                                     navigate("/login");
                                                 } else {
                                                     navigate(item.link);

@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
+import * as signalR from '@microsoft/signalr';
 import {
     Box,
     Grid,
@@ -12,26 +13,8 @@ import {
 import { style } from './style';
 import OrderDetails from '../../main-component/OrderDetails/OrderDetails';
 import useAuth from '../../hooks/useAuth';
+import ReactLoading from 'react-loading';
 import axios from 'axios';
-
-const mockOrders = Array(30).fill(null).map((_, index) => ({
-    id: `#362689FG-${index + 1}`,
-    service: 'Dọn dẹp theo giờ',
-    startTime: '10',
-    date: '20/5/2025',
-    price: 200000,
-    duration: 2,
-    note: 'Nhà có mèo, dọn kỹ gầm bàn, gầm giường, và các góc khuất khác. Không cần dọn bếp vì đã có người dọn.',
-    name: 'Hoàng Tiến Dũng',
-    address: 'Số nhà 30, Nguyễn Sơn, Bồ Đề, Long Biên, Hà Nội',
-    payment: 'Tiền mặt',
-    employee: 1,
-    status:
-        index % 4 === 0 ? 'canceled' :
-            index % 3 === 0 ? 'paymentFail' :
-                index % 2 === 1 ? 'active' :
-                    'completed',
-}));
 
 const ORDERS_PER_PAGE = 6;
 
@@ -110,35 +93,71 @@ const OrderHistorySection = () => {
     const [open, setOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [bookings, setBookings] = useState([]);
+    const [connection, setConnection] = useState(null);
+    const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
     console.log(bookings)
 
+    const fetchBookings = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get('/bookings/get-bookings', {
+                params: {
+                    userId: user.id,
+                },
+            });
+
+            const rawData = response.data;
+
+            // 3. Chuyển đổi status code thành status key
+            const convertedData = rawData.map(item => ({
+                ...item,
+                status: statusMap[item.bookingStatusId] || 'unknown',
+            }));
+
+            setBookings(convertedData);
+        } catch (error) {
+            console.error('Lỗi khi fetch bookings:', error);
+        } finally {
+            setLoading(false)
+        }
+    }, [user?.id])
+
+
     useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                const response = await axios.get('/bookings/get-bookings', {
-                    params: {
-                        userId: user.id,
-                    },
-                });
-
-                const rawData = response.data;
-
-                // 3. Chuyển đổi status code thành status key
-                const convertedData = rawData.map(item => ({
-                    ...item,
-                    status: statusMap[item.bookingStatusId] || 'unknown',
-                }));
-
-                setBookings(convertedData);
-            } catch (error) {
-                console.error('Lỗi khi fetch bookings:', error);
-            }
-        };
-
         fetchBookings();
-    }, [user])
+    }, [fetchBookings])
+
+    // Khởi tạo connection trong useEffect
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/workHub")
+            .build();
+        setConnection(newConnection);
+    }, []);
+
+    // Kết nối và lắng nghe sự kiện
+    useEffect(() => {
+        if (connection) {
+            if (connection.state === signalR.HubConnectionState.Disconnected) {
+                connection.start()
+                    .then(() => console.log('SignalR Connected'))
+                    .catch(err => console.error('SignalR Connection Error: ', err));
+            }
+
+            connection.on('ReceiveBookingUpdate', () => {
+                fetchBookings();
+            });
+
+            return () => {
+                connection.off('ReceiveBookingUpdate');
+                if (connection.state !== signalR.HubConnectionState.Disconnected) {
+                    connection.stop();
+                }
+            };
+        }
+    }, [connection, fetchBookings]);
 
     const handleOpenOrderDetails = (order) => {
         setOpen(true);
@@ -192,131 +211,155 @@ const OrderHistorySection = () => {
     }
 
     return (
-        <Box sx={style.orderHistorySection}>
-            <Box className="container" sx={style.container}>
-                {/* Tabs */}
-                <Grid container spacing={2} sx={{ mb: 4 }}>
-                    {['total', 'accepted', 'inProgress', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
-                        const selected = selectedTab === type;
-                        const colors = colorMap[type];
-                        return (
-                            <Grid item xs={12} sm={2.4} key={type}>
-                                <Card
-                                    onClick={() => handleSelect(type)}
-                                    sx={{
-                                        ...style.tabCard,
-                                        borderColor: colors.border,
-                                        backgroundColor: colors.background,
-                                        filter: selected ? 'brightness(0.8)' : 'brightness(1)',
-                                        color: colors.color,
-                                        '&:hover': {
-                                            filter: 'brightness(0.8)',
-                                        },
-                                    }}
-                                >
-                                    <CardContent sx={{
-                                        '@media (min-width: 600px)': {
-                                            p: 1,
-                                        }
-                                    }}>
-                                        <Typography
-                                            variant="h6"
-                                            sx={{
-                                                color: 'inherit',
-                                                mb: 1,
-                                                '@media (max-width: 600px)': {
-                                                    fontSize: '12px',
-                                                },
-                                            }}>
-                                            {type === 'total'
-                                                ? 'Tổng số đơn'
-                                                : type === "inProgress"
-                                                    ? "Đang thực hiện"
-                                                    : type === "accepted"
-                                                        ? "Đơn đã nhận"
-                                                        : type === 'pending'
-                                                            ? 'Chờ xác nhận'
-                                                            : type === 'paymentFail'
-                                                                ? 'Thanh toán thất bại'
-                                                                : type === 'completed'
-                                                                    ? 'Đơn hoàn thành'
-                                                                    : 'Đơn đã hủy'}
-                                        </Typography>
-                                        <Typography variant="h4" fontWeight={600} sx={{ color: 'inherit' }}>
-                                            {stats[type]}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        );
-                    })}
-                </Grid>
-
-                {/* Stats Summary */}
-                <Box sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
-                    <Typography variant="body1" color="textSecondary">
-                        Tổng: {stats.total} | Chờ xác nhận: {stats.pending} | Đơn hoàn thành: {stats.completed} | Đơn đã hủy: {stats.canceled} | Thanh toán thất bại: {stats.paymentFail}
-                    </Typography>
+        <>
+            {loading && (
+                <Box sx={style.spinnerContainer}>
+                    <ReactLoading type="spinningBubbles" color="#122B82" width={100} height={100} />
                 </Box>
+            )}
+            <Box sx={style.orderHistorySection}>
+                <Box className="container" sx={style.container}>
+                    {/* Tabs */}
+                    <Grid container spacing={2} sx={{ mb: 4 }}>
+                        {['total', 'active', 'accepted', 'inProgress', 'pending', 'completed', 'canceled', 'paymentFail'].map((type) => {
+                            const selected = selectedTab === type;
+                            const colors = colorMap[type];
+                            return (
+                                <Grid item xs={12} sm={2.4} key={type}>
+                                    <Card
+                                        onClick={() => handleSelect(type)}
+                                        sx={{
+                                            ...style.tabCard,
+                                            borderColor: colors.border,
+                                            backgroundColor: colors.background,
+                                            filter: selected ? 'brightness(0.8)' : 'brightness(1)',
+                                            color: colors.color,
+                                            '&:hover': {
+                                                filter: 'brightness(0.8)',
+                                            },
+                                        }}
+                                    >
+                                        <CardContent sx={{
+                                            '@media (min-width: 600px)': {
+                                                p: 1,
+                                            }
+                                        }}>
+                                            <Typography
+                                                variant="h6"
+                                                sx={{
+                                                    color: 'inherit',
+                                                    mb: 1,
+                                                    '@media (max-width: 600px)': {
+                                                        fontSize: '12px',
+                                                    },
+                                                }}>
+                                                {type === 'total'
+                                                    ? 'Tổng số đơn'
+                                                    : type === "active"
+                                                        ? 'Việc mới'
+                                                        : type === "inProgress"
+                                                            ? "Đang thực hiện"
+                                                            : type === "accepted"
+                                                                ? "Đơn đã nhận"
+                                                                : type === 'pending'
+                                                                    ? 'Chờ xác nhận'
+                                                                    : type === 'paymentFail'
+                                                                        ? 'Thanh toán thất bại'
+                                                                        : type === 'completed'
+                                                                            ? 'Đơn hoàn thành'
+                                                                            : 'Đơn đã hủy'}
+                                            </Typography>
+                                            <Typography variant="h4" fontWeight={600} sx={{ color: 'inherit' }}>
+                                                {stats[type]}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
 
-                {/* List of Orders */}
-                <Grid container spacing={2}>
-                    {displayedOrders.map((order, idx) => (
-                        <Grid item xs={12} sm={6} md={4} key={idx}>
-                            <Card sx={style.orderCard} onClick={() => handleOpenOrderDetails(order)}>
-                                <CardContent>
-                                    <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>Bắt đầu lúc {formatTime(order.startTime)} giờ ngày {formatDate(order.date)}</Typography>
-                                    <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.userName}</Typography>
-                                    <Typography variant="subtitle2" color="textSecondary">{order.addressFormatted}</Typography>
-                                    <Box sx={style.priceSection}>
-                                        <Typography variant="h6" sx={{ color: '#1976D2' }}>Số tiền: {formatPrice(order.totalPrice)}</Typography>
-                                        <Typography
-                                            variant="subtitle2"
-                                            sx={{
-                                                ...style.status,
-                                                color:
-                                                    order.status === 'active' ? '#1976D2' :
-                                                        order.status === 'completed' ? '#5CBB52' :
-                                                            order.status === 'pending' ? '#FBC11B' :
-                                                                order.status === 'canceled' ? '#E4293D' :
-                                                                    order.status === 'paymentFail' ? '#E4293D' :
-                                                                        order.status === 'accepted' ? '#4FC3F7' :
-                                                                            order.status === 'inProgress' ? '#9575CD' :
-                                                                                '#E4293D',
-                                                backgroundColor: colorMap[order.status]?.blurBackground || "#fff",
-                                                borderColor: colorMap[order.status]?.border || "#ccc",
-                                            }}
-                                        >
-                                            {statusLabelMap[order.status] || 'Không xác định'}
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Card>
+                    {/* Stats Summary */}
+                    <Box sx={{ mt: 4, mb: 4, textAlign: 'center' }}>
+                        <Typography variant="body1" color="textSecondary">
+                            Tổng: {stats.total} | Chờ xác nhận: {stats.pending} | Đơn hoàn thành: {stats.completed} | Đơn đã hủy: {stats.canceled} | Thanh toán thất bại: {stats.paymentFail}
+                        </Typography>
+                    </Box>
+
+                    {/* List of Orders */}
+                    <Grid container spacing={2}>
+                        <Grid container spacing={2}>
+                            {displayedOrders.length === 0 ? (
+                                <Grid item xs={12}>
+                                    <Typography variant="h6" align="center" color="textSecondary" sx={{ mt: 4 }}>
+                                        Không có đơn hàng nào.
+                                    </Typography>
+                                </Grid>
+                            ) : (
+                                displayedOrders.map((order, idx) => (
+                                    <Grid item xs={12} sm={6} md={4} key={idx}>
+                                        <Card sx={style.orderCard} onClick={() => handleOpenOrderDetails(order)}>
+                                            <CardContent>
+                                                <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
+                                                    Bắt đầu lúc {formatTime(order.startTime)} giờ ngày {formatDate(order.date)}
+                                                </Typography>
+                                                <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.userName}</Typography>
+                                                <Typography variant="subtitle2" color="textSecondary">{order.addressFormatted}</Typography>
+                                                <Box sx={style.priceSection}>
+                                                    <Typography variant="h6" sx={{ color: '#1976D2' }}>
+                                                        Số tiền: {formatPrice(order.totalPrice)}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="subtitle2"
+                                                        sx={{
+                                                            ...style.status,
+                                                            color:
+                                                                order.status === 'active' ? '#1976D2' :
+                                                                    order.status === 'completed' ? '#5CBB52' :
+                                                                        order.status === 'pending' ? '#FBC11B' :
+                                                                            order.status === 'canceled' ? '#E4293D' :
+                                                                                order.status === 'paymentFail' ? '#E4293D' :
+                                                                                    order.status === 'accepted' ? '#4FC3F7' :
+                                                                                        order.status === 'inProgress' ? '#9575CD' :
+                                                                                            '#E4293D',
+                                                            backgroundColor: colorMap[order.status]?.blurBackground || "#fff",
+                                                            borderColor: colorMap[order.status]?.border || "#ccc",
+                                                        }}
+                                                    >
+                                                        {statusLabelMap[order.status] || 'Không xác định'}
+                                                    </Typography>
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))
+                            )}
                         </Grid>
-                    ))}
-                </Grid>
 
-                {open && (
-                    <Modal
-                        open={open}
-                        onClose={handleClose}
-                        disableAutoFocus
-                    >
-                        <OrderDetails selectedOrder={selectedOrder} />
-                    </Modal>
-                )}
+                    </Grid>
 
-                {/* Pagination */}
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Pagination
-                        count={totalPages}
-                        page={page}
-                        onChange={(e, val) => setPage(val)}
-                        color="primary"
-                    />
+                    {open && (
+                        <Modal
+                            open={open}
+                            onClose={handleClose}
+                            disableAutoFocus
+                        >
+                            <OrderDetails selectedOrder={selectedOrder} handleClose={handleClose} />
+                        </Modal>
+                    )}
+
+                    {/* Pagination */}
+                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                        <Pagination
+                            count={totalPages}
+                            page={page}
+                            onChange={(e, val) => setPage(val)}
+                            color="primary"
+                        />
+                    </Box>
                 </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

@@ -591,6 +591,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckIcon from '@mui/icons-material/Check';
+import PaidIcon from '@mui/icons-material/Paid';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import userImage from '../../images/user-image.png';
 import useAuth from '../../hooks/useAuth';
 import EmployeeWorkDetails from '../../components/EmployeeWorkDetails/EmployeeWorkDetails';
@@ -599,6 +603,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PendingWork from '../../components/PendingWork/PendingWork';
 import InProgressWork from '../../components/InProgressWork/InProgressWork';
 import Revenue from '../../components/Revenue/Revenue';
+import DepositCoin from '../../components/Coin/DepositCoin';
+import WithdrawCoin from '../../components/Coin/WithdrawCoin';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -909,7 +915,9 @@ const WorkList = () => {
             case 4:
                 return <Revenue />;
             case 5:
-                return <Revenue />;
+                return <DepositCoin />;
+            case 6:
+                return <WithdrawCoin />;
             default:
                 return <WorkListPage />;
         }
@@ -938,16 +946,24 @@ const WorkList = () => {
             icon: <PlaylistAddCheckOutlinedIcon sx={style.drawerIcon} />,
         },
         {
-            title: 'Công việc chờ xác nhận',
-            icon: <PendingActionsIcon sx={style.drawerIcon} />,
+            title: 'Công việc đã hoàn thành',
+            icon: <CheckIcon sx={style.drawerIcon} />,
         },
         {
-            title: 'Công việc đang thực hiện',
-            icon: <FormatListBulletedIcon sx={style.drawerIcon} />
+            title: 'Công việc đã hủy',
+            icon: <CancelIcon sx={style.drawerIcon} />
         },
         {
             title: 'Thu nhập',
             icon: <CreditCardOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Nạp tiền',
+            icon: <PaidIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Rút tiền',
+            icon: <CurrencyExchangeIcon sx={style.drawerIcon} />,
         },
         {
             title: 'Settings',

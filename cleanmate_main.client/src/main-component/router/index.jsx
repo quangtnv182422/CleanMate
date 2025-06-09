@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation} from "react-router-dom";
 
 import Homepage from '../HomePage/HomePage'
@@ -40,6 +40,7 @@ import DepositCoin from '../../components/Coin/DepositCoin';
 import OrderHistory from '../OrderHistory/OrderHistory';
 import Loading from '../../components/Loading/Loading';
 import BookingDetails from '../../components/BookingDetails/BookingDetails';
+import WithdrawCoin from '../../components/Coin/WithdrawCoin';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -81,6 +82,7 @@ const AllRoute = () => {
                 <Route path="/order/payment" element={<Payment />} />
                 <Route path="/booking-service/choose-address" element={<GoogleMapAutocomplete />} />
                 <Route path="/coin/deposit" element={<DepositCoin />} />
+                <Route path="/coin/withdraw" element={<WithdrawCoin />} />
                 <Route path="/order-history" element={<OrderHistory />} />
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/booking-details" element={<BookingDetails />} />

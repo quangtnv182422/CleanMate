@@ -89,30 +89,6 @@ const AcceptWork = () => {
     }, [setWork, role, status]);
 
     const handleClose = () => setOpen(false);
-    const fetchWorkList = async () => {
-        if (role !== "Cleaner") return;
-        try {
-            const url = status ? `/worklist?status=${status}` : '/worklist';
-
-            const response = await fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const workItems = await response.json();
-            setWork(workItems);
-
-        } catch (error) {
-            console.error('Error fetching work list:', error);
-        }
-    };
 
     const filteredWork = work.filter((work) => {
         return work.customerFullName.toLowerCase().includes(search.toLowerCase());
@@ -168,7 +144,7 @@ const AcceptWork = () => {
                             onChange={handleStatusChange}
                             label="Trạng thái"
                         >
-                            {statusList.filter((statusItem) => statusItem.id >= 2).map((statusItem) => (
+                            {statusList.filter((statusItem) => statusItem.id !== 2 && statusItem.id !== 6 && statusItem.id !== 1).map((statusItem) => (
                                 <MenuItem key={statusItem.id} value={statusItem.id}>
                                     {statusItem.name}
                                 </MenuItem>
@@ -176,7 +152,7 @@ const AcceptWork = () => {
                         </Select>
                     </FormControl>
                 </Box>
-                
+
                 <Grid container spacing={2} sx={{ mt: 1 }}>
                     {displayedWork.length === 0 ? (
                         <Grid item xs={12}>
@@ -224,7 +200,7 @@ const AcceptWork = () => {
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <WorkDetails selectWork={selectedWork} />
+                        <WorkDetails selectWork={selectedWork} handleClose={handleClose} />
                     </Modal>
                 )}
 

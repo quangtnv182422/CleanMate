@@ -29,11 +29,7 @@ const paymentMethods = [
         id: "vnpay",
         name: "VNPay",
         logo: vnpayLogo,
-    },
-    {
-        id: "bank",
-        name: "Chuyển khoản qua ngân hàng",
-        logo: bankLogo,
+        isAvailable: false,
     },
     {
         id: "payos",
@@ -223,9 +219,9 @@ const DepositCoin = () => {
                                                 selectedMethod === method.id ? "primary.main" : "grey.300",
                                             boxShadow:
                                                 selectedMethod === method.id ? 3 : "none",
-                                            cursor: method.id === "bank" ? 'not-allowed' : 'pointer',
-                                            pointerEvents: method.id === "bank" ? 'none' : 'auto',
-                                            opacity: method.id === "bank" ? 0.5 : 1, 
+                                            cursor: method.isAvailable === false ? 'not-allowed' : 'pointer',
+                                            pointerEvents: method.isAvailable === false ? 'none' : 'auto',
+                                            opacity: method.isAvailable === false ? 0.5 : 1, 
                                             height: '120px',
                                         }}
                                     >

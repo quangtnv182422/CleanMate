@@ -14,7 +14,7 @@ const Profile = (props) => {
 
     return (
         <Fragment>
-            <Navbar />
+            {user?.roles?.[0] === "Customer" && (<Navbar />)}
             <div className="team-pg-area section-padding">
                 <div className="container">
                     <div className="team-info-wrap">
@@ -28,13 +28,20 @@ const Profile = (props) => {
                                 <div className="team-info-text">
                                     <h2>{user?.fullName}</h2>
                                     <ul>
-                                        <li>Tên người dùng: <span>{ user?.fullName }</span></li>
-                                        <li>Email:<span>{ user?.email }</span></li>
+                                        <li>Tên người dùng: <span>{user?.fullName}</span></li>
+                                        <li>Email:<span>{user?.email}</span></li>
                                         {/*<li>Experience:<span>12 Years</span></li>*/}
                                         {/*<li>Address:<span>Millington, Ave, TN 38053</span></li>*/}
                                         {/*<li>Phone:<span>+00 568 746 987</span></li>*/}
                                         {/*<li>Email:<span>youremail@gmail.com</span></li>*/}
                                         {/*<li>Fax:<span>568 746 987</span></li>*/}
+                                        {user?.roles?.[0] === "Cleaner" && (
+                                            <>
+                                                <li>Ngân hàng: <span>{user?.bankName}</span></li>
+                                                <li>Số tài khoản: <span>{user?.bankNo}</span></li>
+                                                <li>Ngân hàng: <span>{user?.bankName}</span></li>
+                                            </>
+                                        )}
                                     </ul>
                                 </div>
                             </div>

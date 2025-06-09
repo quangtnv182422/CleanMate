@@ -24,10 +24,10 @@ import SimpleReactValidator from "simple-react-validator";
 
 import { toast } from "react-toastify";
 import useAuth from "../../hooks/useAuth";
+import { useEffect } from "react";
 
 const WithdrawCoin = () => {
     const { user } = useAuth();
-    console.log(user)
     const userRole = user?.roles?.[0];
     const { banks } = useContext(AuthContext);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -37,6 +37,10 @@ const WithdrawCoin = () => {
     const [amount, setAmount] = useState(0);
     const [bankAccountNo, setBankAccountNo] = useState("");
     const navigate = useNavigate();
+
+    const handleClose = () => {
+        setOpenConfirmDialog(false)
+    }
 
     const [validator] = useState(() =>
         new SimpleReactValidator({
@@ -263,7 +267,7 @@ const WithdrawCoin = () => {
                             variant="contained"
                             color="primary"
                             size="large"
-                            onClick={() => handleSubmit}
+                            onClick={handleSubmit}
                         >
                             Rút tiền
                         </Button>

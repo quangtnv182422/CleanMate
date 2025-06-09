@@ -3,10 +3,12 @@ import { WorkContext } from '../../context/WorkProvider';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Box, Typography, Button } from '@mui/material';
 import { toast } from 'react-toastify';
+import useAuth from '../../hooks/useAuth';
 
 const EmployeeWorkDetails = () => {
     const { selectedWork, handleClose, handleAcceptWork, setData } = useContext(WorkContext);
     const [connection, setConnection] = useState(null);
+    const { user } = useAuth();
 
     // Set up SignalR connection
     useEffect(() => {
@@ -21,11 +23,10 @@ const EmployeeWorkDetails = () => {
     useEffect(() => {
         if (connection) {
             connection.start()
-                .then(() => console.log('SignalR Connected'))
                 .catch(err => console.error('SignalR Connection Error: ', err));
 
             connection.on('ReceiveWorkUpdate', (employeeId) => {
-                if (employeeId === user.id) { // Replace 'user.id' with actual employee ID from context/props
+                if (employeeId === user?.id) { // Replace 'user.id' with actual employee ID from context/props
                     fetchWorkList();
                 }
             });

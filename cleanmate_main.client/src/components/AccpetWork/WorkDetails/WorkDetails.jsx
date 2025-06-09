@@ -34,11 +34,9 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
     useEffect(() => {
         if (connection) {
             connection.start()
-                .then(() => console.log('SignalR Conne`cted Successfully'))
                 .catch(err => console.error('SignalR Connection Error: ', err));
 
             connection.on('ReceiveWorkUpdate', () => {
-                console.log('WorkUpdated event received');
                 fetchWorkDetails(); // Refetch data for this component
                 if (onWorkListRefresh) onWorkListRefresh(); // Notify parent to refresh list
             });
@@ -152,7 +150,6 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
         }
     };
 
-    console.log(workData);
     return (
         <Box sx={styles.modal}>
             {/* Work information */}

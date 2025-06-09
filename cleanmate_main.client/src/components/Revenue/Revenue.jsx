@@ -27,8 +27,7 @@ const MonthlyEarnings = () => {
                 const data = await response.json();
                 setData(data)
                 const defaultData = data.find(item => item.month === selectedMonth);
-                setMonthlyEarnings(defaultData?.earnings || 0); 
-                console.log('Monthly earnings data:', data);
+                setMonthlyEarnings(defaultData?.earnings || 0);
             } catch (err) {
                 console.error('Error fetching monthly earnings:', err);
                 setError('Không thể tải dữ liệu doanh thu tháng này. Vui lòng thử lại sau.');

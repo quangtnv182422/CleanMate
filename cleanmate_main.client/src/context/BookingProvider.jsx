@@ -151,7 +151,6 @@ const BookingProvider = ({ children }) => {
     // Fetch địa chỉ khi user thay đổi hoặc authLoading hoàn tất
     useEffect(() => {
         if (!authLoading && user && user.roles?.includes('Customer') && location.pathname === '/booking-service') {
-            console.log('Fetching user address due to user change or auth loading complete');
             fetchUserAddress();
         }
     }, [authLoading, user, location.pathname]);

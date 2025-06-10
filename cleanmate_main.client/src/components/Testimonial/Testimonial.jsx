@@ -2,7 +2,7 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import ts1 from '../../images/testimonial.jpg'
+import ts1 from '../../images/cleaner-with-client.jpg'
 
 
 const settings = {
@@ -48,7 +48,7 @@ const Testimonial = () => {
                     <div className="row align-items-center">
                         <div className="col-lg-5 col-12">
                             <div className="wpo-testimonials-img">
-                                <img src={ts1} alt="" />
+                                <img src={ts1} alt="Khách hàng với CleanMate" style={{ height: '500px', width: '500px', objectFit: 'contain' }} />
                             </div>
                         </div>
                         <div className="col-lg-7 col-12">

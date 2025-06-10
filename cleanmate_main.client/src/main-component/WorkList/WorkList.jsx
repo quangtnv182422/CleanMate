@@ -87,7 +87,7 @@ const WorkList = () => {
     const { user, loading } = useAuth();
     const role = user?.roles?.[0] || '';
     const [connection, setConnection] = useState(null);
-
+    console.log(selectedWork)
     const formatPrice = (price) => {
         return price.toLocaleString('vi-VN', {
             style: 'currency',

@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { ListItem, ListItemIcon, Box, Avatar, Typography, Button } from '@mui/material';
+import { ListItem, ListItemIcon, Box, Avatar, Typography, Button, Badge } from '@mui/material';
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify'
 import HomeIcon from '@mui/icons-material/Home';
@@ -10,9 +10,12 @@ import ArticleIcon from '@mui/icons-material/Article';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import PaidIcon from '@mui/icons-material/Paid';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import userAvatar from '../../images/user-image.png';
 import './style.css';
 import useAuth from '../../hooks/useAuth';
+import { useContext } from 'react';
+import { BookingContext } from '../../context/BookingProvider';
 
 const buttonStyle = {
     width: '90%',
@@ -58,12 +61,19 @@ const menus = [
     },
     {
         id: 7,
+        title: "Đơn chưa đánh giá",
+        link: '/order/no-rating-yet',
+        badge: true,
+        icon: <CommentsDisabledIcon />
+    },
+    {
+        id: 8,
         title: 'Blog',
         link: '/blog',
         icon: <ArticleIcon />,
     },
     {
-        id: 8,
+        id: 9,
         title: 'Liên hệ',
         link: '/contact',
         icon: <ContactMailIcon />,
@@ -76,6 +86,7 @@ const MobileMenu = () => {
     const [openId, setOpenId] = useState(0);
     const [openMenu, setOpenMenu] = useState(false);
     const [menuActive, setMenuState] = useState(false);
+    const { noRatingOrder } = useContext(BookingContext)
     const navigate = useNavigate();
 
     const handleToggleMenu = () => setOpenMenu(!openMenu);
@@ -128,11 +139,11 @@ const MobileMenu = () => {
 
                 <ul className="responsivemenu">
                     {menus.map((item, mn) => {
-                        const isProtected = item.link === '/order-history' || item.link === '/coin/deposit' || item.link === '/coin/withdraw';
+                        const isProtected = !user && (item.link === '/order-history' || item.link === '/coin/deposit' || item.link === '/coin/withdraw' || item.link === '/order/no-rating-yet');
                         return (
-                            <Box sx={{ display: 'flex', alignItems: 'center', paddingLeft: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', paddingLeft: 1 }} key={mn}>
                                 <ListItemIcon sx={{ minWidth: 32, mr: 1 }}>{item.icon}</ListItemIcon>
-                                <ListItem className={item.id === openId ? 'active' : null} key={mn}>
+                                <ListItem className={item.id === openId ? 'active' : null}>
                                     {isProtected ? (
                                         <Box
                                             onClick={() => {
@@ -144,16 +155,45 @@ const MobileMenu = () => {
                                                 }
                                             }}
                                         >
-                                            <NavLink exact activeClassName="active" style={{ fontSize: '16px', textDecoration: 'none', color: '#222', padding: '10px 2px' }}>{item.title}</NavLink>
+                                            <NavLink
+                                                exact
+                                                activeClassName="active"
+                                                style={{ fontSize: '16px', textDecoration: 'none', color: '#222', padding: '10px 2px' }}
+                                            >
+                                                {item.title}
+                                            </NavLink>
                                         </Box>
                                     ) : (
-                                        <NavLink exact activeClassName="active" style={{ fontSize: '16px', textDecoration: 'none', color: '#222', padding: '10px 2px' }}
-                                            to={item.link}>{item.title}
+                                        <NavLink
+                                            exact
+                                            activeClassName="active"
+                                            style={{ fontSize: '16px', textDecoration: 'none', color: '#222', padding: '10px 2px' }}
+                                            to={item.link}
+                                        >
+                                            {item.badge ? (
+                                                <Badge
+                                                    badgeContent={user ? noRatingOrder.length : '0'}
+                                                    sx={{
+                                                        '& .MuiBadge-badge': {
+                                                            backgroundColor: '#d32f2f',
+                                                            color: '#fff',
+                                                            fontSize: '12px',
+                                                            height: '18px',
+                                                            minWidth: '18px',
+                                                            borderRadius: '20px',
+                                                        },
+                                                    }}
+                                                >
+                                                    {item.title}
+                                                </Badge>
+                                            ) : (
+                                                item.title
+                                            )}
                                         </NavLink>
                                     )}
                                 </ListItem>
                             </Box>
-                        )
+                        );
                     })}
                 </ul>
                 {user ? (
@@ -240,7 +280,7 @@ const MobileMenu = () => {
                     <span className="icon-bar last-angle"></span>
                 </button>
             </div>
-            
+
         </div>
     )
 }

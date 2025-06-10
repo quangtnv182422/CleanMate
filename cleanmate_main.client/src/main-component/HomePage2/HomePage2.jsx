@@ -16,7 +16,7 @@ import { Modal, Box, Typography } from '@mui/material';
 
 const HomePage2 = () => {
     const { user, loading } = useAuth();
-    const [openModal, setOpenModal] = useState(false)
+    //const [openModal, setOpenModal] = useState(false)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,9 +29,9 @@ const HomePage2 = () => {
         }
     }, [user, loading, navigate]);
 
-    useEffect(() => {
-        setOpenModal(true)
-    }, []);
+    //useEffect(() => {
+    //    setOpenModal(true)
+    //}, []);
 
     if (loading) return null; // Hoặc một loading spinner
 
@@ -45,37 +45,37 @@ const HomePage2 = () => {
             <Footer/>
             <Scrollbar />
 
-            <Modal
-                open={openModal}
-                onClose={() => setOpenModal(false)}
-                aria-labelledby="maintenance-title"
-                aria-describedby="maintenance-description"
-                disableAutoFocus
-            >
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        border: '2px solid #000',
-                        boxShadow: 24,
-                        borderRadius: 2,
-                        p: 4,
-                        textAlign: 'center'
-                    }}
-                >
-                    <DoNotDisturbOffIcon color="error" sx={{ fontSize: 50, mb: 2 }} />
-                    <Typography id="maintenance-title" variant="h6" component="h2">
-                        Thông báo bảo trì
-                    </Typography>
-                    <Typography id="maintenance-description" sx={{ mt: 2 }}>
-                        Hệ thống đang được bảo trì. Một số chức năng có thể bị gián đoạn.
-                    </Typography>
-                </Box>
-            </Modal>
+            {/*<Modal*/}
+            {/*    open={openModal}*/}
+            {/*    onClose={() => setOpenModal(false)}*/}
+            {/*    aria-labelledby="maintenance-title"*/}
+            {/*    aria-describedby="maintenance-description"*/}
+            {/*    disableAutoFocus*/}
+            {/*>*/}
+            {/*    <Box*/}
+            {/*        sx={{*/}
+            {/*            position: 'absolute',*/}
+            {/*            top: '50%',*/}
+            {/*            left: '50%',*/}
+            {/*            transform: 'translate(-50%, -50%)',*/}
+            {/*            width: 400,*/}
+            {/*            bgcolor: 'background.paper',*/}
+            {/*            border: '2px solid #000',*/}
+            {/*            boxShadow: 24,*/}
+            {/*            borderRadius: 2,*/}
+            {/*            p: 4,*/}
+            {/*            textAlign: 'center'*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <DoNotDisturbOffIcon color="error" sx={{ fontSize: 50, mb: 2 }} />*/}
+            {/*        <Typography id="maintenance-title" variant="h6" component="h2">*/}
+            {/*            Thông báo bảo trì*/}
+            {/*        </Typography>*/}
+            {/*        <Typography id="maintenance-description" sx={{ mt: 2 }}>*/}
+            {/*            Hệ thống đang được bảo trì. Một số chức năng có thể bị gián đoạn.*/}
+            {/*        </Typography>*/}
+            {/*    </Box>*/}
+            {/*</Modal>*/}
         </Fragment>
     )
 };

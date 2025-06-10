@@ -1,13 +1,17 @@
-﻿import React, { useState } from 'react'
+﻿import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import HeaderTopbar from '../HeaderTopbar/HeaderTopbar'
 import MobileMenu from '../MobileMenu/MobileMenu'
 import LogoTransparent from '../../images/header-logo-transparent.png'
+import { BookingContext } from '../../context/BookingProvider'
+import useAuth from '../../hooks/useAuth'
 
 
 
 const Header = (props) => {
+    const { noRatingOrder } = useContext(BookingContext);
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [menuActive, setMenuState] = useState(false);
 
     const SubmitHandler = (e) => {
@@ -41,12 +45,15 @@ const Header = (props) => {
                                 <div id="navbar" className="collapse navbar-collapse navigation-holder">
                                     <button className="menu-close"><i className="ti-close"></i></button>
                                     <ul className="nav navbar-nav mb-2 mb-lg-0">
-                                        <li className="menu-item-has-children">
-                                            <Link to="/home">Trang chủ</Link>
+                                        <li>
+                                            <Link onClick={ClickHandler} to="/about">Về chúng tôi</Link>
                                         </li>
-                                        <li><Link onClick={ClickHandler} to="/about">Về chúng tôi</Link></li>
                                         <li className="menu-item-has-children">
                                             <Link to="/service">Dịch vụ</Link>
+                                        </li>
+                                        <li className="order-item-none-feedback">
+                                            <Link to="/order/no-rating-yet">Đơn chưa đánh giá</Link>
+                                            <span className="badge">{user ? noRatingOrder.length : 0}</span>
                                         </li>
                                         <li className="menu-item-has-children">
                                             <Link to="/contact">Liên hệ</Link>

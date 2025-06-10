@@ -85,6 +85,7 @@ const EmployeeWorkDetails = () => {
                 </Box>
             </Box>
             <Box sx={{ mb: 2 }}>
+                <Typography sx={style.lightGray}>Khách hàng: <strong style={style.fontBlack}>{selectedWork?.customerFullName}</strong></Typography>
                 <Typography sx={style.lightGray}>Số điện thoại: <strong style={style.fontBlack}>{selectedWork?.customerPhoneNumber}</strong></Typography>
                 <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>{selectedWork?.address}</strong></Typography>
                 <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork?.note}</strong></Typography>

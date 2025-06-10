@@ -1,6 +1,7 @@
 ﻿export const style = {
     inProgressWorkSection: {
         backgroundColor: "#fff",
+        marginBottom: '20px',
     },
     container: {
         maxWidth: '1200px',

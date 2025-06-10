@@ -1,14 +1,35 @@
 ﻿import React, { useState } from 'react';
-import Grid from '@mui/material/Grid';
-import SimpleReactValidator from 'simple-react-validator';
+import {
+    Grid,
+    TextField,
+    Button,
+    FormControl,
+    OutlinedInput,
+    InputLabel,
+    InputAdornment,
+    IconButton
+} from '@mui/material';
 import { toast } from 'react-toastify';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import { Link, useNavigate } from 'react-router-dom';
+import SimpleReactValidator from 'simple-react-validator';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Logo from '../../images/logo-transparent.png';
 
 const SignUpPageUser = () => {
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
+
 
     const [value, setValue] = useState({
         first_name: '',
@@ -185,35 +206,79 @@ const SignUpPageUser = () => {
                             {validator.message('email', value.email, 'required|email')}
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                type="password"
-                                className="inputOutline"
-                                fullWidth
-                                placeholder="Mật khẩu"
-                                value={value.password}
-                                variant="outlined"
-                                name="password"
-                                label="Mật khẩu"
-                                InputLabelProps={{ shrink: true }}
-                                onBlur={(e) => changeHandler(e)}
-                                onChange={(e) => changeHandler(e)}
-                            />
+                            <FormControl sx={{ width: '100%' }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={value.password}
+                                    onBlur={(e) => changeHandler(e)}
+                                    onChange={(e) => changeHandler(e)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Mật khẩu"
+                                    sx={{
+                                        input: {
+                                            '&::-ms-reveal': { display: 'none' },
+                                            '&::-ms-clear': { display: 'none' },
+                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        }
+                                    }}
+                                />
+                            </FormControl>
                             {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                type="password"
-                                className="inputOutline"
-                                fullWidth
-                                placeholder="Xác nhận mật khẩu"
-                                value={value.confirm_password}
-                                variant="outlined"
-                                name="confirm_password"
-                                label="Xác nhận mật khẩu"
-                                InputLabelProps={{ shrink: true }}
-                                onBlur={(e) => changeHandler(e)}
-                                onChange={(e) => changeHandler(e)}
-                            />
+                            <FormControl sx={{ width: '100%' }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Xác nhận mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="confirm_password"
+                                    value={value.confirm_password}
+                                    onBlur={(e) => changeHandler(e)}
+                                    onChange={(e) => changeHandler(e)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Xác nhận mật khẩu"
+                                    sx={{
+                                        input: {
+                                            '&::-ms-reveal': { display: 'none' },
+                                            '&::-ms-clear': { display: 'none' },
+                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        }
+                                    }}
+                                />
+                            </FormControl>
                             {validator.message('confirm password', value.confirm_password, `required|password_match:${value.password}`)}
                         </Grid>
                         <Grid item xs={12}>
@@ -221,11 +286,6 @@ const SignUpPageUser = () => {
                                 <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">
                                     Đăng ký
                                 </Button>
-                            </Grid>
-                            <Grid className="loginWithSocial">
-                                <Button className="facebook"><i className="fa fa-facebook"></i></Button>
-                                <Button className="twitter"><i className="fa fa-twitter"></i></Button>
-                                <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
                             <p className="noteHelp">
                                 Bạn đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>

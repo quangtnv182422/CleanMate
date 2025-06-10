@@ -65,7 +65,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 StatusDescription = b.BookingStatus.StatusDescription,
                 Note = b.Note,
                 AddressId = b.AddressId,
-                AddressFormatted = b.Address?.GG_FormattedAddress ?? "Chưa có địa chỉ",
+                AddressFormatted = b.Address?.GG_DispalyName ?? "Chưa có địa chỉ",
                 Date = b.Date,
                 StartTime = b.StartTime,
                 TotalPrice = b.TotalPrice,

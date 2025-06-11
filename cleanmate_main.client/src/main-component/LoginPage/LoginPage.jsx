@@ -7,9 +7,16 @@ import {
     Grid,
     TextField,
     FormControlLabel,
+    FormControl,
+    InputLabel, 
+    OutlinedInput,
+    InputAdornment,
+    IconButton,
     Checkbox,
     Button
 } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Logo from '../../images/logo-transparent.png';
 import './style.scss';
 
@@ -20,6 +27,17 @@ const LoginPage = (props) => {
 
     const push = useNavigate();
     const { refreshAuth } = useContext(BookingContext);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
 
     const [value, setValue] = useState({
         email: '',
@@ -110,8 +128,10 @@ const LoginPage = (props) => {
                         push("/public-work");
                     } else if (roles.includes("Customer")) {
                         push("/home");
+                    } else if (roles.includes("Admin")) {
+                        push("/admin/dashboard");
                     } else {
-                        push("/");
+                        push('/home')
                     }
                 } else {
                     const error = await response.json();
@@ -156,21 +176,41 @@ const LoginPage = (props) => {
                             {validator.message('email', value.email, 'required|email')}
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                className="inputOutline"
-                                fullWidth
-                                placeholder="Mật khẩu"
-                                value={value.password}
-                                variant="outlined"
-                                name="password"
-                                type="password"
-                                label="Mật khẩu"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                onBlur={(e) => changeHandler(e)}
-                                onChange={(e) => changeHandler(e)}
-                            />
+                            <FormControl sx={{ width: '100%' }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={value.password}
+                                    onBlur={(e) => changeHandler(e)}
+                                    onChange={(e) => changeHandler(e)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Mật khẩu"
+                                    sx={{
+                                        input: {
+                                            '&::-ms-reveal': { display: 'none' },
+                                            '&::-ms-clear': { display: 'none' },
+                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        }
+                                    }}
+                                />
+                            </FormControl>
                             {validator.message('password', value.password, 'required')}
                         </Grid>
                         <Grid item xs={12}>

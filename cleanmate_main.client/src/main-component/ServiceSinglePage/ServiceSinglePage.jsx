@@ -1,26 +1,37 @@
 ﻿import React, { Fragment, useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom'
+import { BookingContext } from '../../context/BookingProvider';
+import { Box } from '@mui/material';
 import Navbar from '../../components/Navbar/Navbar'
 import Scrollbar from '../../components/scrollbar/scrollbar'
 import Benefits from './benefits'
 import ServiceSidebar from './sidebar'
-import Footer from '../../components/footer/Footer'
-import MainImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
+import Footer from '../../components/footer/Footer';
+import ReactLoading from 'react-loading';
+import MainImage from '../../images/service-single/hourly-cleaning-main-image.webp';
 import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 import axios from 'axios';
-import { BookingContext } from '../../context/BookingProvider';
 
 const ServiceSinglePage = () => {
     const { id } = useParams();
     const { services } = useContext(BookingContext);
+    const [loading, setLoading] = useState(true);
     //use params to get the id from the url
     //use id to get the service details from the api
     //use context to store the service details object
 
-    const serviceDetails = services.find(item => item.serviceId === Number(id))
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000)
 
-    const relatedServices = services.filter(item => item.serviceId !== Number(id));
+        return () => clearTimeout(timer);
+    }, [])
+
+    const serviceDetails = services.find(item => item?.serviceId === Number(id))
+
+    const relatedServices = services.filter(item => item?.serviceId !== Number(id));
 
     const ClickHandler = () => {
         window.scrollTo(10, 0);
@@ -28,6 +39,23 @@ const ServiceSinglePage = () => {
 
     return (
         <Fragment>
+            {loading && (
+                <Box sx={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100vh',
+                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: '1000',
+                }}
+                >
+                    <ReactLoading type="spinningBubbles" color="#122B82" width={100} height={100} />
+                </Box>
+            )}
             <Navbar hclass={'wpo-header-style-5'} />
             <section className="wpo-service-single-section section-padding">
                 <div className="container">

@@ -87,6 +87,7 @@ const EmployeeWorkDetails = () => {
             <Box sx={{ mb: 2 }}>
                 <Typography sx={style.lightGray}>Khách hàng: <strong style={style.fontBlack}>{selectedWork?.customerFullName}</strong></Typography>
                 <Typography sx={style.lightGray}>Số điện thoại: <strong style={style.fontBlack}>{selectedWork?.customerPhoneNumber}</strong></Typography>
+                <Typography sx={style.lightGray}>Số nhà: <strong style={style.fontBlack}>{selectedWork?.addressNo}</strong></Typography>
                 <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>{selectedWork?.address}</strong></Typography>
                 <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork?.note}</strong></Typography>
             </Box>
@@ -110,6 +111,22 @@ const style = {
         bgcolor: 'background.paper',
         borderRadius: '5px',
         p: 2,
+
+        '@media (max-width: 400px)': {
+            width: 380,
+        },
+
+        '@media (max-width: 380px)': {
+            width: 360,
+        },
+
+        '@media (max-width: 360px)': {
+            width: 340,
+        },
+
+        '@media (max-width: 345px)': {
+            width: 330,
+        }
     },
     mainContent: {
         display: 'flex',

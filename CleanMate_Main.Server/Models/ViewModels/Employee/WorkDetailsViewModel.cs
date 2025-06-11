@@ -10,7 +10,8 @@
         public string Commission { get; set; }
         public string Date { get; set; }
         public string StartTime { get; set; }
-        public string Address { get; set; } = null!;
+        public string Address { get; set; } = null!; 
+        public string AddressNo { get; set; } = null!;
         public string? Note { get; set; }
         public string Status { get; set; } = null!;
         public int StatusId { get; set; } = 0;

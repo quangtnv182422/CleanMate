@@ -63,7 +63,7 @@ const useAuth = () => {
         fetchUser();
     }, [refresh]); // Fetch lại khi refresh thay đổi
 
-    return { user, loading, refreshAuth: () => setRefresh(prev => prev + 1) };
+    return { user, loading, refreshAuth: () => setRefresh(prev => prev + 1), setUser };
 };
 
 export default useAuth;

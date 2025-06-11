@@ -18,6 +18,7 @@
     <Folder Include="src\components\BookingDetails\" />
     <Folder Include="src\components\Revenue\" />
     <Folder Include="src\main-component\ConfirmMail\" />
+    <Folder Include="src\main-component\AdminDashboard\" />
     <Folder Include="src\main-component\NoRating\" />
     <Folder Include="src\main-component\ProtectedRoute\" />
     <Folder Include="src\main-component\OrderDetails\" />

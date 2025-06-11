@@ -162,16 +162,16 @@ const AcceptWork = () => {
     return (
         <Box sx={style.accpetWorkSection}>
             <Box className="container" sx={style.container}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2}}>
                     <TextField
                         label="Tìm công việc theo tên"
                         variant="outlined"
                         size="small"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        sx={{ width: 200 }}
+                        sx={{ width: 150 }}
                     />
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                    <FormControl size="small" sx={{ minWidth: 100 }}>
                         <InputLabel id="status-select-label">Trạng thái</InputLabel>
                         <Select
                             labelId="status-select-label"

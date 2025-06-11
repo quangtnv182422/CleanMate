@@ -1,19 +1,40 @@
 ﻿import React, { useState, useContext } from 'react';
-import Grid from "@mui/material/Grid";
-import SimpleReactValidator from "simple-react-validator";
-import { toast } from "react-toastify";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+    FormControl,
+    OutlinedInput,
+    InputAdornment,
+    IconButton,
+    InputLabel,
+    Select,
+    MenuItem,
+    Grid,
+    TextField,
+    Button
+} from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from '../../images/logo-transparent.png';
+import { toast } from "react-toastify";
 import { AuthContext } from '../../context/AuthContext';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import SimpleReactValidator from "simple-react-validator";
+import Logo from '../../images/logo-transparent.png';
+
 
 const SignUpPageEmployee = (props) => {
     const { banks } = useContext(AuthContext);
 
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpPassword = (event) => {
+        event.preventDefault();
+    };
 
     const [value, setValue] = useState({
         first_name: '',
@@ -267,39 +288,79 @@ const SignUpPageEmployee = (props) => {
                             {validator.message('bank account', value.bankAccount, 'required')}
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                type="password"
-                                className="inputOutline"
-                                fullWidth
-                                placeholder="Mật khẩu"
-                                value={value.password}
-                                variant="outlined"
-                                name="password"
-                                label="Mật khẩu"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                onBlur={(e) => changeHandler(e)}
-                                onChange={(e) => changeHandler(e)}
-                            />
+                            <FormControl sx={{ width: '100%' }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={value.password}
+                                    onBlur={(e) => changeHandler(e)}
+                                    onChange={(e) => changeHandler(e)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Mật khẩu"
+                                    sx={{
+                                        input: {
+                                            '&::-ms-reveal': { display: 'none' },
+                                            '&::-ms-clear': { display: 'none' },
+                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        }
+                                    }}
+                                />
+                            </FormControl>
                             {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                type="password"
-                                className="inputOutline"
-                                fullWidth
-                                placeholder="Xác nhận mật khẩu"
-                                value={value.confirm_password}
-                                variant="outlined"
-                                name="confirm_password"
-                                label="Xác nhận mật khẩu"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                onBlur={(e) => changeHandler(e)}
-                                onChange={(e) => changeHandler(e)}
-                            />
+                            <FormControl sx={{ width: '100%' }} variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Xác nhận mật khẩu</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="confirm_password"
+                                    value={value.confirm_password}
+                                    onBlur={(e) => changeHandler(e)}
+                                    onChange={(e) => changeHandler(e)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                onMouseUp={handleMouseUpPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Xác nhận mật khẩu"
+                                    sx={{
+                                        input: {
+                                            '&::-ms-reveal': { display: 'none' },
+                                            '&::-ms-clear': { display: 'none' },
+                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        }
+                                    }}
+                                />
+                            </FormControl>
                             {validator.message('confirm password', value.confirm_password, `required|password_match:${value.password}`)}
                         </Grid>
                         <Grid item xs={12}>

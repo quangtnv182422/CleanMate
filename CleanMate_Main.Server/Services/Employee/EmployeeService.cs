@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Repository.Employee;
@@ -229,6 +230,11 @@ namespace CleanMate_Main.Server.Services.Employee
         public async Task<IEnumerable<MonthlyEarningViewModel>> GetEarningsByMonthAsync(string employeeId)
         {
             return await _employeeRepository.GetEarningsByMonthAsync(employeeId);
+        }
+
+        public async Task<List<CleanerDTO>> GetAvailableCleanersAsync()
+        {
+            return await _employeeRepository.GetAvailableCleanersAsync();
         }
     }
 }

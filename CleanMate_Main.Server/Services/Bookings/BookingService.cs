@@ -5,6 +5,7 @@ using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CleanMate_Main.Server.Services.Bookings
 {
@@ -74,6 +75,30 @@ namespace CleanMate_Main.Server.Services.Bookings
             }).ToList();
 
             return bookingDtos;
+        }
+        public async Task<List<BookingAdminDTO>> GetBookingsForAdminAsync(int? status = null)
+        {
+            var bookings = await _bookingRepo.GetBookingsForAdminAsync(status);
+            return bookings.Select(b => new BookingAdminDTO
+            {
+                BookingId = b.BookingId,
+                ServiceName = b.ServicePrice.Service.Name,
+                CustomerFullName = b.User.FullName,
+                Date = b.Date,
+                StartTime = b.StartTime,
+                Duration = b.ServicePrice.Duration.DurationTime,
+                Address = b.Address.GG_FormattedAddress,
+                Note = b.Note,
+                TotalPrice = b.TotalPrice ?? 0m,
+                Status = b.BookingStatus.Status,
+                CleanerId = b.CleanerId,
+                CleanerName = b.Cleaner != null ? b.Cleaner.FullName : null
+            }).ToList();
+        }
+
+        public async Task<bool> ProcessBookingAfterAssigningCleanerAsync(int bookingId, string cleanerId)
+        {
+            return await _bookingRepo.ProcessBookingAfterAssigningCleanerAsync(bookingId, cleanerId);
         }
     }
 }

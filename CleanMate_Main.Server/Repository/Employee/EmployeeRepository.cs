@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Common;
 using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
+using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
@@ -490,5 +491,19 @@ namespace CleanMate_Main.Server.Repository.Employee
 
             return monthlyEarnings;
         }
+
+        public async Task<List<CleanerDTO>> GetAvailableCleanersAsync()
+        {
+            return await _context.CleanerProfiles
+                .Include(c => c.User)
+                //.Where(c => c.Available) //đoạn này làm để sau làm logic chọn lúc rảnh
+                .Select(c => new CleanerDTO
+                {
+                    CleanerId = c.UserId,
+                    Name = c.User.FullName
+                })
+                .ToListAsync();
+        }
+
     }
 }

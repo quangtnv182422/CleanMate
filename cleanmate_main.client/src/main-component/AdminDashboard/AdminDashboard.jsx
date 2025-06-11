@@ -336,7 +336,7 @@ const AdminDashboard = () => {
         }
     };
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', mr: 1, mb: 2 }}>
             <Drawer
                 open={openDrawer}
                 onClose={handleCloseDrawer}

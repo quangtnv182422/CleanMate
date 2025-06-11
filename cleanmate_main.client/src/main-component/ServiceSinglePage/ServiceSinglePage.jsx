@@ -8,7 +8,7 @@ import Benefits from './benefits'
 import ServiceSidebar from './sidebar'
 import Footer from '../../components/footer/Footer';
 import ReactLoading from 'react-loading';
-import MainImage from '../../images/service-single/hourly-cleaning-main-image.jpg';
+import MainImage from '../../images/service-single/hourly-cleaning-main-image.webp';
 import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 import axios from 'axios';

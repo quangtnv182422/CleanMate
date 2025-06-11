@@ -162,7 +162,7 @@ const AcceptWork = () => {
     return (
         <Box sx={style.accpetWorkSection}>
             <Box className="container" sx={style.container}>
-                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-around' }}>
+                <Box sx={{ display: 'flex', gap: 2}}>
                     <TextField
                         label="Tìm công việc theo tên"
                         variant="outlined"

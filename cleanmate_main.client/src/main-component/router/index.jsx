@@ -42,6 +42,7 @@ import Loading from '../../components/Loading/Loading';
 import BookingDetails from '../../components/BookingDetails/BookingDetails';
 import WithdrawCoin from '../../components/Coin/WithdrawCoin';
 import NoRating from '../NoRating/NoRating';
+import AdminDashboard from '../AdminDashboard/AdminDashboard';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -88,6 +89,7 @@ const AllRoute = () => {
                 <Route path="/loading" element={<Loading />} />
                 <Route path="/booking-details" element={<BookingDetails />} />
                 <Route path="/order/no-rating-yet" element={<NoRating />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Routes>
         </div>
     );

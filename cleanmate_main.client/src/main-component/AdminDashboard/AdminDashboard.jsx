@@ -1,6 +1,5 @@
 ﻿import React, { useState, useMemo, useCallback, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as signalR from '@microsoft/signalr';
 import {
     Box,
     Drawer,
@@ -12,15 +11,11 @@ import {
     TableHead,
     TableRow,
     Paper,
-    TextField,
     Select,
     MenuItem,
     IconButton,
     Pagination,
     Button,
-    Modal,
-    InputLabel,
-    FormControl,
     List,
     ListItemIcon,
     ListItemButton,
@@ -28,40 +23,14 @@ import {
     Divider,
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import { WorkContext } from '../../context/WorkProvider';
-import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import { toast } from 'react-toastify';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
-import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined';
+import PeopleIcon from '@mui/icons-material/People';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
-import PaidIcon from '@mui/icons-material/Paid';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import userImage from '../../images/user-image.png';
 import useAuth from '../../hooks/useAuth';
-import EmployeeWorkDetails from '../../components/EmployeeWorkDetails/EmployeeWorkDetails';
-import AccpetWork from '../../components/AccpetWork/AcceptWork';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import PendingWork from '../../components/PendingWork/PendingWork';
-import InProgressWork from '../../components/InProgressWork/InProgressWork';
-import Revenue from '../../components/Revenue/Revenue';
-import DepositCoin from '../../components/Coin/DepositCoin';
-import WithdrawCoin from '../../components/Coin/WithdrawCoin';
-
-// Placeholder components for other pages
-const ReportsPage = () => (
-    <Box sx={{ p: 3 }}>
-        <Typography variant="h5">Reports Page</Typography>
-        <Typography>This is a placeholder for the Reports page.</Typography>
-    </Box>
-);
+import userImage from '../../images/user-image.png';
 
 const drawerWidth = 300;
 
@@ -74,103 +43,86 @@ const colorMap = {
     'Hoàn thành': '#004085'  // Hoàn thành - Xanh dương đậm
 };
 
-const WorkList = () => {
-    const { open, handleOpen, handleClose, selectedWork, data, setData } = useContext(WorkContext);
-    const { statusList } = useContext(BookingStatusContext);
-    const navigate = useNavigate();
+const array = new Array(10).fill().map((_, index) => ({
+    "address": "390 Đ. Nguyễn Văn Cừ, Ngõc Lâm, Long Biên, Hà Nội, Vietnam",
+    "bookingId": 1,
+    "customerFullName": "Hoang Tien",
+    "date": "2025-05-24",
+    "duration": 1,
+    "note": "First time booking",
+    "serviceName": "Dọn nhà theo giờ",
+    "startTime": "08:00:00",
+    "status": "Việc mới",
+    "totalPrice": 250000
+}));
+
+const UserList = () => {
+    return <h1>UserList</h1>
+}
+
+const CleanerList = () => {
+    return <h1>CleanerList</h1>
+}
+
+const AdminDashboard = () => {
+    const { user, loading } = useAuth();
     const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
+    const [openDrawer, setOpenDrawer] = useState(false);
     const [tabValue, setTabValue] = useState(0);
-    const [status, setStatus] = useState('');
-    const { user, loading } = useAuth();
-    const role = user?.roles?.[0] || '';
-    const [connection, setConnection] = useState(null);
-    console.log(selectedWork)
-    const formatPrice = (price) => {
-        return price.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        });
-    };
 
-    const handleStatusChange = (event) => {
-        setStatus(event.target.value);
-        setPage(1); // Reset to first page when status changes
-    };
-
-    const fetchWorkList = useCallback(async () => {
+    const role = user?.roles?.[0];
+    console.log(role)
+    useEffect(() => {
         if (loading) return;
-        if (!user || role !== 'Cleaner') {
+        if (!user || role !== 'Admin') {
             toast.error("Bạn không có quyền truy cập vào trang này");
             navigate('/home');
             return;
         }
+        setData(array)
+    }, [navigate, role, user, loading])
 
-        try {
-            const url = `/worklist?status=1`;
-            const response = await fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+    const handleDrawerOpen = () => {
+        setOpenDrawer(true);
+    };
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+    const handleCloseDrawer = () => {
+        setOpenDrawer(false);
+    };
 
-            const workItems = await response.json();
-            setData(workItems);
-        } catch (error) {
-            console.error('Error fetching work list:', error);
-        }
-    }, [loading, user, role, navigate, setData]);
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+        setOpenDrawer(false);
+    };
 
-    useEffect(() => {
-        fetchWorkList();
-    }, [fetchWorkList]);
-
-    // Khởi tạo connection trong useEffect
-    useEffect(() => {
-        const newConnection = new signalR.HubConnectionBuilder()
-            .withUrl("/workHub")
-            .build();
-        setConnection(newConnection);
-    }, []);
-
-    // Kết nối và lắng nghe sự kiện
-    useEffect(() => {
-        if (connection) {
-            if (connection.state === signalR.HubConnectionState.Disconnected) {
-                connection.start()
-                    .catch(err => console.error('SignalR Connection Error: ', err));
-            }
-
-            connection.on('ReceiveWorkUpdate', () => {
-                fetchWorkList();
-            });
-
-            return () => {
-                connection.off('ReceiveWorkUpdate');
-                if (connection.state !== signalR.HubConnectionState.Disconnected) {
-                    connection.stop();
-                }
-            };
-        }
-    }, [connection, fetchWorkList]);
-
+    const menuItems = [
+        {
+            title: 'Bảng công việc',
+            icon: <DnsOutlinedIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Danh sách người dùng',
+            icon: <PeopleIcon sx={style.drawerIcon} />,
+        },
+        {
+            title: 'Danh sách nhân viên',
+            icon: <PeopleIcon sx={style.drawerIcon} />,
+        },
+    ];
     const handleSort = useCallback((vietnameseKey) => {
         const keyMapping = {
             'tên': 'serviceName',
             'khách hàng': 'customerFullName',
             'giờ làm': 'startTime',
-            'làm trong (tiếng)': 'duration',
+            'làm trong': 'duration',
             'địa chỉ': 'address',
             'ghi chú': 'note',
-            'số tiền (VND)': 'totalPrice',
+            'số tiền': 'totalPrice',
             'trạng thái': 'status',
         };
 
@@ -222,7 +174,14 @@ const WorkList = () => {
             method: 'POST',
             credentials: 'include',
         }).then(() => {
-            navigate('/login');
+           navigate('/login')
+        });
+    };
+
+    const formatPrice = (price) => {
+        return price.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
         });
     };
 
@@ -239,7 +198,7 @@ const WorkList = () => {
         const [hour, minute] = time.split(':');
         return `${hour}:${minute}`;
     };
-    console.log(data)
+
     const WorkListPage = () => (
         <Box>
             <Box sx={{
@@ -248,9 +207,9 @@ const WorkList = () => {
                 alignItems: 'center',
                 mb: 1,
                 '@media (max-width: 915px)': {
-                    width: '100%', 
+                    width: '100%',
                     justifyContent: 'flex-start',
-                    mt: 1, 
+                    mt: 1,
                 },
             }}>
                 <Box>
@@ -274,21 +233,21 @@ const WorkList = () => {
             </Box>
 
             <TableContainer component={Paper} sx={{
-                overflowX: 'auto', 
-                maxWidth: '100%', 
+                overflowX: 'auto',
+                maxWidth: '100%',
                 '& .MuiTable-root': {
-                    minWidth: 915, 
+                    minWidth: 915,
                 },
-                '@media (max-width: 915px)': { 
-                    width: '100vw', 
-                    marginLeft: '-16px', 
+                '@media (max-width: 915px)': {
+                    width: '100vw',
+                    marginLeft: '-16px',
                     marginRight: '-16px',
                 },
             }}>
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
                         <TableRow>
-                            {['tên', 'khách hàng', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)', 'trạng thái'].map((key) => (
+                            {['tên', 'khách hàng', 'giờ làm', 'làm trong', 'địa chỉ', 'ghi chú', 'số tiền', 'trạng thái'].map((key) => (
                                 <TableCell key={key}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -306,7 +265,7 @@ const WorkList = () => {
                                     </Box>
                                 </TableCell>
                             ))}
-                            <TableCell>Xem trước</TableCell>
+                            <TableCell>Phân công</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -315,8 +274,8 @@ const WorkList = () => {
                                 <TableCell>{row.serviceName}</TableCell>
                                 <TableCell>{row.customerFullName}</TableCell>
                                 <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
-                                <TableCell sx={{maxWidth: 160}}>{row.duration}</TableCell>
-                                <TableCell>{row.address}</TableCell>
+                                <TableCell>{row.duration} tiếng</TableCell>
+                                <TableCell sx={{maxWidth: 160} }>{row.address}</TableCell>
                                 <TableCell>{row.note}</TableCell>
                                 <TableCell>{formatPrice(row.totalPrice)}</TableCell>
                                 <TableCell>
@@ -337,25 +296,18 @@ const WorkList = () => {
                                         textAlign: 'center',
                                         cursor: 'pointer',
                                     }}
-                                    onClick={() => handleOpen(row.bookingId)}
                                 >
-                                    <VisibilityOutlinedIcon />
+                                    <Select label="Nhân viên">
+                                        <MenuItem value={1}>Hoàng Tiến Dũng</MenuItem>
+                                        <MenuItem value={2}>Nguyễn Tùng Lâm</MenuItem>
+                                        <MenuItem value={3}>Trương Nguyễn Việt Quang</MenuItem>
+                                    </Select>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-
-            {selectedWork && (
-                <Modal
-                    open={open}
-                    onClose={handleClose}
-                    disableAutoFocus
-                >
-                    <EmployeeWorkDetails />
-                </Modal>
-            )}
 
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                 <Pagination
@@ -376,71 +328,13 @@ const WorkList = () => {
             case 0:
                 return <WorkListPage />;
             case 1:
-                return <AccpetWork />;
+                return <UserList />
             case 2:
-                return <PendingWork />
-            case 3:
-                return <InProgressWork />
-            case 4:
-                return <Revenue />;
-            case 5:
-                return <DepositCoin />;
-            case 6:
-                return <WithdrawCoin />;
+                return <CleanerList />
             default:
                 return <WorkListPage />;
         }
     };
-
-    const [openDrawer, setOpenDrawer] = useState(false);
-    const handleDrawerOpen = () => {
-        setOpenDrawer(true);
-    };
-
-    const handleCloseDrawer = () => {
-        setOpenDrawer(false);
-    };
-
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-        setOpenDrawer(false);
-    };
-
-    const menuItems = [
-        {
-            title: 'Danh sách công việc',
-            icon: <DnsOutlinedIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Công việc đã nhận',
-            icon: <PlaylistAddCheckOutlinedIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Công việc đã hoàn thành',
-            icon: <CheckIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Công việc đã hủy',
-            icon: <CancelIcon sx={style.drawerIcon} />
-        },
-        {
-            title: 'Thu nhập',
-            icon: <CreditCardOutlinedIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Nạp tiền',
-            icon: <PaidIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Rút tiền',
-            icon: <CurrencyExchangeIcon sx={style.drawerIcon} />,
-        },
-        {
-            title: 'Settings',
-            icon: <SettingsOutlinedIcon sx={style.drawerIcon} />,
-        },
-    ];
-
     return (
         <Box sx={{ display: 'flex' }}>
             <Drawer
@@ -462,7 +356,7 @@ const WorkList = () => {
                     },
                 }}
             >
-                <Box sx={style.userAvatar} onClick={() => navigate('/profile') }>
+                <Box sx={style.userAvatar} onClick={() => navigate('/profile')}>
                     <img src={userImage} alt="Avatar của người dùng" />
                     <Box>
                         <Typography sx={style.userFullName}>{user?.fullName}</Typography>
@@ -490,7 +384,6 @@ const WorkList = () => {
                 <Box sx={{ padding: '0 10px' }}>
                     <Button
                         variant="outlined"
-                        onClick={handleLogout}
                         sx={{
                             width: '100%',
                             mt: 2,
@@ -502,6 +395,7 @@ const WorkList = () => {
                             },
                         }}
                         startIcon={<ExitToAppOutlinedIcon sx={{ color: '#000' }} />}
+                        onClick={handleLogout}
                     >
                         Đăng xuất
                     </Button>
@@ -520,12 +414,12 @@ const WorkList = () => {
                 <MenuIcon />
             </IconButton>
 
-            <Box sx={{ flexGrow: 1, pt: 3, pl: 8 }}>
+            <Box sx={{ flexGrow: 1, pt: 3, pl: 8, mb: 2 }}>
                 {renderPage()}
             </Box>
         </Box>
-    );
-};
+    )
+}
 
 const style = {
     modal: {
@@ -591,4 +485,4 @@ const style = {
     },
 };
 
-export default WorkList;
+export default AdminDashboard;

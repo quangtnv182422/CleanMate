@@ -128,8 +128,10 @@ const LoginPage = (props) => {
                         push("/public-work");
                     } else if (roles.includes("Customer")) {
                         push("/home");
+                    } else if (roles.includes("Admin")) {
+                        push("/admin/dashboard");
                     } else {
-                        push("/");
+                        push('/home')
                     }
                 } else {
                     const error = await response.json();

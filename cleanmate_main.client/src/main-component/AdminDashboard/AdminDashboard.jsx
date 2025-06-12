@@ -347,8 +347,7 @@ const AdminDashboard = () => {
                             key="search-input"
                             type="text"
                             name="search"
-                            label="Tìm kiếm theo tên người dùng hoặc nhân viên..."
-                            placeholder=""
+                            placeholder="Tìm kiếm theo tên người dùng hoặc nhân viên..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             inputProps={{ maxLength: 100 }}
@@ -356,8 +355,7 @@ const AdminDashboard = () => {
                             sx={{
                                 maxWidth: 300,
                                 '& .MuiOutlinedInput-input': {
-                                    padding: '10px 15px',
-                                    textAlign:'center',
+                                    padding: '10px 5px',
                                 },
                                 '@media (max-width: 600px)': {
                                     maxWidth: '100%',

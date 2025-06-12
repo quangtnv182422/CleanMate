@@ -38,6 +38,8 @@ import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import useAuth from '../../hooks/useAuth';
 import userImage from '../../images/user-image.png';
 import { BookingStatusContext } from '../../context/BookingStatusProvider';
+import WithdrawRequest from '../../components/WithdrawRequest/WithdrawRequest';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 
 const drawerWidth = 300;
 
@@ -216,6 +218,10 @@ const AdminDashboard = () => {
             title: 'Danh sách nhân viên',
             icon: <PeopleIcon sx={style.drawerIcon} />,
         },
+        {
+            title: 'Yêu cầu rút tiền',
+            icon: <CurrencyExchangeIcon sx={style.drawerIcon} />
+        }
     ];
 
     const handleLogout = () => {
@@ -512,6 +518,8 @@ const AdminDashboard = () => {
                 return <UserList />
             case 2:
                 return <CleanerList />
+            case 3:
+                return <WithdrawRequest />
             default:
                 return <WorkListPage />;
         }

@@ -39,8 +39,19 @@ const BookingService = () => {
         loading
     } = useContext(BookingContext);
 
+
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        if (authLoading) return;
+
+        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
+        if (role === 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/public-work');
+        }
+    }, [user, authLoading, navigate]);
 
     // Start of data to store booking information
     const [selectedAddress, setSelectedAddress] = useState(null);

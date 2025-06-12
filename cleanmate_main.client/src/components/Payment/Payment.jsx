@@ -99,6 +99,19 @@ const style = {
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const { user, loading } = useAuth();
+
+    useEffect(() => {
+        if (loading) return;
+
+        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
+        if (role === 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/public-work');
+        }
+    }, [user, loading, navigate]);
+
     const [openDialog, setOpenDialog] = useState(false);
     const [coin, setCoin] = useState(null);
     const { selectedAddress,
@@ -110,7 +123,6 @@ const Payment = () => {
     } = location.state || {};
     const [isLoading, setIsLoading] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState('cash');
-    const { user } = useAuth();
 
     useEffect(() => {
         const fetchCoin = async () => {

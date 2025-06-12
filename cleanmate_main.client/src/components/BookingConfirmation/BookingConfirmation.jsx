@@ -1,8 +1,11 @@
-﻿import { useParams, useNavigate, useLocation } from 'react-router-dom';
+﻿import React, { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import WestIcon from '@mui/icons-material/West';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import { Box, Typography } from '@mui/material';
+import useAuth from '../../hooks/useAuth';
 
 const primaryColor = '#1565C0';
 
@@ -65,6 +68,19 @@ const BookingConfirmation = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const { user, loading } = useAuth();
+
+    useEffect(() => {
+        if (loading) return;
+
+        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
+        if (role === 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/public-work');
+        }
+    }, [user, loading, navigate]);
+
     const {
         selectedAddress,
         selectedEmployee,

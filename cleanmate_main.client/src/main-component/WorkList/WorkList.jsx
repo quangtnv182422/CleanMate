@@ -78,7 +78,6 @@ const WorkList = () => {
     const { open, handleOpen, handleClose, selectedWork, data, setData } = useContext(WorkContext);
     const { statusList } = useContext(BookingStatusContext);
     const navigate = useNavigate();
-    const [search, setSearch] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useState(1);
@@ -162,61 +161,6 @@ const WorkList = () => {
         }
     }, [connection, fetchWorkList]);
 
-    const handleSort = useCallback((vietnameseKey) => {
-        const keyMapping = {
-            'tên': 'serviceName',
-            'khách hàng': 'customerFullName',
-            'giờ làm': 'startTime',
-            'làm trong (tiếng)': 'duration',
-            'địa chỉ': 'address',
-            'ghi chú': 'note',
-            'số tiền (VND)': 'totalPrice',
-            'trạng thái': 'status',
-        };
-
-        let direction = 'asc';
-        if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
-
-        const sortedData = [...data].sort((a, b) => {
-            let valueA = a[englishKey];
-            let valueB = b[englishKey];
-
-            if (englishKey === 'startTime') {
-                const dateTimeA = new Date(`${a.date}T${a.startTime}`);
-                const dateTimeB = new Date(`${b.date}T${b.startTime}`);
-                valueA = dateTimeA.getTime();
-                valueB = dateTimeB.getTime();
-            } else if (englishKey === 'totalPrice') {
-                valueA = Number(valueA);
-                valueB = Number(valueB);
-            } else if (typeof valueA === 'string') {
-                valueA = valueA.toLowerCase();
-                valueB = valueB.toLowerCase();
-            }
-
-            if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-            if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        setSortConfig({ key: vietnameseKey, direction });
-        setData(sortedData);
-    }, [data, sortConfig, setData]);
-
-    const filteredData = useMemo(() => {
-        return data.filter((row) =>
-            row.serviceName?.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [data, search]);
-
-    const paginatedData = useMemo(() => {
-        const startIndex = (page - 1) * rowsPerPage;
-        return filteredData.slice(startIndex, startIndex + rowsPerPage);
-    }, [filteredData, page, rowsPerPage]);
-
     const handleLogout = () => {
         fetch('/Authen/logout', {
             method: 'POST',
@@ -240,136 +184,222 @@ const WorkList = () => {
         return `${hour}:${minute}`;
     };
 
-    const WorkListPage = () => (
-        <Box>
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                mb: 1,
-                '@media (max-width: 915px)': {
-                    width: '100%', 
-                    justifyContent: 'flex-start',
-                    mt: 1, 
-                },
-            }}>
-                <Box>
-                    <IconButton>
-                        <FileDownload />
-                    </IconButton>
-                    <IconButton>
-                        <FilterList />
-                    </IconButton>
-                    <Select
-                        value={rowsPerPage}
-                        onChange={(e) => setRowsPerPage(e.target.value)}
-                        size="small"
-                        sx={{ ml: 1 }}
+    const WorkListPage = () => {
+        const [search, setSearch] = useState('');
+
+        const filteredData = useMemo(() => {
+            return data.filter((row) =>
+                row.customerFullName?.toLowerCase().includes(search.toLowerCase())
+            );
+        }, [search]);
+
+        const paginatedData = useMemo(() => {
+            const startIndex = (page - 1) * rowsPerPage;
+            return filteredData.slice(startIndex, startIndex + rowsPerPage);
+        }, [filteredData]);
+
+        const handleSort = useCallback((vietnameseKey) => {
+            const keyMapping = {
+                'tên': 'serviceName',
+                'khách hàng': 'customerFullName',
+                'giờ làm': 'startTime',
+                'làm trong (tiếng)': 'duration',
+                'địa chỉ': 'address',
+                'ghi chú': 'note',
+                'số tiền (VND)': 'totalPrice',
+                'trạng thái': 'status',
+            };
+
+            let direction = 'asc';
+            if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
+                direction = 'desc';
+            }
+            const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
+
+            const sortedData = [...data].sort((a, b) => {
+                let valueA = a[englishKey];
+                let valueB = b[englishKey];
+
+                if (englishKey === 'startTime') {
+                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+                    valueA = dateTimeA.getTime();
+                    valueB = dateTimeB.getTime();
+                } else if (englishKey === 'totalPrice') {
+                    valueA = Number(valueA);
+                    valueB = Number(valueB);
+                } else if (typeof valueA === 'string') {
+                    valueA = valueA.toLowerCase();
+                    valueB = valueB.toLowerCase();
+                }
+
+                if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+                if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            setSortConfig({ key: vietnameseKey, direction });
+            setData(sortedData);
+        }, []);
+
+        return (
+            <Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 1,
+                    '@media (max-width: 915px)': {
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        mt: 1,
+                    },
+                }}>
+                    <Box sx={{
+                        maxWidth: '400px',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                    }}
                     >
-                        <MenuItem value={5}>5</MenuItem>
-                        <MenuItem value={10}>10</MenuItem>
-                        <MenuItem value={25}>25</MenuItem>
-                    </Select>
+                        <TextField
+                            key="search-input"
+                            type="text"
+                            name="search"
+                            placeholder="Tìm kiếm theo tên..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            inputProps={{ maxLength: 100 }}
+                            sx={{
+                                maxWidth: 300,
+                                '& .MuiOutlinedInput-input': {
+                                    padding: '10px 15px',
+                                },
+                                '@media (max-width: 600px)': {
+                                    maxWidth: '100%',
+                                },
+                            }}
+                        />
+                    </Box>
+                    <Box>
+                        <IconButton>
+                            <FileDownload />
+                        </IconButton>
+                        <IconButton>
+                            <FilterList />
+                        </IconButton>
+                        <Select
+                            value={rowsPerPage}
+                            onChange={(e) => setRowsPerPage(e.target.value)}
+                            size="small"
+                            sx={{ ml: 1 }}
+                        >
+                            <MenuItem value={5}>5</MenuItem>
+                            <MenuItem value={10}>10</MenuItem>
+                            <MenuItem value={25}>25</MenuItem>
+                        </Select>
+                    </Box>
+                </Box>
+
+                <TableContainer component={Paper} sx={{
+                    overflowX: 'auto',
+                    maxWidth: '100%',
+                    '& .MuiTable-root': {
+                        minWidth: 915,
+                    },
+                    '@media (max-width: 915px)': {
+                        width: '100vw',
+                        marginLeft: '-16px',
+                        marginRight: '-16px',
+                    },
+                }}>
+                    <Table sx={{ minWidth: 650 }} aria-label="work list table">
+                        <TableHead>
+                            <TableRow>
+                                {['tên', 'khách hàng', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)', 'trạng thái'].map((key) => (
+                                    <TableCell key={key}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                                            <IconButton onClick={() => handleSort(key)} size="small">
+                                                {sortConfig.key === key ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <ArrowUpward fontSize="small" />
+                                                    ) : (
+                                                        <ArrowDownward fontSize="small" />
+                                                    )
+                                                ) : (
+                                                    <ArrowUpward fontSize="small" color="disabled" />
+                                                )}
+                                            </IconButton>
+                                        </Box>
+                                    </TableCell>
+                                ))}
+                                <TableCell>Xem trước</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedData.map((row) => (
+                                <TableRow key={row.bookingId}>
+                                    <TableCell>{row.serviceName}</TableCell>
+                                    <TableCell>{row.customerFullName}</TableCell>
+                                    <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
+                                    <TableCell sx={{ maxWidth: 160 }}>{row.duration}</TableCell>
+                                    <TableCell>{row.address}</TableCell>
+                                    <TableCell>{row.note ? row.note : 'Không có ghi chú'}</TableCell>
+                                    <TableCell>{formatPrice(row.totalPrice)}</TableCell>
+                                    <TableCell>
+                                        <span
+                                            style={{
+                                                backgroundColor: colorMap[row.status] || '#000000',
+                                                color: '#FFFFFF',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                display: 'inline-block',
+                                            }}
+                                        >
+                                            {row.status}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            textAlign: 'center',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => handleOpen(row.bookingId)}
+                                    >
+                                        <VisibilityOutlinedIcon />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {selectedWork && (
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        disableAutoFocus
+                    >
+                        <EmployeeWorkDetails />
+                    </Modal>
+                )}
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Pagination
+                        count={Math.ceil(filteredData.length / rowsPerPage)}
+                        page={page}
+                        onChange={(e, value) => setPage(value)}
+                        color="primary"
+                    />
+                    <Typography sx={{ ml: 2, alignSelf: 'center' }}>
+                        {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
+                    </Typography>
                 </Box>
             </Box>
-
-            <TableContainer component={Paper} sx={{
-                overflowX: 'auto', 
-                maxWidth: '100%', 
-                '& .MuiTable-root': {
-                    minWidth: 915, 
-                },
-                '@media (max-width: 915px)': { 
-                    width: '100vw', 
-                    marginLeft: '-16px', 
-                    marginRight: '-16px',
-                },
-            }}>
-                <Table sx={{ minWidth: 650 }} aria-label="work list table">
-                    <TableHead>
-                        <TableRow>
-                            {['tên', 'khách hàng', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)', 'trạng thái'].map((key) => (
-                                <TableCell key={key}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                                        <IconButton onClick={() => handleSort(key)} size="small">
-                                            {sortConfig.key === key ? (
-                                                sortConfig.direction === 'asc' ? (
-                                                    <ArrowUpward fontSize="small" />
-                                                ) : (
-                                                    <ArrowDownward fontSize="small" />
-                                                )
-                                            ) : (
-                                                <ArrowUpward fontSize="small" color="disabled" />
-                                            )}
-                                        </IconButton>
-                                    </Box>
-                                </TableCell>
-                            ))}
-                            <TableCell>Xem trước</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {paginatedData.map((row) => (
-                            <TableRow key={row.bookingId}>
-                                <TableCell>{row.serviceName}</TableCell>
-                                <TableCell>{row.customerFullName}</TableCell>
-                                <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
-                                <TableCell sx={{maxWidth: 160}}>{row.duration}</TableCell>
-                                <TableCell>{row.address}</TableCell>
-                                <TableCell>{row.note}</TableCell>
-                                <TableCell>{formatPrice(row.totalPrice)}</TableCell>
-                                <TableCell>
-                                    <span
-                                        style={{
-                                            backgroundColor: colorMap[row.status] || '#000000',
-                                            color: '#FFFFFF',
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            display: 'inline-block',
-                                        }}
-                                    >
-                                        {row.status}
-                                    </span>
-                                </TableCell>
-                                <TableCell
-                                    sx={{
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={() => handleOpen(row.bookingId)}
-                                >
-                                    <VisibilityOutlinedIcon />
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            {selectedWork && (
-                <Modal
-                    open={open}
-                    onClose={handleClose}
-                    disableAutoFocus
-                >
-                    <EmployeeWorkDetails />
-                </Modal>
-            )}
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                <Pagination
-                    count={Math.ceil(filteredData.length / rowsPerPage)}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                />
-                <Typography sx={{ ml: 2, alignSelf: 'center' }}>
-                    {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
-                </Typography>
-            </Box>
-        </Box>
-    );
+        );
+    };
 
     const renderPage = () => {
         switch (tabValue) {

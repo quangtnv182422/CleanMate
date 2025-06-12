@@ -30,7 +30,7 @@ const paymentMethods = [
         id: "vnpay",
         name: "VNPay",
         logo: vnpayLogo,
-        isAvailable: false,
+        isAvailable: true,
     },
     {
         id: "payos",
@@ -60,7 +60,7 @@ const DepositCoin = () => {
             validators: {
                 min_amount: {
                     message: "Bạn phải nạp tối thiểu 200,000 đồng.",
-                    rule: (val) => parseFloat(val) >= 20000, /// tạm sửa thành 20k để test PayOS
+                    rule: (val) => parseFloat(val) >= 200000, /// tạm sửa thành 20k để test PayOS
                     required: true,
                 },
                 positive_number: {

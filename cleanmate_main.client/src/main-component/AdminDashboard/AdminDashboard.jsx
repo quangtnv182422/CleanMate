@@ -11,6 +11,8 @@ import {
     TableHead,
     TableRow,
     Paper,
+    FormControl,
+    InputLabel,
     Select,
     MenuItem,
     IconButton,
@@ -21,6 +23,11 @@ import {
     ListItemButton,
     ListItemText,
     Divider,
+    TextField,
+    Dialog, 
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -28,33 +35,20 @@ import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import PeopleIcon from '@mui/icons-material/People';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
-import CheckIcon from '@mui/icons-material/Check';
 import useAuth from '../../hooks/useAuth';
 import userImage from '../../images/user-image.png';
+import { BookingStatusContext } from '../../context/BookingStatusProvider';
 
 const drawerWidth = 300;
 
 const colorMap = {
-    'Việc mới': '#4DA8DA', // Việc mới - Xanh lam nhạt
-    'Đã hủy': '#A9A9A9', // Đã hủy - Xám
-    'Đã nhận': '#28A745', // Đã nhận - Xanh lá
-    'Đang thực hiện': '#FF8C00', // Đang thực hiện - Cam
-    'Chờ xác nhận': '#FFD700', // Chờ xác nhận - Vàng
-    'Hoàn thành': '#004085'  // Hoàn thành - Xanh dương đậm
+    'Việc mới': '#4DA8DA',          // Xanh lam nhạt
+    'Đã hủy': '#FF4C4C',            // Đỏ
+    'Đã nhận': '#0077B6',           // Xanh lam đậm hơn 'Việc mới'
+    'Đang thực hiện': '#800080',    // Tím
+    'Chờ xác nhận': '#FFD700',      // Vàng
+    'Hoàn thành': '#28A745',        // Xanh lá
 };
-
-const array = new Array(10).fill().map((_, index) => ({
-    "address": "390 Đ. Nguyễn Văn Cừ, Ngõc Lâm, Long Biên, Hà Nội, Vietnam",
-    "bookingId": 1,
-    "customerFullName": "Hoang Tien",
-    "date": "2025-05-24",
-    "duration": 1,
-    "note": "First time booking",
-    "serviceName": "Dọn nhà theo giờ",
-    "startTime": "08:00:00",
-    "status": "Việc mới",
-    "totalPrice": 250000
-}));
 
 const UserList = () => {
     return <h1>UserList</h1>
@@ -65,27 +59,136 @@ const CleanerList = () => {
 }
 
 const AdminDashboard = () => {
-    const { user, loading } = useAuth();
-    const [search, setSearch] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [page, setPage] = useState(1);
-    const [data, setData] = useState([]);
     const navigate = useNavigate();
+
+    const { statusList } = useContext(BookingStatusContext);
+    const { user, loading } = useAuth();
+
+    const [status, setStatus] = useState(0);
+    const [page, setPage] = useState(1);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [tabValue, setTabValue] = useState(0);
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const [data, setData] = useState([]);
+    const [cleaners, setCleaners] = useState([]);
+    const [selectedCleaner, setSelectedCleaner] = useState({});
+    const [selectedWork, setSelectedWork] = useState(null);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    console.log(cleaners)
     const role = user?.roles?.[0];
-    console.log(role)
-    useEffect(() => {
+
+    const fetchBooking = useCallback(async () => {
         if (loading) return;
         if (!user || role !== 'Admin') {
             toast.error("Bạn không có quyền truy cập vào trang này");
             navigate('/home');
             return;
         }
-        setData(array)
-    }, [navigate, role, user, loading])
+
+        try {
+            const url = status
+                ? `/managebooking/get-booking-admin?status=${status}`
+                : '/managebooking/get-booking-admin';
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const workItems = await response.json();
+            setData(workItems);
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    }, [loading, user, role, navigate, setData, status]);
+
+    const handleSelectWork = (work) => {
+        setSelectedWork(work);
+        setOpenConfirm(true);
+    }
+
+    const getCleaners = async () => {
+        try {
+            const response = await fetch('/managebooking/get-cleaners', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const cleanersData = await response.json();
+            setCleaners(cleanersData);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchBooking();
+        getCleaners();
+    }, [fetchBooking]);
+
+    const handleSelectCleaner = (bookingId, e) => {
+        const selectedCleanerObj = cleaners.find(cleaner => cleaner.cleanerId === e.target.value);
+        setSelectedCleaner((prev) => ({
+            ...prev,
+            [bookingId]: selectedCleanerObj, // Lưu cả object cleaner
+        }));
+    };
+
+    const handleAssignCleaner = async () => {
+        if (!selectedWork || !selectedCleaner[selectedWork.bookingId]) {
+            toast.error("Vui lòng chọn nhân viên trước khi giao việc!");
+            return;
+        }
+
+        const { bookingId } = selectedWork;
+        const cleanerId = selectedCleaner[selectedWork.bookingId].cleanerId;
+
+        try {
+            const response = await fetch('/managebooking/assign-cleaner', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    bookingId,
+                    cleanerId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Cập nhật state data với thông tin nhân viên mới
+            setData((prevData) =>
+                prevData.map((item) =>
+                    item.bookingId === bookingId
+                        ? { ...item, cleanerId, cleanerName: selectedCleaner[bookingId].name }
+                        : item
+                )
+            );
+
+            toast.success("Giao việc thành công!");
+            setOpenConfirm(false); // Đóng dialog sau khi giao việc
+        } catch (error) {
+            console.error('Error assigning cleaner:', error);
+            toast.error("Lỗi khi giao việc!");
+        }
+    }
 
     const handleDrawerOpen = () => {
         setOpenDrawer(true);
@@ -114,67 +217,13 @@ const AdminDashboard = () => {
             icon: <PeopleIcon sx={style.drawerIcon} />,
         },
     ];
-    const handleSort = useCallback((vietnameseKey) => {
-        const keyMapping = {
-            'tên': 'serviceName',
-            'khách hàng': 'customerFullName',
-            'giờ làm': 'startTime',
-            'làm trong': 'duration',
-            'địa chỉ': 'address',
-            'ghi chú': 'note',
-            'số tiền': 'totalPrice',
-            'trạng thái': 'status',
-        };
-
-        let direction = 'asc';
-        if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
-
-        const sortedData = [...data].sort((a, b) => {
-            let valueA = a[englishKey];
-            let valueB = b[englishKey];
-
-            if (englishKey === 'startTime') {
-                const dateTimeA = new Date(`${a.date}T${a.startTime}`);
-                const dateTimeB = new Date(`${b.date}T${b.startTime}`);
-                valueA = dateTimeA.getTime();
-                valueB = dateTimeB.getTime();
-            } else if (englishKey === 'totalPrice') {
-                valueA = Number(valueA);
-                valueB = Number(valueB);
-            } else if (typeof valueA === 'string') {
-                valueA = valueA.toLowerCase();
-                valueB = valueB.toLowerCase();
-            }
-
-            if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-            if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        setSortConfig({ key: vietnameseKey, direction });
-        setData(sortedData);
-    }, [data, sortConfig, setData]);
-
-    const filteredData = useMemo(() => {
-        return data.filter((row) =>
-            row.serviceName?.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [data, search]);
-
-    const paginatedData = useMemo(() => {
-        const startIndex = (page - 1) * rowsPerPage;
-        return filteredData.slice(startIndex, startIndex + rowsPerPage);
-    }, [filteredData, page, rowsPerPage]);
 
     const handleLogout = () => {
         fetch('/Authen/logout', {
             method: 'POST',
             credentials: 'include',
         }).then(() => {
-           navigate('/login')
+            navigate('/login')
         });
     };
 
@@ -199,129 +248,263 @@ const AdminDashboard = () => {
         return `${hour}:${minute}`;
     };
 
-    const WorkListPage = () => (
-        <Box>
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                mb: 1,
-                '@media (max-width: 915px)': {
-                    width: '100%',
-                    justifyContent: 'flex-start',
-                    mt: 1,
-                },
-            }}>
-                <Box>
-                    <IconButton>
-                        <FileDownload />
-                    </IconButton>
-                    <IconButton>
-                        <FilterList />
-                    </IconButton>
-                    <Select
-                        value={rowsPerPage}
-                        onChange={(e) => setRowsPerPage(e.target.value)}
-                        size="small"
-                        sx={{ ml: 1 }}
-                    >
-                        <MenuItem value={5}>5</MenuItem>
-                        <MenuItem value={10}>10</MenuItem>
-                        <MenuItem value={25}>25</MenuItem>
-                    </Select>
-                </Box>
-            </Box>
+    const handleStatusChange = (event) => {
+        setStatus(event.target.value);
+        setPage(1); // Reset to first page when status changes
+    };
 
-            <TableContainer component={Paper} sx={{
-                overflowX: 'auto',
-                maxWidth: '100%',
-                '& .MuiTable-root': {
-                    minWidth: 915,
-                },
-                '@media (max-width: 915px)': {
-                    width: '100vw',
-                    marginLeft: '-16px',
-                    marginRight: '-16px',
-                },
-            }}>
-                <Table sx={{ minWidth: 650 }} aria-label="work list table">
-                    <TableHead>
-                        <TableRow>
-                            {['tên', 'khách hàng', 'giờ làm', 'làm trong', 'địa chỉ', 'ghi chú', 'số tiền', 'trạng thái'].map((key) => (
-                                <TableCell key={key}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                                        <IconButton onClick={() => handleSort(key)} size="small">
-                                            {sortConfig.key === key ? (
-                                                sortConfig.direction === 'asc' ? (
-                                                    <ArrowUpward fontSize="small" />
+    const WorkListPage = () => {
+        const [search, setSearch] = useState('');
+
+        const filteredData = useMemo(() => {
+            return data.filter((row) =>
+                row.customerFullName?.toLowerCase().includes(search.toLowerCase()) ||
+                row.cleanerName?.toLowerCase().includes(search.toLowerCase())
+            );
+        }, [search]);
+
+        const paginatedData = useMemo(() => {
+            const startIndex = (page - 1) * rowsPerPage;
+            return filteredData.slice(startIndex, startIndex + rowsPerPage);
+        }, [filteredData]);
+
+        const handleSort = useCallback((vietnameseKey) => {
+            const keyMapping = {
+                'tên': 'serviceName',
+                'khách hàng': 'customerFullName',
+                'người dọn': 'cleanerName',
+                'giờ làm': 'startTime',
+                'làm trong': 'duration',
+                'địa chỉ': 'address',
+                'ghi chú': 'note',
+                'số tiền': 'totalPrice',
+                'trạng thái': 'status',
+            };
+
+            let direction = 'asc';
+            if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
+                direction = 'desc';
+            }
+            const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
+
+            const sortedData = [...data].sort((a, b) => {
+                let valueA = a[englishKey];
+                let valueB = b[englishKey];
+
+                if (englishKey === 'cleanerName') {
+                    valueA = valueA || 'Chưa phân công'; // Nếu null, dùng "Chưa phân công"
+                    valueB = valueB || 'Chưa phân công';
+                }
+                if (englishKey === 'note') {
+                    valueA = valueA || 'không có ghi chú'; // Nếu null, dùng "không có ghi chú"
+                    valueB = valueB || 'không có ghi chú';
+                }
+
+                if (englishKey === 'startTime') {
+                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
+                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
+                    valueA = dateTimeA.getTime();
+                    valueB = dateTimeB.getTime();
+                } else if (englishKey === 'totalPrice') {
+                    valueA = Number(valueA);
+                    valueB = Number(valueB);
+                } else if (typeof valueA === 'string') {
+                    valueA = valueA.toLowerCase();
+                    valueB = valueB?.toLowerCase();
+                }
+
+                if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+                if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            setSortConfig({ key: vietnameseKey, direction });
+            setData(sortedData);
+        }, []);
+
+        return (
+            <Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 1,
+                    '@media (max-width: 915px)': {
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        mt: 1,
+                    },
+                }}>
+                    <Box sx={{
+                        maxWidth: '460px',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                    }}
+                    >
+                        <TextField
+                            key="search-input"
+                            type="text"
+                            name="search"
+                            label="Tìm kiếm theo tên người dùng hoặc nhân viên..."
+                            placeholder=""
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            inputProps={{ maxLength: 100 }}
+                            fullWidth
+                            sx={{
+                                maxWidth: 300,
+                                '& .MuiOutlinedInput-input': {
+                                    padding: '10px 15px',
+                                    textAlign:'center',
+                                },
+                                '@media (max-width: 600px)': {
+                                    maxWidth: '100%',
+                                },
+                            }}
+                        />
+                        <FormControl size="small" sx={{ width: '60%' }}>
+                            <InputLabel id="status-select-label">Trạng thái</InputLabel>
+                            <Select
+                                labelId="status-select-label"
+                                value={status}
+                                onChange={handleStatusChange}
+                                label="Trạng thái"
+                            >
+                                <MenuItem value={0}>
+                                    Tất cả công việc
+                                </MenuItem>
+                                {statusList.map((statusItem) => (
+                                    <MenuItem key={statusItem.id} value={statusItem.id}>
+                                        {statusItem.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    <Box>
+                        <IconButton>
+                            <FileDownload />
+                        </IconButton>
+                        <IconButton>
+                            <FilterList />
+                        </IconButton>
+                        <Select
+                            value={rowsPerPage}
+                            onChange={(e) => setRowsPerPage(e.target.value)}
+                            size="small"
+                            sx={{ ml: 1 }}
+                        >
+                            <MenuItem value={5}>5</MenuItem>
+                            <MenuItem value={10}>10</MenuItem>
+                            <MenuItem value={25}>25</MenuItem>
+                        </Select>
+                    </Box>
+                </Box>
+
+                <TableContainer component={Paper} sx={{
+                    overflowX: 'auto',
+                    maxWidth: '100%',
+                    '& .MuiTable-root': {
+                        minWidth: 915,
+                    },
+                    '@media (max-width: 915px)': {
+                        width: '100vw',
+                        marginLeft: '-16px',
+                        marginRight: '-16px',
+                    },
+                }}>
+                    <Table sx={{ minWidth: 650 }} aria-label="work list table">
+                        <TableHead>
+                            <TableRow>
+                                {['tên', 'khách hàng', 'người dọn', 'giờ làm', 'làm trong', 'địa chỉ', 'ghi chú', 'số tiền', 'trạng thái'].map((key) => (
+                                    <TableCell key={key}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                                            <IconButton onClick={() => handleSort(key)} size="small">
+                                                {sortConfig.key === key ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <ArrowUpward fontSize="small" />
+                                                    ) : (
+                                                        <ArrowDownward fontSize="small" />
+                                                    )
                                                 ) : (
-                                                    <ArrowDownward fontSize="small" />
-                                                )
-                                            ) : (
-                                                <ArrowUpward fontSize="small" color="disabled" />
-                                            )}
-                                        </IconButton>
-                                    </Box>
-                                </TableCell>
-                            ))}
-                            <TableCell>Phân công</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {paginatedData.map((row) => (
-                            <TableRow key={row.bookingId}>
-                                <TableCell>{row.serviceName}</TableCell>
-                                <TableCell>{row.customerFullName}</TableCell>
-                                <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
-                                <TableCell>{row.duration} tiếng</TableCell>
-                                <TableCell sx={{maxWidth: 160} }>{row.address}</TableCell>
-                                <TableCell>{row.note}</TableCell>
-                                <TableCell>{formatPrice(row.totalPrice)}</TableCell>
-                                <TableCell>
-                                    <span
-                                        style={{
-                                            backgroundColor: colorMap[row.status] || '#000000',
-                                            color: '#FFFFFF',
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            display: 'inline-block',
+                                                    <ArrowUpward fontSize="small" color="disabled" />
+                                                )}
+                                            </IconButton>
+                                        </Box>
+                                    </TableCell>
+                                ))}
+                                <TableCell>Phân công</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedData?.map((row) => (
+                                <TableRow key={row.bookingId}>
+                                    <TableCell>{row.serviceName}</TableCell>
+                                    <TableCell>{row.customerFullName}</TableCell>
+                                    <TableCell>{row.cleanerName ? row.cleanerName : 'Chưa phân công'}</TableCell>
+                                    <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
+                                    <TableCell>{row.duration} tiếng</TableCell>
+                                    <TableCell sx={{ maxWidth: 160 }}>{row.address}</TableCell>
+                                    <TableCell>{row.note ? row.note : "không có ghi chú"}</TableCell>
+                                    <TableCell>{formatPrice(row.totalPrice)}</TableCell>
+                                    <TableCell>
+                                        <span
+                                            style={{
+                                                backgroundColor: colorMap[row.status] || '#000000',
+                                                color: '#FFFFFF',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                display: 'inline-block',
+                                            }}
+                                        >
+                                            {row.status}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            textAlign: 'center',
+                                            cursor: 'pointer',
                                         }}
                                     >
-                                        {row.status}
-                                    </span>
-                                </TableCell>
-                                <TableCell
-                                    sx={{
-                                        textAlign: 'center',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    <Select label="Nhân viên">
-                                        <MenuItem value={1}>Hoàng Tiến Dũng</MenuItem>
-                                        <MenuItem value={2}>Nguyễn Tùng Lâm</MenuItem>
-                                        <MenuItem value={3}>Trương Nguyễn Việt Quang</MenuItem>
-                                    </Select>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                        <FormControl size="large" sx={{ width: '100%' }}>
+                                            <InputLabel id="status-select-label">Nhân viên</InputLabel>
+                                            <Select
+                                                labelId="status-select-label"
+                                                value={selectedCleaner[row.bookingId]?.cleanerId || ''}
+                                                onChange={(e) => handleSelectCleaner(row.bookingId, e)}
+                                                label="Nhân viên"
+                                            >
+                                                {cleaners.map((cleaner) => (
+                                                    <MenuItem key={cleaner.cleanerId} value={cleaner.cleanerId} onClick={() => handleSelectWork(row)}>
+                                                        {cleaner.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                <Pagination
-                    count={Math.ceil(filteredData.length / rowsPerPage)}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                />
-                <Typography sx={{ ml: 2, alignSelf: 'center' }}>
-                    {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData.length)} of ${filteredData.length}`}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Pagination
+                        count={Math.ceil(filteredData?.length / rowsPerPage)}
+                        page={page}
+                        onChange={(e, value) => setPage(value)}
+                        color="primary"
+                    />
+                    <Typography sx={{ ml: 2, alignSelf: 'center' }}>
+                        {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData?.length)} of ${filteredData?.length}`}
+                    </Typography>
+                </Box>
             </Box>
-        </Box>
-    );
+        )
+    };
 
     const renderPage = () => {
         switch (tabValue) {
@@ -335,6 +518,7 @@ const AdminDashboard = () => {
                 return <WorkListPage />;
         }
     };
+
     return (
         <Box sx={{ display: 'flex', mr: 1, mb: 2 }}>
             <Drawer
@@ -417,6 +601,25 @@ const AdminDashboard = () => {
             <Box sx={{ flexGrow: 1, pt: 3, pl: 8, mb: 2 }}>
                 {renderPage()}
             </Box>
+            {openConfirm && (
+                <Dialog
+                    open={openConfirm}
+                    onClose={() => setOpenConfirm(false)}
+                >
+                    <DialogTitle>
+                        Xác nhận giao việc
+                    </DialogTitle>
+                    <DialogContent> 
+                        <Typography>
+                            Bạn có chắc chắn muốn giao việc này cho nhân viên {selectedCleaner[selectedWork?.bookingId]?.name || 'Chưa chọn'}?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" color="error" onClick={() => setOpenConfirm(false)}>Hủy</Button>
+                        <Button variant="contained" color="primary" onClick={handleAssignCleaner}>Đồng ý</Button>
+                    </DialogActions>
+                </Dialog>
+            ) }
         </Box>
     )
 }

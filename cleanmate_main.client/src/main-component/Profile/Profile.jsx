@@ -1,4 +1,7 @@
 ﻿import React, { Fragment } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import Scrollbar from '../../components/scrollbar/scrollbar'
@@ -8,6 +11,17 @@ import userImage from '../../images/user-image.png'
 import useAuth from '../../hooks/useAuth';
 const Profile = (props) => {
     const { user, loading } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (loading) return;
+
+        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
+        if (role === 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/public-work');
+        }
+    }, [user, loading, navigate]);
     const SubmitHandler = (e) => {
         e.preventDefault();
     }

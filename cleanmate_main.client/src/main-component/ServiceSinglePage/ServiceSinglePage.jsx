@@ -1,7 +1,8 @@
 ﻿import React, { Fragment, useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { BookingContext } from '../../context/BookingProvider';
 import { Box } from '@mui/material';
+import { toast } from 'react-toastify';
 import Navbar from '../../components/Navbar/Navbar'
 import Scrollbar from '../../components/scrollbar/scrollbar'
 import Benefits from './benefits'
@@ -12,6 +13,7 @@ import MainImage from '../../images/service-single/hourly-cleaning-main-image.we
 import SubImage1 from '../../images/service-single/hourly-cleaning-sub-image-1.jpg';
 import SubImage2 from '../../images/service-single/hourly-cleaning-sub-image-2.jpg';
 import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
 
 const ServiceSinglePage = () => {
     const { id } = useParams();
@@ -20,6 +22,19 @@ const ServiceSinglePage = () => {
     //use params to get the id from the url
     //use id to get the service details from the api
     //use context to store the service details object
+
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (loading) return;
+
+        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
+        if (role === 'Cleaner') {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/public-work');
+        }
+    }, [user, loading, navigate]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -100,7 +115,7 @@ const ServiceSinglePage = () => {
                                 <Benefits />
                             </div>
                         </div>
-                        <ServiceSidebar id={serviceDetails.serviceId} />
+                        <ServiceSidebar id={serviceDetails?.serviceId} />
                     </div>
                 </div>
             </section>

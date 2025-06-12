@@ -15,8 +15,8 @@ import { Modal, Box, Typography } from '@mui/material';
 
 
 const HomePage2 = () => {
-    const { user, loading } = useAuth();
     //const [openModal, setOpenModal] = useState(false)
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {

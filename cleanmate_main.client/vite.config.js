@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url';
+﻿import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
@@ -104,7 +104,7 @@ export default defineConfig({
                 target,
                 secure: false
             },
-            '^/request': {
+            '^/managebooking': {
                 target,
                 secure: false
             }

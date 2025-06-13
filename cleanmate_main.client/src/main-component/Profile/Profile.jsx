@@ -13,15 +13,7 @@ const Profile = (props) => {
     const { user, loading } = useAuth();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (loading) return;
-
-        const role = user?.roles?.[0];// Nếu là Cleaner thì return về trang public-work
-        if (role === 'Cleaner') {
-            toast.error("Bạn không có quyền truy cập trang này")
-            navigate('/public-work');
-        }
-    }, [user, loading, navigate]);
+    
     const SubmitHandler = (e) => {
         e.preventDefault();
     }

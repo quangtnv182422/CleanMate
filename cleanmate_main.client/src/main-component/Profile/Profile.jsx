@@ -1,7 +1,9 @@
 ﻿import React, { Fragment } from 'react';
+import Button from '@mui/material/Button';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import Scrollbar from '../../components/scrollbar/scrollbar'
@@ -24,6 +26,7 @@ const Profile = (props) => {
             <div className="team-pg-area section-padding">
                 <div className="container">
                     <div className="team-info-wrap">
+                        <Button variant="text" sx={{ fontSize: '16px' }} onClick={() => navigate('/public-work')} startIcon={<KeyboardBackspaceIcon /> }>Quay lại</Button>
                         <div className="row align-items-center">
                             <div className="col-lg-6">
                                 <div className="team-info-img">

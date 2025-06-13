@@ -30,7 +30,7 @@ const paymentMethods = [
         id: "vnpay",
         name: "VNPay",
         logo: vnpayLogo,
-        isAvailable: true,
+        isAvailable: false,
     },
     {
         id: "payos",

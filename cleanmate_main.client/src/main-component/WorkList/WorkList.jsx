@@ -40,6 +40,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import ReviewsIcon from '@mui/icons-material/Reviews';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import PaidIcon from '@mui/icons-material/Paid';
@@ -54,6 +55,7 @@ import InProgressWork from '../../components/InProgressWork/InProgressWork';
 import Revenue from '../../components/Revenue/Revenue';
 import DepositCoin from '../../components/Coin/DepositCoin';
 import WithdrawCoin from '../../components/Coin/WithdrawCoin';
+import CleanerViewFeedback from '../../components/CleanerViewFeedback/CleanerViewFeedback';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -412,10 +414,12 @@ const WorkList = () => {
             case 3:
                 return <InProgressWork />
             case 4:
-                return <Revenue />;
+                return <CleanerViewFeedback />
             case 5:
-                return <DepositCoin />;
+                return <Revenue />;
             case 6:
+                return <DepositCoin />;
+            case 7:
                 return <WithdrawCoin />;
             default:
                 return <WorkListPage />;
@@ -452,6 +456,10 @@ const WorkList = () => {
         {
             title: 'Công việc đã hủy',
             icon: <CancelIcon sx={style.drawerIcon} />
+        },
+        {
+            title: 'Đánh giá của khách hàng',
+            icon: <ReviewsIcon sx={style.drawerIcon} />,
         },
         {
             title: 'Thu nhập',

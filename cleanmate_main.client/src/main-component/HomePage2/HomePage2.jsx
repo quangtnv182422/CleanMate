@@ -26,6 +26,9 @@ const HomePage2 = () => {
         if (role === 'Cleaner') {
             toast.error("Bạn không có quyền truy cập trang này")
             navigate('/public-work');
+        } else if (role === "Admin") {
+            toast.error("Bạn không có quyền truy cập trang này")
+            navigate('/admin/dashboard');
         }
     }, [user, loading, navigate]);
 

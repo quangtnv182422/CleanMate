@@ -63,6 +63,14 @@ const useAuth = () => {
         fetchUser();
     }, [refresh]); // Fetch lại khi refresh thay đổi
 
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem("user", JSON.stringify(user));
+        } else {
+            localStorage.removeItem("user");
+        }
+    }, [user]);
+
     return { user, loading, refreshAuth: () => setRefresh(prev => prev + 1), setUser };
 };
 

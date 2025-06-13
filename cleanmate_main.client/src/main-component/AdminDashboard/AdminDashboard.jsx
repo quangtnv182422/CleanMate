@@ -353,7 +353,8 @@ const AdminDashboard = () => {
                             key="search-input"
                             type="text"
                             name="search"
-                            placeholder="Tìm kiếm theo tên người dùng hoặc nhân viên..."
+                            label="Tìm kiếm theo tên khách hàng hoặc nhân viên"
+                            size="small"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             inputProps={{ maxLength: 100 }}

@@ -292,7 +292,7 @@ const BookingService = () => {
                             <Button
                                 variant="outlined"
                                 sx={{ ml: 4, mt: 1, fontSize: '12px' }}
-                                onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
+                                onClick={() => window.location.href = `/map.html?service=${serviceId}`}
                             >
                                 Thêm địa chỉ mới
                             </Button>
@@ -376,7 +376,7 @@ const BookingService = () => {
                                             <Button
                                                 variant="outlined"
                                                 sx={{ width: '100%' }}
-                                                onClick={() => navigate(`/booking-service/choose-address?service=${serviceId}`)}
+                                                    onClick={() => window.location.href = `/map.html?service=${serviceId}`}
                                             >
                                                 Chọn địa chỉ mới
                                             </Button>

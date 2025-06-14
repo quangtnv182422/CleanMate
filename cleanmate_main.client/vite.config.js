@@ -108,6 +108,11 @@ export default defineConfig({
                 target,
                 secure: false
             }
+            ,
+            '^/cleanperhour': {
+                target,
+                secure: false
+            }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),
         https: {

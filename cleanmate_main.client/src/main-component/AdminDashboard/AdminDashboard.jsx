@@ -32,6 +32,7 @@ import {
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
@@ -40,6 +41,7 @@ import userImage from '../../images/user-image.png';
 import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WithdrawRequest from '../../components/WithdrawRequest/WithdrawRequest';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import Dashboard from '../../components/Dashboard/Dashboard';
 
 const drawerWidth = 300;
 
@@ -206,6 +208,10 @@ const AdminDashboard = () => {
     };
 
     const menuItems = [
+        {
+            title: 'Dashboard',
+            icon: <DashboardIcon sx={style.drawerIcon} />,
+        },
         {
             title: 'Bảng công việc',
             icon: <DnsOutlinedIcon sx={style.drawerIcon} />,
@@ -514,12 +520,14 @@ const AdminDashboard = () => {
     const renderPage = () => {
         switch (tabValue) {
             case 0:
-                return <WorkListPage />;
+                return <Dashboard />
             case 1:
-                return <UserList />
+                return <WorkListPage />;
             case 2:
-                return <CleanerList />
+                return <UserList />
             case 3:
+                return <CleanerList />
+            case 4:
                 return <WithdrawRequest />
             default:
                 return <WorkListPage />;

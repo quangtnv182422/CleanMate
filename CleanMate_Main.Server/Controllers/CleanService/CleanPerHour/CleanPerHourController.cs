@@ -1,8 +1,10 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Authentication;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanMate_Main.Server.Controllers.CleanService.CleanPerHour
 {
@@ -16,17 +18,26 @@ namespace CleanMate_Main.Server.Controllers.CleanService.CleanPerHour
             _cleanPerHourService = cleanPerHourService;
         }
 
-       /* [HttpGet]
-        public async Task<ActionResult<List<ServicePrice>>> GetAllServiceCleanPerHour()
+        [HttpGet("available")]
+        public async Task<ActionResult<List<CleanerDTO>>> GetAvailableCleaners([FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
         {
-            var result = await _cleanPerHourService.GetAllServiceCleanPerHourAsync();
-
-            if (result == null || result.Count == 0)
+            try
             {
-                return NotFound("Không tìm thấy dịch vụ dọn dẹp theo giờ.");
+                var availableCleaners = await _cleanPerHourService.GetAvailableCleanersForTimeSlotAsync(startTime, endTime);
+                return Ok(availableCleaners);
             }
-
-            return Ok(result);
-        }*/
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized("Bạn không có quyền thực hiện hành động này.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Đã xảy ra lỗi khi xử lý yêu cầu.");
+            }
+        }
     }
 }

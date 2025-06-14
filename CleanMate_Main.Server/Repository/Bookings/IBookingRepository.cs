@@ -10,7 +10,7 @@ namespace CleanMate_Main.Server.Repository.Bookings
         Task<List<Booking>> GetBookingsByUserIdAsync(string userId, int? statusId);
         Task<List<Booking>> GetBookingsForAdminAsync(int? status = null);
         Task<bool> ProcessBookingAfterAssigningCleanerAsync(int bookingId, string cleanerId);
-
+        
 
     }
 }

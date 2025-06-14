@@ -7,7 +7,7 @@ namespace CleanMate_Main.Server.Common
         public const int DefaultPageSize = 9;
         public static readonly TimeSpan TIME_INTERVAL = TimeSpan.FromMinutes(20);
         // time interval between each work shift calculated in minutes
-        public static readonly decimal COMMISSION_PERCENTAGE = 0.55m; 
+        public static readonly decimal COMMISSION_PERCENTAGE = 0.80m; 
         //Commission percentage 
         public static readonly decimal MINIMUM_DEBIT_AMOUNT = 200000m; //toi thieu can 200k coin
         public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000m; //nap toi thieu 200k coin

@@ -29,6 +29,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         Task<decimal> GetMonthlyEarningsAsync(string employeeId);
         Task<IEnumerable<MonthlyEarningViewModel>> GetEarningsByMonthAsync(string employeeId);
         Task<List<CleanerDTO>> GetAvailableCleanersAsync();
-
+        Task<IEnumerable<FeedbackHistoryViewModel>> GetFeedbackHistoryAsync(string employeeId);
+        Task<int> CountFeedbackDone(string employeeId);
     }
 }

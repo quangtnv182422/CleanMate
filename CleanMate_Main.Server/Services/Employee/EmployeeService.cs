@@ -4,6 +4,7 @@ using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Repository.Wallet;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Services.Employee
 {
@@ -235,6 +236,29 @@ namespace CleanMate_Main.Server.Services.Employee
         public async Task<List<CleanerDTO>> GetAvailableCleanersAsync()
         {
             return await _employeeRepository.GetAvailableCleanersAsync();
+        }
+
+        public async Task<IEnumerable<FeedbackHistoryViewModel>> GetFeedbackHistoryAsync(string employeeId)
+        {
+            return await _employeeRepository.GetFeedbackHistoryAsync(employeeId);
+        }
+
+        public async Task<bool> RecalculateCleanerRatingAsync(string employeeId, int newRating)
+        {
+            var cleanerProfile = await _employeeRepository.GetPersonalProfileAsync(employeeId);
+            if (cleanerProfile == null)
+            {
+                throw new KeyNotFoundException("Hồ sơ người dọn dẹp không tồn tại.");
+            }
+
+            var feedbackCount = await _employeeRepository.CountFeedbackDone(employeeId);
+
+            var averageRating = cleanerProfile.AverageRating ?? 0;
+
+            var newAverage = (averageRating * feedbackCount + newRating) / (feedbackCount + 1);
+            cleanerProfile.AverageRating = newAverage;
+
+            return await _employeeRepository.UpdatePersonalProfileAsync(cleanerProfile);
         }
     }
 }

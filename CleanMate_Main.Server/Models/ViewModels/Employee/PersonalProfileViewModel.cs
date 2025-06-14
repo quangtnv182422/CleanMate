@@ -15,6 +15,7 @@
         public string ActiveAreas { get; set; }
         public bool IsAvailable { get; set; }
         public int ExperienceYears { get; set; }
-        public double AverageRating { get; set; }
+        public double? AverageRating { get; set; }
+
     }
 }

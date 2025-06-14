@@ -335,7 +335,7 @@ const CleanerViewFeedback = () => {
                     ) : (
                         displayedWork.map((work, idx) => (
                             <Grid item xs={12} sm={6} md={4} key={idx}>
-                                <Card sx={style.workCard} onClick={() => handleOpenFeedbackDetails(work)}>
+                                <Card sx={style.workCard}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
                                             Bắt đầu lúc {work.startTime} ngày {work.date}

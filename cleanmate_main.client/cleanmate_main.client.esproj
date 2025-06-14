@@ -17,6 +17,7 @@
     <Folder Include="src\components\Loading\" />
     <Folder Include="src\components\BookingDetails\" />
     <Folder Include="src\components\Feedback\" />
+    <Folder Include="src\components\Dashboard\" />
     <Folder Include="src\components\Revenue\" />
     <Folder Include="src\main-component\ConfirmMail\" />
     <Folder Include="src\main-component\AdminDashboard\" />

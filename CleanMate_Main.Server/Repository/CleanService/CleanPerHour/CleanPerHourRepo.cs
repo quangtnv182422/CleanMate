@@ -27,14 +27,30 @@ namespace CleanMate_Main.Server.Repository.CleanService.CleanPerHour
 
         public async Task<List<string>> GetBookedCleanersAsync(DateOnly requestDate, TimeOnly requestStartTime, TimeOnly requestEndTime)
         {
-            return await _context.Bookings
+            // Lấy dữ liệu từ database với các điều kiện đơn giản
+            var bookings = await _context.Bookings
                 .Where(b => b.BookingStatusId != CommonConstants.BookingStatus.CANCEL
-                         && b.Date == requestDate
-                         && b.StartTime < requestEndTime
-                         && TimeOnly.FromTimeSpan(b.StartTime.ToTimeSpan().Add(TimeSpan.FromHours(b.ServicePrice.Duration.DurationTime))) > requestStartTime)
+                            && b.Date == requestDate
+                            && b.StartTime < requestEndTime)
+                .Include(b => b.ServicePrice)
+                    .ThenInclude(sp => sp.Duration) // Tải dữ liệu liên quan
+                .ToListAsync();
+
+            // Lọc trong bộ nhớ với phép tính thời gian
+            var bookedCleaners = bookings
+                .Where(b =>
+                {
+                    if (b.ServicePrice?.Duration == null) return false; // Kiểm tra null
+                    var startTime = b.StartTime;
+                    var durationHours = b.ServicePrice.Duration.DurationTime;
+                    var endTime = TimeOnly.FromTimeSpan(startTime.ToTimeSpan().Add(TimeSpan.FromHours(durationHours)));
+                    return endTime > requestStartTime;
+                })
                 .Select(b => b.CleanerId)
                 .Distinct()
-                .ToListAsync();
+                .ToList();
+
+            return bookedCleaners;
         }
     }
 }

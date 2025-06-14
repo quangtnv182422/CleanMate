@@ -403,7 +403,7 @@ namespace CleanMate_Main.Server.Repository.Employee
             cleanerProfile.Area = profile.ActiveAreas;
             cleanerProfile.Available = profile.IsAvailable;
             cleanerProfile.ExperienceYear = profile.ExperienceYears;
-
+            cleanerProfile.Rating = profile.AverageRating;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -503,6 +503,35 @@ namespace CleanMate_Main.Server.Repository.Employee
                     Name = c.User.FullName
                 })
                 .ToListAsync();
+        }
+        public async Task<IEnumerable<FeedbackHistoryViewModel>> GetFeedbackHistoryAsync(string employeeId)
+        {
+            var query = from booking in _context.Bookings
+                        join feedback in _context.Feedbacks on booking.BookingId equals feedback.BookingId
+                        join customer in _context.Users on booking.UserId equals customer.Id
+                        where booking.CleanerId == employeeId
+                            && booking.BookingStatusId == CommonConstants.BookingStatus.DONE
+                            && feedback.Rating > 0
+                        select new FeedbackHistoryViewModel
+                        {
+                            BookingId = booking.BookingId,
+                            Date = booking.Date.ToDateTime(TimeOnly.MinValue), // Use a default TimeOnly if needed, or adjust
+                            StartTime = booking.StartTime,
+                            Rating = feedback.Rating,
+                            Content = feedback.Content,
+                            CustomerFullName = customer.FullName
+                        };
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<int> CountFeedbackDone(string employeeId, int newRating)
+        {
+            var existingRatingsCount = await _context.Feedbacks
+                .Join(_context.Bookings, f => f.BookingId, b => b.BookingId, (f, b) => new { f, b })
+                .Where(fb => fb.b.CleanerId == employeeId && fb.b.BookingStatusId == CommonConstants.BookingStatus.DONE && fb.f.Rating > 0)
+                .CountAsync();
+            return existingRatingsCount;
         }
 
     }

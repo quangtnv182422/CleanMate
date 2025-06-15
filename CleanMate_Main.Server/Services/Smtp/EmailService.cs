@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace CleanMate_Main.Server.Services.Smtp
 {
@@ -34,6 +36,24 @@ namespace CleanMate_Main.Server.Services.Smtp
                 <p>Nhấn vào liên kết sau để đặt lại mật khẩu:</p>
                 <a href='{resetLink}'>Đặt lại mật khẩu</a>
             ";
+            await _emailSender.SendEmailAsync(email, subject, message);
+        }
+
+        public async Task SendNewBookingNotify(string email, Booking booking)
+        {
+            string subject = $"Bạn có một booking mới với mã User là: {booking.UserId} vào ngày {booking.Date.ToString("dd/MM/yyyy")}";
+            string message = $@"
+                <h3>Có booking mới</h3>
+                <p>Thông tin booking:</p>
+                <ul>
+                    <li>Mã User: {booking.UserId}</li>
+                    <li>Ngày: {booking.Date}</li>
+                    <li>Thời gian bắt đầu: {booking.StartTime}</li>
+                    <li>Địa chỉ ID: {booking.AddressId}</li>
+                    <li>Ghi chú: {booking.Note ?? "Không có"}</li>
+                    <li>Tổng giá: {booking.TotalPrice?.ToString("C", new System.Globalization.CultureInfo("vi-VN")) ?? "Chưa xác định"}</li>
+                </ul>
+    ";
             await _emailSender.SendEmailAsync(email, subject, message);
         }
     }

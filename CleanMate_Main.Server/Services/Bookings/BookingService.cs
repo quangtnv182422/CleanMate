@@ -3,6 +3,7 @@ using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
+using CleanMate_Main.Server.Services.Smtp;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -12,10 +13,13 @@ namespace CleanMate_Main.Server.Services.Bookings
     public class BookingService : IBookingService
     {
         private readonly IBookingRepository _bookingRepo;
+        private readonly IEmailService _emailService;
+       
 
-        public BookingService(IBookingRepository bookingRepo)
+        public BookingService(IBookingRepository bookingRepo, IEmailService emailService)
         {
             _bookingRepo = bookingRepo;
+            _emailService = emailService;
         }
 
 
@@ -35,8 +39,9 @@ namespace CleanMate_Main.Server.Services.Bookings
                 CreatedAt = DateTime.Now,
                 UpdatedAt = null
             };
-
-            return await _bookingRepo.AddBookingAsync(booking);
+            var addBooking = await _bookingRepo.AddBookingAsync(booking);
+            await _emailService.SendNewBookingNotify("cleanmatemail@gmail.com", addBooking);
+            return addBooking;
         }
 
 

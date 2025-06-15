@@ -163,9 +163,9 @@ const InProgressWork = () => {
                                                 variant="subtitle2"
                                                 sx={{
                                                     ...style.status,
-                                                    color: '#9575CD',
-                                                    backgroundColor: '#e2daf2',
-                                                    borderColor: '#9575CD',
+                                                    color: '#E4293D',
+                                                    backgroundColor: '#FCE8EA',
+                                                    borderColor: '#E4293D',
                                                 }}
                                             >
                                                 {work.status}

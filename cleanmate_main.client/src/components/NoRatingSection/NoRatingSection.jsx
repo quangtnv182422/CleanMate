@@ -28,8 +28,6 @@ const NoRatingSection = () => {
     const { user } = useAuth();
     const role = user?.roles?.[0] || '';
 
-    console.log(selectedOrder);
-
     const handleClose = () => {
         setOpen(false);
         setSelectedOrder(null);

@@ -117,6 +117,9 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
 
             if (response.status === 200) {
                 toast.success('Gửi đánh giá thành công.');
+                setTimeout(() => {
+                    window.location.reload(); // Hoặc dùng navigate(0) nếu dùng useNavigate()
+                }, 1500);
                 return true;
             } else {
                 toast.error(response.data.message || 'Gửi đánh giá thất bại.');

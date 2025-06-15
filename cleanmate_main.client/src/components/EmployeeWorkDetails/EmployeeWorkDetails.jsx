@@ -89,7 +89,7 @@ const EmployeeWorkDetails = () => {
                 <Typography sx={style.lightGray}>Số điện thoại: <strong style={style.fontBlack}>{selectedWork?.customerPhoneNumber}</strong></Typography>
                 <Typography sx={style.lightGray}>Số nhà: <strong style={style.fontBlack}>{selectedWork?.addressNo}</strong></Typography>
                 <Typography sx={style.lightGray}>Tại: <strong style={style.fontBlack}>{selectedWork?.address}</strong></Typography>
-                <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork?.note}</strong></Typography>
+                <Typography sx={style.lightGray}>Ghi chú: <strong style={style.fontBlack}>{selectedWork?.note ? selectedWork?.note : "Không có ghi chú"}</strong></Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Button variant="outlined" color="error" onClick={handleClose}>Đóng</Button>

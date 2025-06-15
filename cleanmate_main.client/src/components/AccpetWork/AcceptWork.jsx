@@ -162,14 +162,36 @@ const AcceptWork = () => {
     return (
         <Box sx={style.accpetWorkSection}>
             <Box className="container" sx={style.container}>
-                <Box sx={{ display: 'flex', gap: 2}}>
+                <Box sx={{
+                    display: 'flex',
+                    gap: 2,
+
+                    '@media (max-width: 400px)': {
+                        gap: 0.5,
+                    }
+                }}
+                >
                     <TextField
                         label="Tìm công việc theo tên"
                         variant="outlined"
                         size="small"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        sx={{ width: 150 }}
+                        sx={{
+                            width: 150,
+
+                            '@media (max-width: 414px)': {
+                                width: 130,
+                            },
+
+                            '@media (max-width: 365px)': {
+                                width: 115,
+                            },
+                            '@media (max-width: 350px)': {
+                                width: 100, 
+                            },
+
+                        }}
                     />
                     <FormControl size="small" sx={{ minWidth: 100 }}>
                         <InputLabel id="status-select-label">Trạng thái</InputLabel>
@@ -196,7 +218,7 @@ const AcceptWork = () => {
                             </Typography>
                         </Grid>
                     ) : (
-                        displayedWork.map((work, idx) => (
+                        displayedWork.reverse().map((work, idx) => (
                             <Grid item xs={12} sm={6} md={4} key={idx}>
                                 <Card sx={style.workCard} onClick={() => handleOpen(work.bookingId)}>
                                     <CardContent>

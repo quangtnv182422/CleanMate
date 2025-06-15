@@ -24,7 +24,7 @@ import {
     ListItemText,
     Divider,
     TextField,
-    Dialog, 
+    Dialog,
     DialogTitle,
     DialogContent,
     DialogActions
@@ -47,7 +47,7 @@ const drawerWidth = 300;
 
 const colorMap = {
     'Việc mới': '#4DA8DA',          // Xanh lam nhạt
-    'Đã hủy': '#FF4C4C',            // Đỏ
+    'Đã huỷ': '#F00',            // Đỏ
     'Đã nhận': '#0077B6',           // Xanh lam đậm hơn 'Việc mới'
     'Đang thực hiện': '#800080',    // Tím
     'Chờ xác nhận': '#FFD700',      // Vàng
@@ -80,7 +80,6 @@ const AdminDashboard = () => {
     const [selectedCleaner, setSelectedCleaner] = useState({});
     const [selectedWork, setSelectedWork] = useState(null);
     const [openConfirm, setOpenConfirm] = useState(false);
-    console.log(cleaners)
     const role = user?.roles?.[0];
 
     const fetchBooking = useCallback(async () => {
@@ -111,8 +110,9 @@ const AdminDashboard = () => {
             setData(workItems);
         } catch (error) {
             console.error('Error fetching work list:', error);
+            toast.error("Lỗi khi tải danh sách công việc!");
         }
-    }, [loading, user, role, navigate, setData, status]);
+    }, [loading, user, role, navigate, status]);
 
     const handleSelectWork = (work) => {
         setSelectedWork(work);
@@ -134,7 +134,8 @@ const AdminDashboard = () => {
             const cleanersData = await response.json();
             setCleaners(cleanersData);
         } catch (error) {
-            console.log(error)
+            console.error('Error fetching cleaners:', error);
+            toast.error("Lỗi khi tải danh sách nhân viên!");
         }
     }
 
@@ -147,7 +148,7 @@ const AdminDashboard = () => {
         const selectedCleanerObj = cleaners.find(cleaner => cleaner.cleanerId === e.target.value);
         setSelectedCleaner((prev) => ({
             ...prev,
-            [bookingId]: selectedCleanerObj, // Lưu cả object cleaner
+            [bookingId]: selectedCleanerObj,
         }));
     };
 
@@ -158,7 +159,8 @@ const AdminDashboard = () => {
         }
 
         const { bookingId } = selectedWork;
-        const cleanerId = selectedCleaner[selectedWork.bookingId].cleanerId;
+        const cleanerId = selectedCleaner[bookingId].cleanerId;
+        const cleanerName = selectedCleaner[bookingId].name;
 
         try {
             const response = await fetch('/managebooking/assign-cleaner', {
@@ -177,20 +179,25 @@ const AdminDashboard = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Cập nhật state data với thông tin nhân viên mới
+            // Update the data state to reflect the assigned cleaner
             setData((prevData) =>
                 prevData.map((item) =>
                     item.bookingId === bookingId
-                        ? { ...item, cleanerId, cleanerName: selectedCleaner[bookingId].name }
+                        ? { ...item, cleanerId, cleanerName }
                         : item
                 )
             );
 
             toast.success("Giao việc thành công!");
-            setOpenConfirm(false); // Đóng dialog sau khi giao việc
+            setOpenConfirm(false);
+            setSelectedCleaner((prev) => {
+                const newSelected = { ...prev };
+                delete newSelected[bookingId]; // Clear selection after assignment
+                return newSelected;
+            });
         } catch (error) {
             console.error('Error assigning cleaner:', error);
-            toast.error("Lỗi khi giao việc!");
+            toast.error("Bạn không thể thực hiện giao việc cho người này!");
         }
     }
 
@@ -262,18 +269,33 @@ const AdminDashboard = () => {
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
-        setPage(1); // Reset to first page when status changes
+        setPage(1);
     };
 
     const WorkListPage = () => {
         const [search, setSearch] = useState('');
+        const [openConfirm, setOpenConfirm] = useState(false);
+        const [selectedBooking, setSelectedBooking] = useState(null);
+
+        const sortedByCreatedAt = useMemo(() => {
+            return [...data].sort((a, b) => {
+                const dateA = new Date(a.createdAt).getTime();
+                const dateB = new Date(b.createdAt).getTime();
+                return dateB - dateA; // công việc mới nhất lên đầu
+            });
+        }, []);
+
+        const handleOpenConfirm = (booking) => {
+            setSelectedBooking(booking);
+            setOpenConfirm(true)
+        }
 
         const filteredData = useMemo(() => {
-            return data.filter((row) =>
+            return sortedByCreatedAt.filter((row) =>
                 row.customerFullName?.toLowerCase().includes(search.toLowerCase()) ||
                 row.cleanerName?.toLowerCase().includes(search.toLowerCase())
             );
-        }, [search]);
+        }, [search, sortedByCreatedAt]);
 
         const paginatedData = useMemo(() => {
             const startIndex = (page - 1) * rowsPerPage;
@@ -304,11 +326,11 @@ const AdminDashboard = () => {
                 let valueB = b[englishKey];
 
                 if (englishKey === 'cleanerName') {
-                    valueA = valueA || 'Chưa phân công'; // Nếu null, dùng "Chưa phân công"
+                    valueA = valueA || 'Chưa phân công';
                     valueB = valueB || 'Chưa phân công';
                 }
                 if (englishKey === 'note') {
-                    valueA = valueA || 'không có ghi chú'; // Nếu null, dùng "không có ghi chú"
+                    valueA = valueA || 'không có ghi chú';
                     valueB = valueB || 'không có ghi chú';
                 }
 
@@ -332,7 +354,28 @@ const AdminDashboard = () => {
 
             setSortConfig({ key: vietnameseKey, direction });
             setData(sortedData);
-        }, []);
+        }, [data]);
+
+        const handleCancelWork = async (bookingId) => {
+            try {
+                const response = await fetch(`/managebooking/cancel-booking`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ bookingId }),
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                toast.success("Công việc đã được hủy thành công!");
+            } catch (error) {
+                console.error('Error canceling work:', error);
+                toast.error("Lỗi khi hủy công việc!");
+            }
+        }
 
         return (
             <Box>
@@ -448,6 +491,7 @@ const AdminDashboard = () => {
                                     </TableCell>
                                 ))}
                                 <TableCell>Phân công</TableCell>
+                                <TableCell>Hủy việc</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -455,11 +499,11 @@ const AdminDashboard = () => {
                                 <TableRow key={row.bookingId}>
                                     <TableCell>{row.serviceName}</TableCell>
                                     <TableCell>{row.customerFullName}</TableCell>
-                                    <TableCell>{row.cleanerName ? row.cleanerName : 'Chưa phân công'}</TableCell>
+                                    <TableCell>{row.cleanerName || 'Chưa phân công'}</TableCell>
                                     <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
                                     <TableCell>{row.duration} tiếng</TableCell>
                                     <TableCell sx={{ maxWidth: 160 }}>{row.address}</TableCell>
-                                    <TableCell>{row.note ? row.note : "không có ghi chú"}</TableCell>
+                                    <TableCell>{row.note || "không có ghi chú"}</TableCell>
                                     <TableCell>{formatPrice(row.totalPrice)}</TableCell>
                                     <TableCell>
                                         <span
@@ -484,17 +528,24 @@ const AdminDashboard = () => {
                                             <InputLabel id="status-select-label">Nhân viên</InputLabel>
                                             <Select
                                                 labelId="status-select-label"
-                                                value={selectedCleaner[row.bookingId]?.cleanerId || ''}
+                                                value={selectedCleaner[row.bookingId]?.cleanerId || row.cleanerId || ''}
                                                 onChange={(e) => handleSelectCleaner(row.bookingId, e)}
                                                 label="Nhân viên"
                                             >
                                                 {cleaners.map((cleaner) => (
-                                                    <MenuItem key={cleaner.cleanerId} value={cleaner.cleanerId} onClick={() => handleSelectWork(row)}>
+                                                    <MenuItem
+                                                        key={cleaner.cleanerId}
+                                                        value={cleaner.cleanerId}
+                                                        onClick={() => handleSelectWork(row)}
+                                                    >
                                                         {cleaner.name}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button variant="contained" color="error" sx={style.cancelButton} onClick={() => handleOpenConfirm(row)}>Hủy việc</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -513,6 +564,20 @@ const AdminDashboard = () => {
                         {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData?.length)} of ${filteredData?.length}`}
                     </Typography>
                 </Box>
+                {openConfirm && (
+                    <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+                        <DialogTitle>Xác nhận hủy công việc</DialogTitle>
+                        <DialogContent>
+                            <Typography>
+                                Bạn có chắc chắn muốn hủy công việc này của khách hàng <span style={{ fontWeight: 'bold' }}>{selectedBooking?.customerFullName}</span>?
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="contained" color="error" onClick={() => setOpenConfirm(false)}>Hủy</Button>
+                            <Button variant="contained" color="primary" onClick={() => handleCancelWork(selectedBooking.bookingId)}>Đồng ý</Button>
+                        </DialogActions>
+                    </Dialog>
+                )}
             </Box>
         )
     };
@@ -624,7 +689,7 @@ const AdminDashboard = () => {
                     <DialogTitle>
                         Xác nhận giao việc
                     </DialogTitle>
-                    <DialogContent> 
+                    <DialogContent>
                         <Typography>
                             Bạn có chắc chắn muốn giao việc này cho nhân viên {selectedCleaner[selectedWork?.bookingId]?.name || 'Chưa chọn'}?
                         </Typography>
@@ -634,7 +699,7 @@ const AdminDashboard = () => {
                         <Button variant="contained" color="primary" onClick={handleAssignCleaner}>Đồng ý</Button>
                     </DialogActions>
                 </Dialog>
-            ) }
+            )}
         </Box>
     )
 }
@@ -666,6 +731,11 @@ const style = {
             backgroundColor: '#1565C0',
             color: '#fff',
         },
+    },
+    cancelButton: {
+        width: '100%',
+        padding: '15px 5px',
+        fontSize: 11,
     },
     userAvatar: {
         display: 'flex',

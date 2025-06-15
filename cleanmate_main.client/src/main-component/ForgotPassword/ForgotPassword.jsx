@@ -4,7 +4,8 @@ import SimpleReactValidator from "simple-react-validator";
 import {toast} from "react-toastify";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const ForgotPassword = (props) => {
 
@@ -34,18 +35,33 @@ const ForgotPassword = (props) => {
         }
     }));
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
+
         if (validator.allValid()) {
-            setValue({
-                email: '',
-            });
-            validator.hideMessages();
-            toast.success('You successfully Login!');
-            push('/login');
+            try {
+                push('/loading', { replace: true })
+                // Gửi request tới API quên mật khẩu
+                const response = await axios.post('/Authen/forgot-password', {
+                    email: value.email,
+                });
+
+                if (response.status === 200) {
+                    toast.success('Đã gửi email đặt lại mật khẩu! Vui lòng kiểm tra hộp thư.');
+                    push('/login', { replace: true })
+                } else {
+                    toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+                }
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    toast.error('Email không tồn tại trong hệ thống.');
+                } else {
+                    toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
+                }
+            }
         } else {
             validator.showMessages();
-            toast.error('Empty field is not allowed!');
+            toast.error('Vui lòng nhập địa chỉ email hợp lệ.');
         }
     };
     return (
@@ -76,11 +92,6 @@ const ForgotPassword = (props) => {
                         <Grid item xs={12}>
                             <Grid className="formFooter">
                                 <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Gửi lại mật khẩu</Button>
-                            </Grid>
-                            <Grid className="loginWithSocial">
-                                <Button className="facebook"><i className="fa fa-facebook"></i></Button>
-                                <Button className="twitter"><i className="fa fa-twitter"></i></Button>
-                                <Button className="linkedin"><i className="fa fa-linkedin"></i></Button>
                             </Grid>
                             <p className="noteHelp">Bạn đã có tài khoản? <Link to="/login">Quay lại đăng nhập</Link>
                             </p>

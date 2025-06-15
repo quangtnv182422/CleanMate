@@ -10,6 +10,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import PaidIcon from '@mui/icons-material/Paid';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import CommentsDisabledIcon from '@mui/icons-material/CommentsDisabled';
 import userAvatar from '../../images/user-image.png';
 import './style.css';
@@ -53,27 +54,34 @@ const menus = [
         link: '/service',
         icon: <BuildIcon />,
     },
+
     {
         id: 6,
+        title: 'Ưu đãi của tôi',
+        link: '/voucher',
+        icon: <LocalOfferIcon />,
+    },
+    {
+        id: 7,
         title: 'Lịch sử đặt dịch vụ',
         link: '/order-history',
         icon: <HistoryIcon />,
     },
     {
-        id: 7,
+        id: 8,
         title: "Đơn chưa đánh giá",
         link: '/order/no-rating-yet',
         badge: true,
         icon: <CommentsDisabledIcon />
     },
     {
-        id: 8,
+        id: 9,
         title: 'Blog',
         link: '/blog',
         icon: <ArticleIcon />,
     },
     {
-        id: 9,
+        id: 10,
         title: 'Liên hệ',
         link: '/contact',
         icon: <ContactMailIcon />,

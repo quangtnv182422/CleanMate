@@ -843,7 +843,7 @@ const BookingService = () => {
 
         try {
             const response = await axios.get(
-                `/cleanperhour/cleaner-available?startTime=${startTimeStr}&endTime=${endTimeStr}`//----------Đang lỗi lấy giờ đoạn này vì nó đang lấy không đúng giờ => sai logic------------
+                `/cleanperhour/cleaner-available?startTime=${startTimeStr}&endTime=${endTimeStr}`
             );
 
             if (response.data.length > 0) {

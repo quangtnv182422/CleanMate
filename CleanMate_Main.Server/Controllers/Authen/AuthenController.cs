@@ -236,5 +236,23 @@ namespace CleanMate_Main.Server.Controllers.Authen
 
             return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
         }
+
+        [HttpPost("resend-email-confirmation")]
+        public async Task<IActionResult> ResendEmailConfirmation([FromBody] ResendEmailModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var (success, error) = await _authenService.ResendEmailConfirmationAsync(model.Email);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Email xác nhận đã được gửi lại." });
+        }
     }
 }

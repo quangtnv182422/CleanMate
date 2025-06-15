@@ -10,5 +10,6 @@ namespace CleanMate_Main.Server.Services.Authentication
         Task<(bool Success, string Error)> ForgotPasswordAsync(string email);
         Task<(bool Success, string Error)> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
         Task<(bool Success, string Error)> ResetPasswordAsync(string userId, string token, string newPassword);
+        Task<(bool Success, string Error)> ResendEmailConfirmationAsync(string email);
     }
 }

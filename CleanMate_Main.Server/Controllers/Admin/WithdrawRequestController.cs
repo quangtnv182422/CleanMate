@@ -1,8 +1,10 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Transaction;
+using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,13 +17,17 @@ namespace CleanMate_Main.Server.Controllers.Admin
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly ITransactionService _transactionService;
+        private readonly IHubContext<WorkHub> _hubContext;
+
 
         public WithdrawRequestController(
             UserManager<AspNetUser> userManager,
-            ITransactionService transactionService)
+            ITransactionService transactionService,
+            IHubContext<WorkHub> hubContext)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -75,6 +81,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
                     return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
                 }
                 var qrCodeUrl = await _transactionService.AcceptWithdrawRequestAsync(id, admin.Id);
+                await _hubContext.Clients.All.SendAsync("ReceiveWithdrawUpdate", admin.Id);
                 return Ok(new { success = true, message = "Yêu cầu rút tiền đã được chấp nhận.", qrCodeUrl });
             }
             catch (InvalidOperationException ex)
@@ -112,7 +119,13 @@ namespace CleanMate_Main.Server.Controllers.Admin
                     return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
                 }
                 var success = await _transactionService.CompleteWithdrawRequestAsync(id, admin.Id);
-                return Ok(new { success, message = "Yêu cầu rút tiền đã được hoàn tất." });
+                if (success)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveWithdrawUpdate", admin.Id);
+                    return Ok(new { success, message = "Yêu cầu rút tiền đã được hoàn tất." });
+                }
+                else
+                    return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi từ chối yêu cầu rút tiền." });
             }
             catch (InvalidOperationException ex)
             {
@@ -146,7 +159,13 @@ namespace CleanMate_Main.Server.Controllers.Admin
                     return Unauthorized(new { success = false, message = "Không tìm thấy thông tin quản trị viên." });
                 }
                 var success = await _transactionService.RejectWithdrawRequestAsync(id, admin.Id, model.AdminNote);
-                return Ok(new { success, message = "Yêu cầu rút tiền đã bị từ chối." });
+                if (success)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveWithdrawUpdate", admin.Id);
+                    return Ok(new { success, message = "Yêu cầu rút tiền đã bị từ chối." });
+                }
+                else
+                    return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi khi từ chối yêu cầu rút tiền." });
             }
             catch (InvalidOperationException ex)
             {

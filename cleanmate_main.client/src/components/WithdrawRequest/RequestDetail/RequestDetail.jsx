@@ -1,14 +1,23 @@
 ﻿import { styles } from './style';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
     Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 const RequestDetail = ({ selectedRequest, handleClose }) => {
+    const [openRejectModal, setOpenRejectModal] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [connection, setConnection] = useState(null);
+
     const formatPrice = (price) => {
         return price?.toLocaleString("vi-VN", {
             style: 'currency',
@@ -16,9 +25,21 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
         });
     };
 
+
+    const handleOpenRejectModal = () => {
+        setOpenRejectModal(true);
+    };
+
+    const handleCloseRejectModal = () => {
+        setOpenRejectModal(false);
+        setRejectionReason(''); // Reset the reason when closing
+    };
+
     const handleReject = async () => {
-        if (!selectedRequest?.requestId) return;
+        if (!selectedRequest?.requestId || !rejectionReason.trim()) return;
         const url = `/withdrawrequest/${selectedRequest.requestId}/reject`;
+        const body = JSON.stringify({ adminNote: rejectionReason });
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -26,10 +47,12 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: body,
             });
             const result = await response.json();
             if (response.ok && result.success) {
                 toast.success('Yêu cầu đã bị từ chối');
+                handleCloseRejectModal();
                 handleClose();
             } else {
                 toast.error(result.message || 'Thao tác thất bại.');
@@ -65,7 +88,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
     };
 
     const handleConfirmTransfer = async () => {
-        if (!selectedRequest?.id) return;
+        if (!selectedRequest?.requestId) return;
         const url = `/withdrawrequest/${selectedRequest.requestId}/complete`;
         try {
             const response = await fetch(url, {
@@ -84,7 +107,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             }
         } catch (error) {
             console.error('Error confirming transfer:', error);
-            toast.error('Đã xảy ra lỗi khi xử lý yêu cầu.' + selectedRequest.requestId );
+            toast.error('Đã xảy ra lỗi khi xử lý yêu cầu.' + selectedRequest.requestId);
         }
     };
 
@@ -117,7 +140,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             {/* Conditional Rendering Based on Status */}
             {selectedRequest?.status === 0 && (
                 <Box sx={styles.confirmSection}>
-                    <Button variant="outlined" color="error" onClick={handleReject}>
+                    <Button variant="outlined" color="error" onClick={handleOpenRejectModal}>
                         Từ chối
                     </Button>
                     <Button variant="contained" color="primary" onClick={handleApprove}>
@@ -134,6 +157,36 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
                     </Button>
                 </Box>
             )}
+
+            {/* Rejection Reason Modal */}
+            <Dialog open={openRejectModal} onClose={handleCloseRejectModal}>
+                <DialogTitle>Nhập lý do từ chối</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Lý do từ chối"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        required
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseRejectModal} color="primary">
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={handleReject}
+                        color="error"
+                        disabled={!rejectionReason.trim()}
+                    >
+                        Xác nhận từ chối
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

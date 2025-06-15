@@ -92,6 +92,8 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Note = b.Note,
                 TotalPrice = b.TotalPrice ?? 0m,
                 Status = b.BookingStatus.Status,
+                CreatedAt = b.CreatedAt,
+                UpdatedAt = b.UpdatedAt,
                 CleanerId = b.CleanerId,
                 CleanerName = b.Cleaner != null ? b.Cleaner.FullName : null
             }).ToList();
@@ -100,6 +102,11 @@ namespace CleanMate_Main.Server.Services.Bookings
         public async Task<bool> ProcessBookingAfterAssigningCleanerAsync(int bookingId, string cleanerId)
         {
             return await _bookingRepo.ProcessBookingAfterAssigningCleanerAsync(bookingId, cleanerId);
+        }
+
+        public async Task<bool> CancelBookingAsync(int bookingId)
+        {
+            return await _bookingRepo.CancelBookingAsync(bookingId);
         }
     }
 }

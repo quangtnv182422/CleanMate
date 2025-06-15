@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
 using CleanMate_Main.Server.Services.Employee;
@@ -172,5 +173,68 @@ namespace CleanMate_Main.Server.Controllers.Authen
             return Ok(new { message = "Xác nhận email thành công. Bạn có thể đăng nhập." });
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var (success, error) = await _authenService.ForgotPasswordAsync(model.Email);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Email đặt lại mật khẩu đã được gửi." });
+        }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userEmail))
+                return Unauthorized();
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+                return Unauthorized();
+
+            var (success, error) = await _authenService.ChangePasswordAsync(user.Id, model.CurrentPassword, model.NewPassword);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var (success, error) = await _authenService.ResetPasswordAsync(model.UserId, model.Token, model.NewPassword);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
+        }
     }
 }

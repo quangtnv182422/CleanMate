@@ -26,5 +26,15 @@ namespace CleanMate_Main.Server.Services.Smtp
             await _emailSender.SendEmailAsync(email, subject, message);
         }
 
+        public async Task SendResetPasswordEmail(string email, string resetLink)
+        {
+            string subject = "Yêu cầu đặt lại mật khẩu";
+            string message = $@"
+                <h3>Đặt lại mật khẩu của bạn</h3>
+                <p>Nhấn vào liên kết sau để đặt lại mật khẩu:</p>
+                <a href='{resetLink}'>Đặt lại mật khẩu</a>
+            ";
+            await _emailSender.SendEmailAsync(email, subject, message);
+        }
     }
 }

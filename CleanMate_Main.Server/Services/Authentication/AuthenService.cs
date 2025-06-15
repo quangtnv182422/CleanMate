@@ -230,8 +230,58 @@ namespace CleanMate_Main.Server.Services.Authentication
             return (false, null, "Sai mật khẩu.");
         }
 
+        public async Task<(bool Success, string Error)> ForgotPasswordAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || !user.EmailConfirmed)
+            {
+                return (false, "Email không tồn tại hoặc chưa được xác thực.");
+            }
 
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
+            var baseUrl = _configuration["SettingDomain:BaseUrl"];
+            var resetLink = $"{baseUrl}/reset-password?userId={user.Id}&token={encodedToken}";
 
+            await _emailService.SendResetPasswordEmail(user.Email, resetLink);
+
+            return (true, null);
+        }
+
+        public async Task<(bool Success, string Error)> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, "Người dùng không tồn tại.");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+            {
+                return (false, string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            return (true, null);
+        }
+        public async Task<(bool Success, string Error)> ResetPasswordAsync(string userId, string token, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, "Người dùng không tồn tại.");
+            }
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
+
+            if (!result.Succeeded)
+            {
+                return (false, string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            return (true, null);
+        }
     }
 }

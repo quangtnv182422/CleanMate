@@ -15,13 +15,15 @@ import {
     MenuItem
 } from '@mui/material';
 import { style } from './style.js';
-import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail.jsx'
+import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail.jsx';
 
-
+// Updated status list with "Tất cả" (all) as -1 to avoid conflict with "Đang chờ" (0)
 const statusList = [
+    { id: -1, label: 'Tất cả', color: '#000000', bgColor: 'transparent', borderColor: '#000000' },
     { id: 1, label: 'Đã duyệt', color: '#28A745', bgColor: 'rgba(40, 167, 69, 0.1)', borderColor: '#28A745' },
-    { id: 2, label: 'Đã từ chối', color: '#DC3545', bgColor: 'rgba(220, 53, 69, 0.1)', borderColor: '#DC3545' },
-    { id: 3, label: 'Đang chờ', color: '#FFC107', bgColor: 'rgba(255, 193, 7, 0.1)', borderColor: '#FFC107' },
+    { id: 3, label: 'Đã từ chối', color: '#DC3545', bgColor: 'rgba(220, 53, 69, 0.1)', borderColor: '#DC3545' },
+    { id: 0, label: 'Đang chờ', color: '#FFC107', bgColor: 'rgba(255, 193, 7, 0.1)', borderColor: '#FFC107' },
+    { id: 2, label: 'Hoàn thành', color: '#28A745', bgColor: 'rgba(40, 167, 69, 0.1)', borderColor: '#28A745' },
 ];
 
 const REQUESTS_PER_PAGE = 6;
@@ -29,108 +31,58 @@ const REQUESTS_PER_PAGE = 6;
 const WithdrawRequest = () => {
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
-    const [requests, setRequests] = useState([
-        {
-            id: 'REQ001',
-            createdDate: '2025-06-10',
-            createdTime: '09:15',
-            requesterName: 'Nguyễn Văn A',
-            amount: 500000,
-            statusId: 3,
-            status: 'Đang chờ'
-        },
-        {
-            id: 'REQ002',
-            createdDate: '2025-06-10',
-            createdTime: '10:45',
-            requesterName: 'Trần Thị B',
-            amount: 1200000,
-            statusId: 1,
-            status: 'Đã duyệt'
-        },
-        {
-            id: 'REQ003',
-            createdDate: '2025-06-11',
-            createdTime: '08:30',
-            requesterName: 'Lê Văn C',
-            amount: 250000,
-            statusId: 2,
-            status: 'Đã từ chối'
-        },
-        {
-            id: 'REQ004',
-            createdDate: '2025-06-11',
-            createdTime: '11:00',
-            requesterName: 'Phạm Thị D',
-            amount: 900000,
-            statusId: 3,
-            status: 'Đang chờ'
-        },
-        {
-            id: 'REQ005',
-            createdDate: '2025-06-11',
-            createdTime: '14:20',
-            requesterName: 'Hoàng Văn E',
-            amount: 300000,
-            statusId: 1,
-            status: 'Đã duyệt'
-        },
-        {
-            id: 'REQ006',
-            createdDate: '2025-06-12',
-            createdTime: '07:50',
-            requesterName: 'Đặng Thị F',
-            amount: 750000,
-            statusId: 3,
-            status: 'Đang chờ'
-        },
-        {
-            id: 'REQ007',
-            createdDate: '2025-06-12',
-            createdTime: '10:10',
-            requesterName: 'Bùi Văn G',
-            amount: 600000,
-            statusId: 2,
-            status: 'Đã từ chối'
-        },
-        {
-            id: 'REQ008',
-            createdDate: '2025-06-12',
-            createdTime: '12:00',
-            requesterName: 'Ngô Thị H',
-            amount: 1000000,
-            statusId: 3,
-            status: 'Đang chờ'
-        },
-        {
-            id: 'REQ009',
-            createdDate: '2025-06-12',
-            createdTime: '15:30',
-            requesterName: 'Vũ Văn I',
-            amount: 450000,
-            statusId: 1,
-            status: 'Đã duyệt'
-        },
-        {
-            id: 'REQ010',
-            createdDate: '2025-06-12',
-            createdTime: '16:45',
-            requesterName: 'Lương Thị K',
-            amount: 850000,
-            statusId: 1,
-            status: 'Đã duyệt'
-        }
-    ]);
-
-
+    const [requests, setRequests] = useState([]);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState(3);
+    const [status, setStatus] = useState(-1); // Default to "Tất cả" (-1)
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const filteredRequest = requests.filter((request) =>
-        request.requesterName.toLowerCase().includes(search.toLowerCase()) &&
-        request.statusId === status
-    );
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedRequest(null);
+    };
+
+    useEffect(() => {
+        const fetchWithdrawRequests = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch('/withdrawrequest', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    console.log('API Response:', result.data); // Log to inspect the data structure
+                    setRequests(result.data || []);
+                } else {
+                    console.error('Failed to fetch withdraw requests:', result.message);
+                    setRequests([]);
+                }
+            } catch (error) {
+                console.error('Error fetching withdraw requests:', error);
+                setRequests([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchWithdrawRequests();
+    }, []);
+
+    // Updated filter logic to handle "Tất cả" (-1) and safeguard against undefined values
+    const filteredRequest = requests.filter((request) => {
+        const nameMatch = (request?.user?.fullName || request?.requesterName || '').toLowerCase().includes(search.toLowerCase());
+        const statusMatch = status === -1 || (request?.statusId !== undefined && request.statusId === status);
+        return nameMatch && statusMatch;
+    });
 
     const totalPages = Math.ceil(filteredRequest.length / REQUESTS_PER_PAGE);
     const displayedRequest = filteredRequest.slice(
@@ -139,7 +91,7 @@ const WithdrawRequest = () => {
     );
 
     const handleStatusChange = (event) => {
-        setStatus(event.target.value);
+        setStatus(parseInt(event.target.value));
         setPage(1); // Reset to first page when status changes
     };
 
@@ -149,27 +101,25 @@ const WithdrawRequest = () => {
             currency: 'VND',
         });
     };
-
-    const formatTime = (time) => {
-        if (!time) return '';
-        const [hour, minute] = time.split(':');
-        return `${hour}:${minute}`;
+    const formatTime = (dateTime) => {
+        if (!dateTime) return '';
+        const date = new Date(dateTime);
+        if (isNaN(date)) return ''; // Handle invalid date
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
     };
 
-    const formatDate = (input) => {
-        const date = new Date(input);
-        if (isNaN(date)) return '';
-        return date.toLocaleDateString('vi-VN');
+    const formatDate = (dateTime) => {
+        if (!dateTime) return '';
+        const date = new Date(dateTime);
+        if (isNaN(date)) return ''; // Handle invalid date
+        return date.toLocaleDateString('vi-VN'); // Format date in Vietnamese locale
     };
 
     const handleOpen = (request) => {
         setSelectedRequest(request);
         setOpen(true);
-    }
-
-    const handleClose = () => {
-        setOpen(false);
-        setSelectedRequest(null);
     };
 
     return (
@@ -184,7 +134,7 @@ const WithdrawRequest = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         sx={{ width: 150 }}
                     />
-                    <FormControl size="small" sx={{ minWidth: 100 }}>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
                         <InputLabel id="status-select-label">Trạng thái</InputLabel>
                         <Select
                             labelId="status-select-label"
@@ -201,23 +151,26 @@ const WithdrawRequest = () => {
                     </FormControl>
                 </Box>
 
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                    {displayedRequest.length === 0 ? (
-                        <Grid item xs={12}>
-                            <Typography align="center" sx={{ mt: 4, color: 'gray' }}>
-                                Hiện tại chưa có công việc nào.
-                            </Typography>
-                        </Grid>
-                    ) : (
-                        displayedRequest.map((request, idx) => (
+                {loading ? (
+                    <Typography align="center" sx={{ mt: 4, color: 'gray' }}>
+                        Đang tải dữ liệu...
+                    </Typography>
+                ) : displayedRequest.length === 0 ? (
+                    <Typography align="center" sx={{ mt: 4, color: 'gray' }}>
+                        Hiện tại chưa có yêu cầu nào.
+                    </Typography>
+                ) : (
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                        {displayedRequest.map((request, idx) => (
                             <Grid item xs={12} sm={6} md={4} key={idx}>
                                 <Card sx={style.workCard} onClick={() => handleOpen(request)}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
-                                            Yêu cầu lúc {formatTime(request.createdTime)} giờ ngày {formatDate(request.createdDate)}
+                                            Yêu cầu lúc {formatTime(request.processedAt)} giờ ngày {formatDate(request.processedAt)}
                                         </Typography>
-                                        <Typography sx={{ mt: 2, fontWeight: 500 }}>{request.requesterName}</Typography>
-                                        {/*<Typography variant="subtitle2" color="textSecondary">{request.address}</Typography>*/}
+                                        <Typography sx={{ mt: 2, fontWeight: 500 }}>
+                                            {request.user?.fullName || request.requesterName || 'N/A'}
+                                        </Typography>
                                         <Box sx={style.priceSection}>
                                             <Typography variant="h6" sx={{ color: '#1976D2' }}>
                                                 Số tiền: {formatPrice(request.amount)}
@@ -226,20 +179,20 @@ const WithdrawRequest = () => {
                                                 variant="subtitle2"
                                                 sx={{
                                                     ...style.status,
-                                                    color: statusList.find(s => s.id === request.statusId)?.color,
-                                                    backgroundColor: statusList.find(s => s.id === request.statusId)?.bgColor,
-                                                    borderColor: statusList.find(s => s.id === request.statusId)?.borderColor,
+                                                    color: statusList.find(s => s.id === request.status)?.color || '#000000',
+                                                    backgroundColor: statusList.find(s => s.id === request.status)?.bgColor || 'transparent',
+                                                    borderColor: statusList.find(s => s.id === request.status)?.borderColor || '#000000',
                                                 }}
                                             >
-                                                {request.status}
+                                                {statusList.find(s => s.id === request.status)?.label || 'Không xác định'}
                                             </Typography>
                                         </Box>
                                     </CardContent>
                                 </Card>
                             </Grid>
-                        ))
-                    )}
-                </Grid>
+                        ))}
+                    </Grid>
+                )}
 
                 {open && (
                     <Modal
@@ -251,7 +204,6 @@ const WithdrawRequest = () => {
                     </Modal>
                 )}
 
-                {/* Pagination */}
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
                     <Pagination
                         count={totalPages}
@@ -262,7 +214,7 @@ const WithdrawRequest = () => {
                 </Box>
             </Box>
         </Box>
-    )
-}
+    );
+};
 
 export default WithdrawRequest;

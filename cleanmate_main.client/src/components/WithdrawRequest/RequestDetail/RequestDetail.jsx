@@ -1,22 +1,14 @@
 ﻿import { styles } from './style';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Typography,
     Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogContentText,
-    DialogActions
 } from '@mui/material';
 import { toast } from 'react-toastify';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 const RequestDetail = ({ selectedRequest, handleClose }) => {
-    const [confirmOpen, setConfirmOpen] = useState(false);
-
     const formatPrice = (price) => {
         return price?.toLocaleString("vi-VN", {
             style: 'currency',
@@ -24,25 +16,85 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
         });
     };
 
-    const handleConfirmOpen = () => {
-        setConfirmOpen(true);
-    }
+    const handleReject = async () => {
+        if (!selectedRequest?.requestId) return;
+        const url = `/withdrawrequest/${selectedRequest.requestId}/reject`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const result = await response.json();
+            if (response.ok && result.success) {
+                toast.success('Yêu cầu đã bị từ chối');
+                handleClose();
+            } else {
+                toast.error(result.message || 'Thao tác thất bại.');
+            }
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+            toast.error('Đã xảy ra lỗi khi xử lý yêu cầu.' + selectedRequest.requestId);
+        }
+    };
+
+    const handleApprove = async () => {
+        if (!selectedRequest?.requestId) return;
+        const url = `/withdrawrequest/${selectedRequest.requestId}/accept`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const result = await response.json();
+            if (response.ok && result.success) {
+                toast.success('Yêu cầu đã được duyệt');
+                handleClose();
+            } else {
+                toast.error(result.message || 'Thao tác thất bại.');
+            }
+        } catch (error) {
+            console.error('Error approving request:', error);
+            toast.error('Đã xảy ra lỗi khi xử lý yêu cầu.' + selectedRequest.requestId);
+        }
+    };
+
+    const handleConfirmTransfer = async () => {
+        if (!selectedRequest?.id) return;
+        const url = `/withdrawrequest/${selectedRequest.requestId}/complete`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const result = await response.json();
+            if (response.ok && result.success) {
+                toast.success('Xác nhận chuyển tiền thành công');
+                handleClose();
+            } else {
+                toast.error(result.message || 'Thao tác thất bại.');
+            }
+        } catch (error) {
+            console.error('Error confirming transfer:', error);
+            toast.error('Đã xảy ra lỗi khi xử lý yêu cầu.' + selectedRequest.requestId );
+        }
+    };
+
+    const imageUrl = selectedRequest
+        ? `https://img.vietqr.io/image/${selectedRequest.user?.bankName || ''}-${selectedRequest.user?.bankNo || ''}-print.jpg?amount=${selectedRequest.amount || 0}Chuyen%20tien%20tu%20Cleanmate,%20request%20ID%20=%20${selectedRequest.requestId || ''}`
+        : '';
 
     return (
         <Box sx={styles.modal}>
-            {/* Work information */}
-            {/*<Box sx={styles.informationTitle}>*/}
-            {/*    <AssignmentIcon size="small" sx={styles.subtitleIcon} />*/}
-            {/*    <Typography variant="h6" sx={styles.subtitle}>Thông tin ca làm</Typography>*/}
-            {/*</Box>*/}
-            {/*<Box sx={styles.informationContent}>*/}
-            {/*    <Box sx={{ mb: 1 }}>*/}
-            {/*        <Typography sx={styles.contentTitle}>Nhân viên</Typography>*/}
-            {/*        <Typography sx={styles.content}>khách hàng chọn {selectedRequest.serviceName}</Typography>*/}
-            {/*    </Box>*/}
-            {/*</Box>*/}
-
-             {/*Booking */}
+            {/* Request Information */}
             <Box sx={styles.informationTitle}>
                 <LibraryBooksIcon size="small" sx={styles.subtitleIcon} />
                 <Typography variant="h6" sx={styles.subtitle}>Yêu cầu</Typography>
@@ -50,44 +102,53 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             <Box sx={styles.informationContent}>
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Nhân viên</Typography>
-                    <Typography sx={styles.content}>{selectedRequest.requesterName}</Typography>
+                    <Typography sx={styles.content}>{selectedRequest?.user.fullName}</Typography>
                 </Box>
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Số tiền</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedRequest.amount)}</Typography>
+                    <Typography sx={styles.content}>{formatPrice(selectedRequest?.amount)}</Typography>
+                </Box>
+                <Box sx={styles.bookingContent}>
+                    <Typography sx={styles.bookingTitle}>Ngày tạo</Typography>
+                    <Typography sx={styles.content}>{formatDate(selectedRequest?.createdDate)} {formatTime(selectedRequest?.createdTime)}</Typography>
                 </Box>
             </Box>
 
-            <Box sx={styles.confirmSection}>
-                <Button variant="outlined" color="error" onClick={() => setConfirmOpen(false)}>Từ chối</Button>
-                <Button variant="contained" color="primary" onClick={handleConfirmOpen}>Duyệt</Button>
-            </Box>
+            {/* Conditional Rendering Based on Status */}
+            {selectedRequest?.status === 0 && (
+                <Box sx={styles.confirmSection}>
+                    <Button variant="outlined" color="error" onClick={handleReject}>
+                        Từ chối
+                    </Button>
+                    <Button variant="contained" color="primary" onClick={handleApprove}>
+                        Duyệt
+                    </Button>
+                </Box>
+            )}
 
-            {/* Confirmation Dialog */}
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-                <DialogTitle>Xác nhận yêu cầu</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Bạn có chắc chắn muốn duyệt yêu cầu này?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setConfirmOpen(false)} color="error">
-                        Hủy
+            {selectedRequest?.status === 1 && (
+                <Box sx={{ mt: 2 }}>
+                    <img src={imageUrl} alt="QR Code" style={{ maxWidth: '100%', marginBottom: '10px' }} />
+                    <Button variant="contained" color="primary" onClick={handleConfirmTransfer}>
+                        Xác nhận chuyển tiền
                     </Button>
-                    <Button
-                        onClick={() => {
-                            setConfirmOpen(false);
-                        }}
-                        color="primary"
-                        variant="contained"
-                    >
-                        Duyệt yêu cầu
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                </Box>
+            )}
         </Box>
     );
+};
+
+// Helper functions
+const formatDate = (input) => {
+    const date = new Date(input);
+    if (isNaN(date)) return '';
+    return date.toLocaleDateString('vi-VN');
+};
+
+const formatTime = (time) => {
+    if (!time) return '';
+    const [hour, minute] = time.split(':');
+    return `${hour}:${minute}`;
 };
 
 export default RequestDetail;

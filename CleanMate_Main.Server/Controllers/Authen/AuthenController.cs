@@ -172,5 +172,47 @@ namespace CleanMate_Main.Server.Controllers.Authen
             return Ok(new { message = "Xác nhận email thành công. Bạn có thể đăng nhập." });
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var (success, error) = await _authenService.ForgotPasswordAsync(model.Email);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Email đặt lại mật khẩu đã được gửi." });
+        }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var (success, error) = await _authenService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
+        }
     }
 }

@@ -199,8 +199,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.MapHub<WorkHub>("/workHub");
-app.MapHub<WithdrawHub>("/withdrawHub");
-
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowReactApp"); 

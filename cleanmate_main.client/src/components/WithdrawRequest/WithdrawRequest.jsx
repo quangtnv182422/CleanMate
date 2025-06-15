@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import {
     Box,
     Grid,
@@ -16,6 +17,9 @@ import {
 } from '@mui/material';
 import { style } from './style.js';
 import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail.jsx';
+import * as signalR from '@microsoft/signalr';
+import { toast } from 'react-toastify'; // Added for toast notifications
+import useAuth from '../../hooks/useAuth'; // Added for user authentication
 
 // Updated status list with "Tất cả" (all) as -1 to avoid conflict with "Đang chờ" (0)
 const statusList = [
@@ -36,15 +40,25 @@ const WithdrawRequest = () => {
     const [status, setStatus] = useState(-1); // Default to "Tất cả" (-1)
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [connection, setConnection] = useState(null);
+    const { user, loading: authLoading } = useAuth(); // Added useAuth for user info
+    const navigate = useNavigate(); // Added for navigation
+    const role = user?.roles?.[0] || '';
 
     const handleClose = () => {
         setOpen(false);
         setSelectedRequest(null);
     };
 
-    useEffect(() => {
-        const fetchWithdrawRequests = async () => {
-            setLoading(true);
+    /*    // Fetch withdraw requests with useCallback
+        const fetchWithdrawRequests = useCallback(async () => {
+            if (loading || authLoading) return;
+            if (!user || role !== 'Admin') { // Assuming Admin role based on controller
+                toast.error("Bạn không có quyền truy cập vào trang này");
+                navigate('/home');
+                return;
+            }
+    
             try {
                 const response = await fetch('/withdrawrequest', {
                     method: 'GET',
@@ -53,14 +67,13 @@ const WithdrawRequest = () => {
                         'Content-Type': 'application/json',
                     },
                 });
-
+    
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+    
                 const result = await response.json();
                 if (result.success) {
-                    console.log('API Response:', result.data); // Log to inspect the data structure
                     setRequests(result.data || []);
                 } else {
                     console.error('Failed to fetch withdraw requests:', result.message);
@@ -68,14 +81,104 @@ const WithdrawRequest = () => {
                 }
             } catch (error) {
                 console.error('Error fetching withdraw requests:', error);
-                setRequests([]);
             } finally {
                 setLoading(false);
             }
-        };
+        }, [loading, authLoading, user, role, navigate]);
+    
+        // Initialize SignalR connection
+        useEffect(() => {
+            const newConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/workHub") // Match the hub URL from the server
+                .build();
+            setConnection(newConnection);
+        }, []);
+    
+        // Start connection and listen for status updates
+        useEffect(() => {
+            if (connection) {
+                if (connection.state === signalR.HubConnectionState.Disconnected) {
+                    connection.start()
+                        .catch(err => console.error('SignalR Connection Error: ', err));
+                }
+    
+                connection.on('ReceiveWorkUpdate', () => {
+                    fetchWithdrawRequests();
+                });
+    
+                return () => {
+                    connection.off('ReceiveWorkUpdate');
+                    if (connection.state !== signalR.HubConnectionState.Disconnected) {
+                        connection.stop();
+                    }
+                };
+            }
+        }, [connection, fetchWithdrawRequests]);
+    */
 
-        fetchWithdrawRequests();
+    const fetchRequestList = useCallback(async () => {
+        if (loading) return;
+        if (!user || role !== 'Admin') {
+            toast.error("Bạn không có quyền truy cập vào trang này");
+            navigate('/home');
+            return;
+        }
+
+        try {
+            const response = await fetch('/withdrawrequest', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setRequests(result.data || []);
+        } catch (error) {
+            console.error('Error fetching work list:', error);
+        }
+    }, [loading, user, role, navigate, setRequests]);
+
+    useEffect(() => {
+        fetchRequestList();
+    }, [fetchRequestList]);
+
+    // Khởi tạo connection trong useEffect
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/workHub")
+            .build();
+        setConnection(newConnection);
     }, []);
+
+    // Kết nối và lắng nghe sự kiện
+    useEffect(() => {
+        if (connection) {
+            if (connection.state === signalR.HubConnectionState.Disconnected) {
+                connection.start()
+                    .catch(err => console.error('SignalR Connection Error: ', err));
+            }
+
+            connection.on('ReceiveWorkUpdate', () => {
+                fetchRequestList();
+            });
+
+            return () => {
+                connection.off('ReceiveWorkUpdate');
+                if (connection.state !== signalR.HubConnectionState.Disconnected) {
+                    connection.stop();
+                }
+            };
+        }
+    }, [connection, fetchRequestList]);
+
+    // Fetch initial data
+    useEffect(() => {
+        fetchRequestList();
+    }, [fetchRequestList]);
 
     // Updated filter logic to handle "Tất cả" (-1) and safeguard against undefined values
     const filteredRequest = requests.filter((request) => {
@@ -101,6 +204,7 @@ const WithdrawRequest = () => {
             currency: 'VND',
         });
     };
+
     const formatTime = (dateTime) => {
         if (!dateTime) return '';
         const date = new Date(dateTime);
@@ -179,12 +283,12 @@ const WithdrawRequest = () => {
                                                 variant="subtitle2"
                                                 sx={{
                                                     ...style.status,
-                                                    color: statusList.find(s => s.id === request.status)?.color || '#000000',
-                                                    backgroundColor: statusList.find(s => s.id === request.status)?.bgColor || 'transparent',
-                                                    borderColor: statusList.find(s => s.id === request.status)?.borderColor || '#000000',
+                                                    color: statusList.find(s => s.id === request.statusId)?.color || '#000000',
+                                                    backgroundColor: statusList.find(s => s.id === request.statusId)?.bgColor || 'transparent',
+                                                    borderColor: statusList.find(s => s.id === request.statusId)?.borderColor || '#000000',
                                                 }}
                                             >
-                                                {statusList.find(s => s.id === request.status)?.label || 'Không xác định'}
+                                                {statusList.find(s => s.id === request.statusId)?.label || 'Không xác định'}
                                             </Typography>
                                         </Box>
                                     </CardContent>

@@ -198,14 +198,17 @@ namespace CleanMate_Main.Server.Controllers.Authen
             {
                 return BadRequest(new { message = "Validation failed" });
             }
+            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
+            if (string.IsNullOrEmpty(userEmail))
                 return Unauthorized();
-            }
 
-            var (success, error) = await _authenService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+                return Unauthorized();
+
+            var (success, error) = await _authenService.ChangePasswordAsync(user.Id, model.CurrentPassword, model.NewPassword);
 
             if (!success)
             {

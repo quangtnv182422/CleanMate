@@ -71,7 +71,8 @@ namespace CleanMate_Main.Server.Services.Bookings
                 StartTime = b.StartTime,
                 TotalPrice = b.TotalPrice,
                 CreatedAt = b.CreatedAt,
-                UpdatedAt = b.UpdatedAt
+                UpdatedAt = b.UpdatedAt,
+                HasFeedback = b.Feedbacks.Any()
             }).ToList();
 
             return bookingDtos;

@@ -10,7 +10,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
 {
     [Route("[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class WithdrawRequestController : ControllerBase
     {
         private readonly UserManager<AspNetUser> _userManager;
@@ -24,7 +24,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
             _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
         }
 
-        [HttpGet("withdraw-requests")]
+        [HttpGet]
         public async Task<IActionResult> GetAllWithdrawRequests()
         {
             try
@@ -39,7 +39,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
             }
         }
 
-        [HttpGet("withdraw-requests/{id}")]
+        [HttpGet("withdrawrequest/{id}")]
         public async Task<IActionResult> GetWithdrawRequest(int id)
         {
             try
@@ -58,7 +58,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
             }
         }
 
-        [HttpPost("withdraw-requests/{id}/accept")]
+        [HttpPost("{id}/accept")]
         public async Task<IActionResult> AcceptWithdrawRequest(int id)
         {
             try
@@ -95,7 +95,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
             }
         }
 
-        [HttpPost("withdraw-requests/{id}/complete")]
+        [HttpPost("{id}/complete")]
         public async Task<IActionResult> CompleteWithdrawRequest(int id)
         {
             try
@@ -129,7 +129,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
             }
         }
 
-        [HttpPost("withdraw-requests/{id}/reject")]
+        [HttpPost("{id}/reject")]
         public async Task<IActionResult> RejectWithdrawRequest(int id, [FromBody] RejectRequestModel model)
         {
             try

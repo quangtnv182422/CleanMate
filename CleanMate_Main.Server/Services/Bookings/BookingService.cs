@@ -92,6 +92,8 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Note = b.Note,
                 TotalPrice = b.TotalPrice ?? 0m,
                 Status = b.BookingStatus.Status,
+                CreatedAt = b.CreatedAt,
+                UpdatedAt = b.UpdatedAt,
                 CleanerId = b.CleanerId,
                 CleanerName = b.Cleaner != null ? b.Cleaner.FullName : null
             }).ToList();

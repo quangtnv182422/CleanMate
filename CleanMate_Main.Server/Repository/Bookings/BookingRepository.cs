@@ -78,7 +78,7 @@ namespace CleanMate_Main.Server.Repository.Bookings
                 query = query.Where(b => b.BookingStatusId == status.Value);
             }
 
-            query = query.OrderBy(b => b.BookingId);
+            query = query.OrderBy(b => b.CreatedAt);
 
             var bookings = await query.ToListAsync();
 
@@ -98,13 +98,15 @@ namespace CleanMate_Main.Server.Repository.Bookings
             }
 
             // Kiểm tra trạng thái hiện tại của booking
-            if (booking.BookingStatusId != CommonConstants.BookingStatus.NEW)
+            if (booking.BookingStatusId != CommonConstants.BookingStatus.NEW &&
+                booking.BookingStatusId != CommonConstants.BookingStatus.ACCEPT)
             {
                 throw new Exception("Booking không ở trạng thái chính xác để gán cleaner.");
             }
 
             // Gán cleaner cho booking bằng cách cập nhật CleanerId
             booking.CleanerId = cleanerId;
+            booking.BookingStatusId = CommonConstants.BookingStatus.ACCEPT;
 
             await _context.SaveChangesAsync();
 

@@ -834,15 +834,16 @@ const BookingService = () => {
         const endTime = selectedDateTime.add(selectedDuration, 'hour');
 
         // Chuyển đổi sang UTC để gửi đến backend
-        const startTimeUTC = selectedDateTime.utc().toISOString();
-        const endTimeUTC = endTime.utc().toISOString();
+        const startTimeStr = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
+        const endTimeStr = endTime.format('YYYY-MM-DD HH:mm:ss');
 
-        console.log("Bắt đầu (UTC)", startTimeUTC);
-        console.log("Kết thúc (UTC)", endTimeUTC);
+        console.log("Bắt đầu (UTC)", startTimeStr);
+        console.log("Kết thúc (UTC)", endTimeStr);
+      
 
         try {
             const response = await axios.get(
-                `/cleanperhour/cleaner-available?startTime=${startTimeUTC}&endTime=${endTimeUTC}`//----------Đang lỗi lấy giờ đoạn này vì nó đang lấy không đúng giờ => sai logic------------
+                `/cleanperhour/cleaner-available?startTime=${startTimeStr}&endTime=${endTimeStr}`//----------Đang lỗi lấy giờ đoạn này vì nó đang lấy không đúng giờ => sai logic------------
             );
 
             if (response.data.length > 0) {

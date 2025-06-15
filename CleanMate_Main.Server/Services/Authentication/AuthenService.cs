@@ -265,5 +265,23 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             return (true, null);
         }
+        public async Task<(bool Success, string Error)> ResetPasswordAsync(string userId, string token, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, "Người dùng không tồn tại.");
+            }
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
+
+            if (!result.Succeeded)
+            {
+                return (false, string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            return (true, null);
+        }
     }
 }

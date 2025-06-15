@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
 using CleanMate_Main.Server.Services.Employee;
@@ -216,6 +217,24 @@ namespace CleanMate_Main.Server.Controllers.Authen
             }
 
             return Ok(new { message = "Mật khẩu đã được thay đổi thành công." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Validation failed" });
+            }
+
+            var (success, error) = await _authenService.ResetPasswordAsync(model.UserId, model.Token, model.NewPassword);
+
+            if (!success)
+            {
+                return BadRequest(new { message = error });
+            }
+
+            return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
         }
     }
 }

@@ -6,6 +6,9 @@
         maxWidth: '1200px',
         margin: '0 auto',
         padding: '0 16px',
+        '@media (max-width: 400px)': {
+            padding: '0 16px', 
+        },
     },
     tabCard: {
         border: '2px solid',

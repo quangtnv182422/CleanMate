@@ -6,6 +6,8 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import CleaningServicesOutlinedIcon from '@mui/icons-material/CleaningServicesOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import SyncLockIcon from '@mui/icons-material/SyncLock';
 import { AuthContext } from '../../context/AuthContext';
 
 const HeaderTopbar = () => {
@@ -120,9 +122,17 @@ const HeaderTopbar = () => {
                                                         <AccountCircleOutlinedIcon size="small" />
                                                         Hồ sơ cá nhân
                                                     </div>
+                                                    <div className="dropdown-item" onClick={() => navigateTo("/voucher")}>
+                                                        <LocalOfferIcon size="small" />
+                                                        Ưu đãi của tôi
+                                                    </div>
                                                     <div className="dropdown-item" onClick={() => navigateTo("/order-history")}>
                                                         <CleaningServicesOutlinedIcon size="small" />
                                                         Lịch sử đặt dịch vụ
+                                                    </div>
+                                                    <div className="dropdown-item" onClick={() => navigateTo("/change-password")}>
+                                                        <SyncLockIcon size="small" />
+                                                        Đổi mật khẩu
                                                     </div>
                                                 </div>
                                                 <div className="cleanmate-wallet">

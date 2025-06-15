@@ -24,10 +24,10 @@ import useAuth from '../../hooks/useAuth'; // Added for user authentication
 // Updated status list with "Tất cả" (all) as -1 to avoid conflict with "Đang chờ" (0)
 const statusList = [
     { id: -1, label: 'Tất cả', color: '#000000', bgColor: 'transparent', borderColor: '#000000' },
-    { id: 1, label: 'Đã duyệt', color: '#28A745', bgColor: 'rgba(40, 167, 69, 0.1)', borderColor: '#28A745' },
-    { id: 3, label: 'Đã từ chối', color: '#DC3545', bgColor: 'rgba(220, 53, 69, 0.1)', borderColor: '#DC3545' },
     { id: 0, label: 'Đang chờ', color: '#FFC107', bgColor: 'rgba(255, 193, 7, 0.1)', borderColor: '#FFC107' },
+    { id: 1, label: 'Đã duyệt', color: '#28A745', bgColor: 'rgba(40, 167, 69, 0.1)', borderColor: '#28A745' },
     { id: 2, label: 'Hoàn thành', color: '#28A745', bgColor: 'rgba(40, 167, 69, 0.1)', borderColor: '#28A745' },
+    { id: 3, label: 'Đã từ chối', color: '#DC3545', bgColor: 'rgba(220, 53, 69, 0.1)', borderColor: '#DC3545' },
 ];
 
 const REQUESTS_PER_PAGE = 6;
@@ -183,7 +183,7 @@ const WithdrawRequest = () => {
     // Updated filter logic to handle "Tất cả" (-1) and safeguard against undefined values
     const filteredRequest = requests.filter((request) => {
         const nameMatch = (request?.user?.fullName || request?.requesterName || '').toLowerCase().includes(search.toLowerCase());
-        const statusMatch = status === -1 || (request?.statusId !== undefined && request.statusId === status);
+        const statusMatch = status === -1 || (request?.status !== undefined && request.status === status);
         return nameMatch && statusMatch;
     });
 
@@ -207,8 +207,13 @@ const WithdrawRequest = () => {
 
     const formatTime = (dateTime) => {
         if (!dateTime) return '';
-        const date = new Date(dateTime);
-        if (isNaN(date)) return ''; // Handle invalid date
+
+        // Cắt bỏ phần dư sau mili giây (đảm bảo trình duyệt parse đúng)
+        const cleanDateTime = dateTime.split('.')[0];
+
+        const date = new Date(cleanDateTime);
+        if (isNaN(date)) return '';
+
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${hours}:${minutes}`;
@@ -216,9 +221,12 @@ const WithdrawRequest = () => {
 
     const formatDate = (dateTime) => {
         if (!dateTime) return '';
-        const date = new Date(dateTime);
-        if (isNaN(date)) return ''; // Handle invalid date
-        return date.toLocaleDateString('vi-VN'); // Format date in Vietnamese locale
+
+        const cleanDateTime = dateTime.split('.')[0];
+        const date = new Date(cleanDateTime);
+        if (isNaN(date)) return '';
+
+        return date.toLocaleDateString('vi-VN');
     };
 
     const handleOpen = (request) => {
@@ -270,7 +278,7 @@ const WithdrawRequest = () => {
                                 <Card sx={style.workCard} onClick={() => handleOpen(request)}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
-                                            Yêu cầu lúc {formatTime(request.processedAt)} giờ ngày {formatDate(request.processedAt)}
+                                            Yêu cầu lúc {formatTime(request.requestedAt)} giờ ngày {formatDate(request.requestedAt)}
                                         </Typography>
                                         <Typography sx={{ mt: 2, fontWeight: 500 }}>
                                             {request.user?.fullName || request.requesterName || 'N/A'}

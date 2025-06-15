@@ -81,24 +81,24 @@ const FeedbackDetails = ({selectedWork }) => {
             </Box>
 
             {/* Booking */}
-            <Box sx={styles.informationTitle}>
-                <LibraryBooksIcon size="small" sx={styles.subtitleIcon} />
-                <Typography variant="h6" sx={styles.subtitle}>Đơn hàng</Typography>
-            </Box>
-            <Box sx={styles.informationContent}>
-                <Box sx={styles.bookingContent}>
-                    <Typography sx={styles.bookingTitle}>Số giờ/buổi</Typography>
-                    <Typography sx={styles.content}>{selectedWork.duration}/buổi</Typography>
-                </Box>
-                <Box sx={styles.bookingContent}>
-                    <Typography sx={styles.bookingTitle}>Tiền ca làm</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedWork.price)}</Typography>
-                </Box>
-                <Box sx={styles.bookingContent}>
-                    <Typography sx={styles.bookingTitle}>Hoa hồng</Typography>
-                    <Typography sx={styles.content}>{formatPrice(selectedWork.commission)}</Typography>
-                </Box>
-            </Box>
+            {/*<Box sx={styles.informationTitle}>*/}
+            {/*    <LibraryBooksIcon size="small" sx={styles.subtitleIcon} />*/}
+            {/*    <Typography variant="h6" sx={styles.subtitle}>Đơn hàng</Typography>*/}
+            {/*</Box>*/}
+            {/*<Box sx={styles.informationContent}>*/}
+            {/*    <Box sx={styles.bookingContent}>*/}
+            {/*        <Typography sx={styles.bookingTitle}>Số giờ/buổi</Typography>*/}
+            {/*        <Typography sx={styles.content}>{selectedWork.duration}/buổi</Typography>*/}
+            {/*    </Box>*/}
+            {/*    <Box sx={styles.bookingContent}>*/}
+            {/*        <Typography sx={styles.bookingTitle}>Tiền ca làm</Typography>*/}
+            {/*        <Typography sx={styles.content}>{formatPrice(selectedWork.price)}</Typography>*/}
+            {/*    </Box>*/}
+            {/*    <Box sx={styles.bookingContent}>*/}
+            {/*        <Typography sx={styles.bookingTitle}>Hoa hồng</Typography>*/}
+            {/*        <Typography sx={styles.content}>{formatPrice(selectedWork.commission)}</Typography>*/}
+            {/*    </Box>*/}
+            {/*</Box>*/}
 
             {/*Feedback*/}
             <Box sx={styles.informationTitle}>
@@ -112,7 +112,7 @@ const FeedbackDetails = ({selectedWork }) => {
                 </Box>
                 <Box sx={styles.bookingContent}>
                     <Typography sx={styles.bookingTitle}>Phản hồi</Typography>
-                    <Typography sx={styles.content}>{selectedWork.feedbackContent}</Typography>
+                    <Typography sx={styles.content}>{selectedWork.content}</Typography>
                 </Box>
             </Box>
         </Box>

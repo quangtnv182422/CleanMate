@@ -84,7 +84,7 @@ const BookingProvider = ({ children }) => {
 }
 
 export default BookingProvider;*/
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
@@ -126,13 +126,38 @@ const BookingProvider = ({ children }) => {
     const [noRatingOrder, setNoRatingOrder] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setNoRatingOrder(array);
-    }, [])
-
     const location = useLocation();
     const { user, loading: authLoading, refreshAuth } = useAuth();
     const role = user?.roles?.[0] || '';
+
+    // hàm fetch booking chưa feedback
+
+    const fetchNoRatingBooking = useCallback(async () => {
+        try {
+            const userId = user?.id;
+            const statusId = 6;
+
+            const response = await axios.get('/bookings/get-bookings', {
+                params: { userId, statusId }
+            });
+
+            if (response.data && Array.isArray(response.data)) {
+                const filtered = response.data.filter(
+                    booking => booking.hasFeedback === false
+                );
+                setNoRatingOrder(filtered);
+            } else {
+                console.warn('Không nhận được danh sách booking hợp lệ');
+                setNoRatingOrder([]);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách booking:", error);
+        }
+    }, [user?.id, setNoRatingOrder]);
+
+    useEffect(() => {
+        fetchNoRatingBooking();
+    }, [fetchNoRatingBooking])
 
     // Fetch services khi component mount
     useEffect(() => {

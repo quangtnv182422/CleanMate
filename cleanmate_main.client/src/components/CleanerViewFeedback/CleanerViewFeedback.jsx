@@ -35,6 +35,8 @@ const CleanerViewFeedback = () => {
 
     const handleClose = () => setOpen(false);
 
+    console.log(selectedWork)
+
     useEffect(() => {
         const fetchFeedbackHistory = async () => {
             if (role !== "Cleaner") return;
@@ -117,23 +119,23 @@ const CleanerViewFeedback = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         sx={{ width: 200 }}
                     />
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
-                        <InputLabel id="status-select-label">Trạng thái</InputLabel>
-                        <Select
-                            labelId="status-select-label"
-                            value={status}
-                            onChange={handleStatusChange}
-                            label="Trạng thái"
-                        >
-                            {statusList
-                                .filter((statusItem) => statusItem.id !== 2 && statusItem.id !== 6 && statusItem.id !== 1)
-                                .map((statusItem) => (
-                                    <MenuItem key={statusItem.id} value={statusItem.id}>
-                                        {statusItem.name}
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
+                    {/*<FormControl size="small" sx={{ minWidth: 160 }}>*/}
+                    {/*    <InputLabel id="status-select-label">Trạng thái</InputLabel>*/}
+                    {/*    <Select*/}
+                    {/*        labelId="status-select-label"*/}
+                    {/*        value={status}*/}
+                    {/*        onChange={handleStatusChange}*/}
+                    {/*        label="Trạng thái"*/}
+                    {/*    >*/}
+                    {/*        {statusList*/}
+                    {/*            .filter((statusItem) => statusItem.id !== 2 && statusItem.id !== 6 && statusItem.id !== 1)*/}
+                    {/*            .map((statusItem) => (*/}
+                    {/*                <MenuItem key={statusItem.id} value={statusItem.id}>*/}
+                    {/*                    {statusItem.name}*/}
+                    {/*                </MenuItem>*/}
+                    {/*            ))}*/}
+                    {/*    </Select>*/}
+                    {/*</FormControl>*/}
                 </Box>
 
                 <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -156,7 +158,7 @@ const CleanerViewFeedback = () => {
                                             Đánh giá: <span>{work.rating} <StarIcon color="warning" fontSize="small" /></span>
                                         </Typography>
                                         <Typography variant="subtitle2" color="textSecondary">
-                                            Phản hồi của khách hàng: <span>{work.content}</span>
+                                            Phản hồi của khách hàng: <span style={{fontWeight: 'bold'}}>{work.content}</span>
                                         </Typography>
                                         <Box sx={style.priceSection}>
                                             <Typography variant="h6" sx={{ color: '#1976D2' }}>
@@ -170,15 +172,15 @@ const CleanerViewFeedback = () => {
                     )}
                 </Grid>
 
-                {open && (
-                    <Modal
-                        open={open}
-                        onClose={handleClose}
-                        disableAutoFocus
-                    >
-                        <FeedbackDetails selectedWork={selectedWork} handleClose={handleClose} />
-                    </Modal>
-                )}
+                {/*{open && (*/}
+                {/*    <Modal*/}
+                {/*        open={open}*/}
+                {/*        onClose={handleClose}*/}
+                {/*        disableAutoFocus*/}
+                {/*    >*/}
+                {/*        <FeedbackDetails selectedWork={selectedWork} handleClose={handleClose} />*/}
+                {/*    </Modal>*/}
+                {/*)}*/}
 
                 {/* Pagination */}
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>

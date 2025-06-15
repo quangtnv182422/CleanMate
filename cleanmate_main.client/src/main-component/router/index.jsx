@@ -43,6 +43,8 @@ import BookingDetails from '../../components/BookingDetails/BookingDetails';
 import WithdrawCoin from '../../components/Coin/WithdrawCoin';
 import NoRating from '../NoRating/NoRating';
 import AdminDashboard from '../AdminDashboard/AdminDashboard';
+import ChangePassword from '../ResetPassword/ChangePassword';
+import ResetPassword from '../ResetPassword/ResetPassword';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -90,6 +92,8 @@ const AllRoute = () => {
                 <Route path="/booking-details" element={<BookingDetails />} />
                 <Route path="/order/no-rating-yet" element={<NoRating />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/change-password" element={<ChangePassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
             </Routes>
         </div>
     );

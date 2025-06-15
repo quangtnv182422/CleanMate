@@ -341,7 +341,7 @@ const WorkList = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {paginatedData.map((row) => (
+                            {paginatedData.reverse().map((row) => (
                                 <TableRow key={row.bookingId}>
                                     <TableCell>{row.serviceName}</TableCell>
                                     <TableCell>{row.customerFullName}</TableCell>

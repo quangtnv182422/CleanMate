@@ -18,7 +18,7 @@ namespace CleanMate_Main.Server.Controllers.CleanService.CleanPerHour
             _cleanPerHourService = cleanPerHourService;
         }
 
-        [HttpGet("available")]
+        [HttpGet("cleaner-available")]
         public async Task<ActionResult<List<CleanerDTO>>> GetAvailableCleaners([FromQuery] DateTime startTime, [FromQuery] DateTime endTime)
         {
             try

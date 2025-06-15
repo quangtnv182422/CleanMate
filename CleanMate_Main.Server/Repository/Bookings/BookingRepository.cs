@@ -48,6 +48,7 @@ namespace CleanMate_Main.Server.Repository.Bookings
                                 .Include(x => x.Address)
                                 .Include(x => x.Cleaner)
                                 .Include(x => x.User)
+                                .Include(x => x.Feedbacks)
                                 .Where(x => x.UserId == userId);
 
             if (statusId.HasValue)
@@ -110,43 +111,6 @@ namespace CleanMate_Main.Server.Repository.Bookings
             return true;
         }
 
-       /* public async Task<List<CleanerDTO>> GetAvailableCleanersForTimeSlotAsync(DateTime startTime, DateTime endTime)
-        {
-            // Lấy danh sách tất cả cleaner trong hệ thống (giả sử có 5 cleaner)
-            var cleaners = await _context.CleanerProfiles
-                .Include(c => c.User)
-                //.Where(c => c.Available) // Cleaner đang sẵn sàng làm việc
-                .Select(c => new { c.UserId, c.User.FullName })
-                .ToListAsync();
-
-            // Chuyển đổi startTime và endTime sang DateOnly và TimeOnly
-            var requestDate = DateOnly.FromDateTime(startTime);
-            var requestStartTime = TimeOnly.FromDateTime(startTime);
-            var requestEndTime = TimeOnly.FromDateTime(endTime);
-
-            // Lấy danh sách cleaner có booking overlap với khoảng thời gian yêu cầu
-            var bookedCleaners = await _context.Bookings
-                .Where(b => b.BookingStatusId != CommonConstants.BookingStatus.CANCEL // Không tính booking đã hủy
-                         && b.Date == requestDate // Chỉ kiểm tra trong cùng ngày
-                         && b.StartTime < requestEndTime // Booking bắt đầu trước khi slot yêu cầu kết thúc
-                         && TimeOnly.FromTimeSpan(b.StartTime.ToTimeSpan().Add(TimeSpan.FromHours(b.ServicePrice.Duration.DurationTime))) > requestStartTime) // Booking kết thúc sau khi slot yêu cầu bắt đầu
-                .Select(b => b.CleanerId)
-                .Distinct()
-                .ToListAsync();
-
-
-            // Lọc ra các cleaner không có trong danh sách bookedCleaners
-            var availableCleaners = cleaners
-                .Where(c => !bookedCleaners.Contains(c.UserId))
-                .Select(c => new CleanerDTO
-                {
-                    CleanerId = c.UserId,
-                    Name = c.FullName
-                })
-                .ToList();
-
-            return availableCleaners;
-        }*/
 
     }
 }

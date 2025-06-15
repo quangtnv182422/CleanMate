@@ -283,5 +283,28 @@ namespace CleanMate_Main.Server.Services.Authentication
 
             return (true, null);
         }
+        public async Task<(bool Success, string Error)> ResendEmailConfirmationAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return (false, "Email không tồn tại.");
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return (false, "Email đã được xác nhận.");
+            }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var baseUrl = _configuration["SettingDomain:BaseUrl"];
+            var confirmationLink = $"{baseUrl}/email-confirmation?userId={user.Id}&token={encodedToken}";
+
+            await _emailService.SendConfirmEmail(user.Email, confirmationLink);
+
+            return (true, null);
+        }
     }
 }

@@ -525,7 +525,7 @@ namespace CleanMate_Main.Server.Repository.Employee
             return await query.ToListAsync();
         }
 
-        public async Task<int> CountFeedbackDone(string employeeId, int newRating)
+        public async Task<int> CountFeedbackDone(string employeeId)
         {
             var existingRatingsCount = await _context.Feedbacks
                 .Join(_context.Bookings, f => f.BookingId, b => b.BookingId, (f, b) => new { f, b })

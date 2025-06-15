@@ -113,6 +113,32 @@ namespace CleanMate_Main.Server.Repository.Bookings
             return true;
         }
 
+        public async Task<bool> CancelBookingAsync(int bookingId)
+        {
+            // Lấy booking theo ID
+            var booking = await _context.Bookings
+                .Include(b => b.BookingStatus)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
 
+            if (booking == null)
+            {
+                throw new Exception("Booking không được tìm thấy.");
+            }
+
+            // Kiểm tra trạng thái hiện tại của booking
+            if (booking.BookingStatusId != CommonConstants.BookingStatus.NEW &&
+                booking.BookingStatusId != CommonConstants.BookingStatus.ACCEPT)
+            {
+                throw new Exception("Chỉ có thể hủy booking ở trạng thái NEW hoặc ACCEPT.");
+            }
+
+            // Cập nhật trạng thái booking sang CANCELED
+            booking.BookingStatusId = CommonConstants.BookingStatus.CANCEL;
+            booking.UpdatedAt = DateTime.Now; // Cập nhật thời gian hủy
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

@@ -103,5 +103,10 @@ namespace CleanMate_Main.Server.Services.Bookings
         {
             return await _bookingRepo.ProcessBookingAfterAssigningCleanerAsync(bookingId, cleanerId);
         }
+
+        public async Task<bool> CancelBookingAsync(int bookingId)
+        {
+            return await _bookingRepo.CancelBookingAsync(bookingId);
+        }
     }
 }

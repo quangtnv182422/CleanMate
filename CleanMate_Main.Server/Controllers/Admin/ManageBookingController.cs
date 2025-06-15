@@ -45,5 +45,23 @@ namespace CleanMate_Main.Server.Controllers.Admin
             }
             return BadRequest("Failed to assign cleaner.");
         }
+
+        [HttpPost("cancel-booking")]
+        public async Task<IActionResult> CancelBooking([FromBody] CancelBookingDTO request)
+        {
+            try
+            {
+                var success = await _bookingService.CancelBookingAsync(request.BookingId);
+                if (success)
+                {
+                    return Ok("Booking canceled successfully.");
+                }
+                return BadRequest("Failed to cancel booking.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

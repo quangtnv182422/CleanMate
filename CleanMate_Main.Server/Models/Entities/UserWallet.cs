@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using CleanMate_Main.Server.Common.Utils;
 
 namespace CleanMate_Main.Server.Models.Entities
 {
@@ -16,7 +17,7 @@ namespace CleanMate_Main.Server.Models.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal Balance { get; set; } = 0;
 
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTimeVN.GetNow();
 
         public virtual AspNetUser User { get; set; } = null!;
 

@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Proxy.VietQR;
@@ -40,7 +41,7 @@ namespace CleanMate_Main.Server.Services.Transaction
                 Amount = amount,
                 TransactionType = transactionType,
                 Description = description,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeVN.GetNow(),
                 RelatedBookingId = bookingId ?? null
             };
 
@@ -72,7 +73,7 @@ namespace CleanMate_Main.Server.Services.Transaction
                 UserId = userId,
                 Amount = amount,
                 Status = WithdrawStatus.Pending,
-                RequestedAt = DateTime.Now
+                RequestedAt = DateTimeVN.GetNow()
             };
 
             return await _transactionRepo.CreateWithdrawRequestAsync(request);
@@ -160,7 +161,7 @@ namespace CleanMate_Main.Server.Services.Transaction
             }
 
             request.Status = WithdrawStatus.Rejected;
-            request.ProcessedAt = DateTime.Now;
+            request.ProcessedAt = DateTimeVN.GetNow();
             request.ProcessedBy = adminId;
             request.AdminNote = adminNote;
 

@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DbContext;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Repository.Feedbacks;
 
@@ -50,8 +51,8 @@ namespace CleanMate_Main.Server.Services.Feedbacks
                 CleanerId = cleanerId,
                 Rating = rating,
                 Content = content,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                CreatedAt = DateTimeVN.GetNow(),
+                UpdatedAt = DateTimeVN.GetNow()
             };
 
             await _feedbackRepo.AddFeedbackAsync(feedback);
@@ -80,7 +81,7 @@ namespace CleanMate_Main.Server.Services.Feedbacks
             // Cập nhật thông tin
             if (rating.HasValue) feedback.Rating = rating;
             if (!string.IsNullOrEmpty(content)) feedback.Content = content;
-            feedback.UpdatedAt = DateTime.Now;
+            feedback.UpdatedAt = DateTimeVN.GetNow();
 
             await _feedbackRepo.UpdateFeedbackAsync(feedback);
         }

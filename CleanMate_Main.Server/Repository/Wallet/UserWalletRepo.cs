@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DbContext;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ namespace CleanMate_Main.Server.Repository.Wallet
         {
             var wallet = await GetWalletByUserIdAsync(userId);
             wallet.Balance += amount;
-            wallet.UpdatedAt = DateTime.Now;
+            wallet.UpdatedAt = DateTimeVN.GetNow();
             await _context.SaveChangesAsync();
             return true;
         }

@@ -38,5 +38,9 @@
         padding: '4px 8px',
         border: '1px solid #ccc',
         borderRadius: '8px',
+    },
+    dateTimeContent: {
+        color: '#1976D2',
+        fontWeight: 'bold',
     }
 };

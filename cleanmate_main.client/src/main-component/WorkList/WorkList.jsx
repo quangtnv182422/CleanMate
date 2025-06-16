@@ -65,7 +65,6 @@ const ReportsPage = () => (
     </Box>
 );
 
-const drawerWidth = 300;
 
 const colorMap = {
     'Việc mới': '#4DA8DA', // Việc mới - Xanh lam nhạt
@@ -189,8 +188,16 @@ const WorkList = () => {
     const WorkListPage = () => {
         const [search, setSearch] = useState('');
 
+        const sortedByCreatedAt = useMemo(() => {
+            return [...data].sort((a, b) => {
+                const dateA = new Date(a.createdAt).getTime();
+                const dateB = new Date(b.createdAt).getTime();
+                return dateB - dateA; // công việc mới nhất lên đầu
+            });
+        }, []);
+
         const filteredData = useMemo(() => {
-            return data.filter((row) =>
+            return data.reverse().filter((row) =>
                 row.customerFullName?.toLowerCase().includes(search.toLowerCase())
             );
         }, [search]);
@@ -426,6 +433,26 @@ const WorkList = () => {
         }
     };
 
+    const [coin, setCoin] = useState(0);
+
+    useEffect(() => {
+        const getCoin = async () => {
+            try {
+                const response = await fetch('/wallet/get-wallet', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const walletData = await response.json();
+                setCoin(walletData?.balance);
+            } catch (error) {
+                console.error('Error fetching wallet:', error);
+            }
+        };
+
+        getCoin();
+    }, []);
+
     const [openDrawer, setOpenDrawer] = useState(false);
     const handleDrawerOpen = () => {
         setOpenDrawer(true);
@@ -468,6 +495,7 @@ const WorkList = () => {
         {
             title: 'Nạp tiền',
             icon: <PaidIcon sx={style.drawerIcon} />,
+            coin: coin,
         },
         {
             title: 'Rút tiền',
@@ -493,10 +521,14 @@ const WorkList = () => {
                     zIndex: 1400,
                     '& .MuiDrawer-paper': {
                         padding: 0,
-                        width: drawerWidth,
+                        width: 350,
                         boxSizing: 'border-box',
                         backgroundColor: '#fff',
                         color: '#ccc',
+
+                        '@media (max-width: 600px)': {
+                            width: 300,
+                        }
                     },
                 }}
             >
@@ -515,10 +547,18 @@ const WorkList = () => {
                             onClick={() => handleTabChange(null, index)}
                             sx={{ padding: '10px 0' }}
                         >
-                            <ListItemIcon>
-                                {item.icon}
-                            </ListItemIcon>
-                            <ListItemText primary={item.title} sx={style.listItemText} />
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                                <ListItemIcon>
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={item.title} sx={style.listItemText} />
+
+                                {item.coin && (
+                                    <Box sx={{ marginLeft: 'auto', paddingRight: 2, color: '#000' }}>
+                                        Số dư ví: <span style={{ color: '#1976D2'} }>{formatPrice(item.coin)}</span>
+                                    </Box>
+                                )}
+                            </Box>
                         </ListItemButton>
                     ))}
                 </List>

@@ -151,7 +151,7 @@ const InProgressWork = () => {
                                 <Card sx={style.workCard} onClick={() => handleOpen(work.bookingId)}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
-                                            Bắt đầu lúc {formatTime(work.startTime)} giờ ngày {formatDate(work.date)}
+                                            Bắt đầu lúc <span style={style.dateTimeContent}>{formatTime(work.startTime)}</span> giờ ngày <span style={style.dateTimeContent}>{formatDate(work.date)}</span>
                                         </Typography>
                                         <Typography sx={{ mt: 2, fontWeight: 500 }}>{work.customerFullName}</Typography>
                                         <Typography variant="subtitle2" color="textSecondary">{work.address}</Typography>

@@ -160,7 +160,9 @@ const OrderHistorySection = () => {
         setOpen(true);
         setSelectedOrder(order);
     };
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+    }
 
     const stats = {
         active: bookings.filter((o) => o.status === "active").length,

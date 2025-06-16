@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Transaction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,11 +17,13 @@ namespace CleanMate_Main.Server.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
-        public RequestController(ITransactionService transactionService, UserManager<AspNetUser> userManager)
+        public RequestController(ITransactionService transactionService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
             _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _userHelper = userHelper;
         }
 
         [HttpPost("withdraw")]
@@ -28,17 +31,10 @@ namespace CleanMate_Main.Server.Controllers
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                }
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
-                {
-                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                }
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
 
                 // Validate bank details

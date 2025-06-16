@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -17,6 +18,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
     const [ratingValue, setRatingValue] = useState(null);
     const [selectedReasons, setSelectedReasons] = useState([]);
     const [otherReason, setOtherReason] = useState("");
+    const navigate = useNavigate();
 
     const handleReasonSelect = (reason) => {
         setSelectedReasons(prev =>
@@ -92,6 +94,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
 
     const postFeedback = async (bookingId, cleanerId, rating, content, selectedReasons, otherReason) => {
         try {
+            //navigate('/loading', { replace: true });
             const feedbackData = {
                 bookingId: bookingId,
                 cleanerId: cleanerId,
@@ -117,9 +120,10 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
 
             if (response.status === 200) {
                 toast.success('Gửi đánh giá thành công.');
-                setTimeout(() => {
-                    window.location.reload(); // Hoặc dùng navigate(0) nếu dùng useNavigate()
-                }, 1000);
+                //navigate('/order/no-rating-yet', {replace: true})
+                //setTimeout(() => {
+                //    window.location.reload(); // Hoặc dùng navigate(0) nếu dùng useNavigate()
+                //}, 1000);
                 return true;
             } else {
                 toast.error(response.data.message || 'Gửi đánh giá thất bại.');
@@ -133,7 +137,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
     };
 
     const handleSubmitFeedback = async () => {
-        if (loading) return;
+        //if (loading) return;
 
         if (!ratingValue || ratingValue <= 0 || ratingValue > 5) {
             toast.warning('Vui lòng chọn số sao trước khi gửi đánh giá.');
@@ -145,7 +149,8 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
             return;
         }
 
-        setLoading(true);
+        //setLoading(true);
+
 
         const success = await postFeedback(
             selectedOrder.bookingId,
@@ -161,7 +166,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
             if (onOrderListRefresh) onOrderListRefresh();
         }
 
-        setLoading(false)
+        //setLoading(false)
     };
 
 

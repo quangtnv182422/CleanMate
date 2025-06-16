@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Repository.Bookings;
@@ -36,7 +37,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Date = dto.Date,
                 StartTime = dto.StartTime,
                 TotalPrice = dto.TotalPrice,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeVN.GetNow(),
                 UpdatedAt = null
             };
             var addBooking = await _bookingRepo.AddBookingAsync(booking);

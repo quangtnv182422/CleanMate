@@ -14,13 +14,14 @@ import { style } from './style.js';
 import useAuth from '../../hooks/useAuth.jsx';
 import { BookingContext } from '../../context/BookingProvider.jsx';
 import Details from './Details/Details.jsx'
+import { WorkContext } from '../../context/WorkProvider.jsx';
 
 const WORKS_PER_PAGE = 6;
 
 
 const NoRatingSection = () => {
-    const { noRatingOrder } = useContext(BookingContext);
-
+    const { noRatingOrder, fetchNoRatingBooking } = useContext(BookingContext);
+    const { setOpenFeedback } = useContext(WorkContext);
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -113,6 +114,11 @@ const NoRatingSection = () => {
                                                 {order.status}
                                             </Typography>
                                         </Box>
+
+                                        <Box sx={style.feedbackContainer}>
+                                            <Typography variant="body2">Vui lòng đánh giá dịch vụ</Typography>
+                                            <Button variant="contained" color="primary" onClick={() => setOpenFeedback(true)}>Đánh giá</Button>
+                                        </Box>
                                     </CardContent>
                                 </Card>
                             </Grid>
@@ -126,7 +132,7 @@ const NoRatingSection = () => {
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <Details selectedOrder={selectedOrder} handleClose={handleClose} />
+                        <Details onOrderListRefresh={fetchNoRatingBooking} selectedOrder={selectedOrder} handleClose={handleClose} />
                     </Modal>
                 )}
 

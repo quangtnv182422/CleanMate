@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Payments;
@@ -23,18 +24,21 @@ namespace CleanMate_Main.Server.Controllers.Employee
         private readonly IHubContext<WorkHub> _hubContext;
         private readonly IPaymentService _paymentService;
         private readonly IUserWalletService _userWalletService;
+        private readonly UserHelper<AspNetUser> _userHelper;
         public WorkController(
             IEmployeeService employeeService,
             UserManager<AspNetUser> userManager,
             IHubContext<WorkHub> hubContext,
             IPaymentService paymentService,
-            IUserWalletService userWalletService)
+            IUserWalletService userWalletService,
+            UserHelper<AspNetUser> userHelper)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
             _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
             _userWalletService = userWalletService ?? throw new ArgumentNullException(nameof(userWalletService));
+            _userHelper = userHelper;
         }
 
         [HttpPost("{id}/start")]
@@ -42,12 +46,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                string employeeId = await GetEmployeeIdAsync();
-                if(employeeId == null)
-                {
-                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
-                }
-                bool success = await _employeeService.BeginWorkRequestAsync(id, employeeId);
+                var employee = await _userHelper.GetCurrentUserAsync();
+
+                if (employee == null)
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+
+                bool success = await _employeeService.BeginWorkRequestAsync(id, employee.Id);
                 if (success)
                 {
                     await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate");
@@ -75,13 +79,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                string employeeId = await GetEmployeeIdAsync();
-                if (employeeId == null)
-                {
-                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
-                }
-                 
-                bool success = await _employeeService.CompleteWorkRequestAsync(id, employeeId);
+                var employee = await _userHelper.GetCurrentUserAsync();
+
+                if (employee == null)
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+
+                bool success = await _employeeService.CompleteWorkRequestAsync(id, employee.Id);
                 if (success)
                 {
                     var booking = await _employeeService.GetWorkDetailsAsync(id);
@@ -100,7 +103,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                             //await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
                             break;
                         case PaymentType.CleanMate_Coin:
-                            await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            await _userWalletService.AddMoneyAsync(employee.Id, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
                             break;
                         default:
                             return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
@@ -130,12 +133,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                string employeeId = await GetEmployeeIdAsync();
-                if (employeeId == null)
-                {
-                    return BadRequest(new { success = false, message = "Không tìm thấy người dùng" });
-                }
-                bool success = await _employeeService.CancelWorkRequestAsync(id, employeeId);
+                var employee = await _userHelper.GetCurrentUserAsync();
+
+                if (employee == null)
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+
+                bool success = await _employeeService.CancelWorkRequestAsync(id, employee.Id);
                 if (success)
                 {
                     await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate");
@@ -157,19 +160,6 @@ namespace CleanMate_Main.Server.Controllers.Employee
             }
         }
 
-        private async Task<string> GetEmployeeIdAsync()
-        {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userEmail))
-            {
-                var user = await _userManager.FindByEmailAsync(userEmail);
-
-                if (user != null)
-                {
-                    return user.Id;
-                }
-            }
-            return null ;
-        }
+        
     }
 }

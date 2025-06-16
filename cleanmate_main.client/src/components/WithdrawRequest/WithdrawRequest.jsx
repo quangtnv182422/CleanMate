@@ -16,7 +16,7 @@ import {
     MenuItem
 } from '@mui/material';
 import { style } from './style.js';
-import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail.jsx';
+import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail';
 import * as signalR from '@microsoft/signalr';
 import { toast } from 'react-toastify'; // Added for toast notifications
 import useAuth from '../../hooks/useAuth'; // Added for user authentication
@@ -50,72 +50,6 @@ const WithdrawRequest = () => {
         setSelectedRequest(null);
     };
 
-    /*    // Fetch withdraw requests with useCallback
-        const fetchWithdrawRequests = useCallback(async () => {
-            if (loading || authLoading) return;
-            if (!user || role !== 'Admin') { // Assuming Admin role based on controller
-                toast.error("Bạn không có quyền truy cập vào trang này");
-                navigate('/home');
-                return;
-            }
-    
-            try {
-                const response = await fetch('/withdrawrequest', {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-    
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-    
-                const result = await response.json();
-                if (result.success) {
-                    setRequests(result.data || []);
-                } else {
-                    console.error('Failed to fetch withdraw requests:', result.message);
-                    setRequests([]);
-                }
-            } catch (error) {
-                console.error('Error fetching withdraw requests:', error);
-            } finally {
-                setLoading(false);
-            }
-        }, [loading, authLoading, user, role, navigate]);
-    
-        // Initialize SignalR connection
-        useEffect(() => {
-            const newConnection = new signalR.HubConnectionBuilder()
-                .withUrl("/workHub") // Match the hub URL from the server
-                .build();
-            setConnection(newConnection);
-        }, []);
-    
-        // Start connection and listen for status updates
-        useEffect(() => {
-            if (connection) {
-                if (connection.state === signalR.HubConnectionState.Disconnected) {
-                    connection.start()
-                        .catch(err => console.error('SignalR Connection Error: ', err));
-                }
-    
-                connection.on('ReceiveWorkUpdate', () => {
-                    fetchWithdrawRequests();
-                });
-    
-                return () => {
-                    connection.off('ReceiveWorkUpdate');
-                    if (connection.state !== signalR.HubConnectionState.Disconnected) {
-                        connection.stop();
-                    }
-                };
-            }
-        }, [connection, fetchWithdrawRequests]);
-    */
-
     const fetchRequestList = useCallback(async () => {
         if (loading) return;
         if (!user || role !== 'Admin') {
@@ -148,10 +82,10 @@ const WithdrawRequest = () => {
 
     // Khởi tạo connection trong useEffect
     useEffect(() => {
-        const newConnection = new signalR.HubConnectionBuilder()
+        const withdrawHubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/workHub")
             .build();
-        setConnection(newConnection);
+        setConnection(withdrawHubConnection);
     }, []);
 
     // Kết nối và lắng nghe sự kiện
@@ -159,6 +93,7 @@ const WithdrawRequest = () => {
         if (connection) {
             if (connection.state === signalR.HubConnectionState.Disconnected) {
                 connection.start()
+                    .then(() => console.log('SignalR Connected'))
                     .catch(err => console.error('SignalR Connection Error: ', err));
             }
 

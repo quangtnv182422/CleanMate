@@ -45,6 +45,7 @@ import NoRating from '../NoRating/NoRating';
 import AdminDashboard from '../AdminDashboard/AdminDashboard';
 import ChangePassword from '../ResetPassword/ChangePassword';
 import ResetPassword from '../ResetPassword/ResetPassword';
+import ServiceInformation from '../../components/ServiceInformation/ServiceInformation';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -94,6 +95,7 @@ const AllRoute = () => {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/change-password" element={<ChangePassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/service-information" element={<ServiceInformation/>} />
             </Routes>
         </div>
     );

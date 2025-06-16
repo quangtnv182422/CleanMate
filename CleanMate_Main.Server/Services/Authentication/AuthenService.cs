@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Smtp;
 using Microsoft.AspNetCore.Identity;
@@ -55,7 +56,7 @@ namespace CleanMate_Main.Server.Services.Authentication
                 PhoneNumber = model.PhoneNumber,
                 FullName = model.FullName,
                 Email = model.Email,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTimeVN.GetNow()
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -128,7 +129,7 @@ namespace CleanMate_Main.Server.Services.Authentication
                     FullName = model.FullName, 
                     Email = model.Email,
                     CCCD = model.Identification,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTimeVN.GetNow()
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -219,7 +220,7 @@ namespace CleanMate_Main.Server.Services.Authentication
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddDays(7),
+                    expires: DateTimeVN.GetNow().AddDays(7),
                     signingCredentials: creds
                 );
 

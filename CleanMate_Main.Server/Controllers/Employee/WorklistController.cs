@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Services.Employee;
@@ -23,28 +24,30 @@ namespace CleanMate_Main.Server.Controllers.Employee
         private readonly IHubContext<WorkHub> _hubContext;
         private readonly IPaymentService _paymentService;
         private readonly IUserWalletService _userWalletService;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
-        public WorklistController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, IHubContext<WorkHub> hubContext, IPaymentService paymentService,IUserWalletService userWalletService)
+        public WorklistController(IEmployeeService employeeService, 
+                                  UserManager<AspNetUser> userManager, 
+                                  IHubContext<WorkHub> hubContext,
+                                  IPaymentService paymentService,
+                                  IUserWalletService userWalletService,
+                                  UserHelper<AspNetUser> userHelper)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _hubContext = hubContext;
             _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
             _userWalletService = userWalletService ?? throw new ArgumentNullException(nameof(userWalletService));
+            _userHelper = userHelper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetWorkList([FromQuery] int? status = null)
         {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userEmail))
-                return Unauthorized(new { message = "User email not found." });
-
-            var user = await _userManager.FindByEmailAsync(userEmail);
+            var user = await _userHelper.GetCurrentUserAsync();
 
             if (user == null)
-                return Unauthorized(new { message = "User not found." });
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             string employeeId = user.Id;
             IEnumerable<WorkListViewModel> workItems;
@@ -67,17 +70,10 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
-                }
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
-                {
-                    return Unauthorized(new { message = "Không tìm thấy thông tin người dùng." });
-                }
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
                 string employeeId = user.Id;
                 var workDetail = await _employeeService.GetWorkDetailsAsync(id);
@@ -98,17 +94,10 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
-                }
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
-                {
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
-                }
 
                 string employeeId = user.Id;
                 bool success = await _employeeService.AcceptWorkRequestAsync(id, employeeId);

@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DbContext;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +80,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
                 }
 
                 wallet.Balance -= amount;
-                wallet.UpdatedAt = DateTime.Now;
+                wallet.UpdatedAt = DateTimeVN.GetNow();
 
                 // Record transaction
                 var walletTransaction = new WalletTransaction
@@ -88,7 +89,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
                     Amount = -amount,
                     TransactionType = TransactionType.Debit,
                     Description = $"Rút tiền theo yêu cầu #{requestId}",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeVN.GetNow()
                 };
                 _context.WalletTransactions.Add(walletTransaction);
 
@@ -99,7 +100,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
                     throw new KeyNotFoundException($"Yêu cầu rút tiền với ID {requestId} không tồn tại.");
                 }
 
-                request.ProcessedAt = DateTime.Now;
+                request.ProcessedAt = DateTimeVN.GetNow();
                 request.TransactionId = walletTransaction.TransactionId;
 
                 await _context.SaveChangesAsync();

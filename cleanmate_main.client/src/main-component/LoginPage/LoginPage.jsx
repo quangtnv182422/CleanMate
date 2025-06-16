@@ -143,7 +143,7 @@ const LoginPage = (props) => {
             }
         } else {
             validator.showMessages();
-            toast.error('Các mục không được để trống!');
+            toast.error('Vui lòng kiểm tra lại các trường thông tin!');
         }
     };
 
@@ -211,7 +211,7 @@ const LoginPage = (props) => {
                                     }}
                                 />
                             </FormControl>
-                            {validator.message('password', value.password, 'required')}
+                            {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
                         <Grid item xs={12}>
                             <Grid className="formAction">

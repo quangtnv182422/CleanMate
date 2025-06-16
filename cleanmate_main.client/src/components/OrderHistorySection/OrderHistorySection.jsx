@@ -224,7 +224,7 @@ const OrderHistorySection = () => {
                             const selected = selectedTab === type;
                             const colors = colorMap[type];
                             return (
-                                <Grid item xs={12} sm={2.4} key={type}>
+                                <Grid item xs={6} sm={2.4} key={type}>
                                     <Card
                                         onClick={() => handleSelect(type)}
                                         sx={{
@@ -271,6 +271,31 @@ const OrderHistorySection = () => {
                                             <Typography variant="h4" fontWeight={600} sx={{ color: 'inherit' }}>
                                                 {stats[type]}
                                             </Typography>
+                                            <Typography
+                                                variant="body1"
+                                                sx={{
+                                                    color: 'inherit',
+                                                    mt: 1,
+                                                    '@media (max-width: 600px)': {
+                                                        fontSize: '12px',
+                                                    },
+                                                }}>
+                                                {type === 'total'
+                                                    ? 'Tổng số đơn'
+                                                    : type === "active"
+                                                        ? 'Công việc mới được đăng bởi khách hàng'
+                                                        : type === "inProgress"
+                                                            ? "Người dọn dẹp đang trong quá trình thực hiện công việc"
+                                                            : type === "accepted"
+                                                                ? "Công việc đã được nhận bởi người dọn dẹp"
+                                                                : type === 'pending'
+                                                                    ? 'Công việc đã hoàn thành, chờ khách hàng xác nhận'
+                                                                    : type === 'paymentFail'
+                                                                        ? 'Đơn hàng thanh toán thất bại'
+                                                                        : type === 'completed'
+                                                                            ? 'Công việc đã hoàn thành và được xác nhận'
+                                                                            : 'Công việc này đã bị hủy'}
+                                            </Typography>
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -287,54 +312,51 @@ const OrderHistorySection = () => {
 
                     {/* List of Orders */}
                     <Grid container spacing={2}>
-                        <Grid container spacing={2}>
-                            {displayedOrders.length === 0 ? (
-                                <Grid item xs={12}>
-                                    <Typography variant="h6" align="center" color="textSecondary" sx={{ mt: 4 }}>
-                                        Không có đơn hàng nào.
-                                    </Typography>
-                                </Grid>
-                            ) : (
-                                displayedOrders.map((order, idx) => (
-                                    <Grid item xs={12} sm={6} md={4} key={idx}>
-                                        <Card sx={style.orderCard} onClick={() => handleOpenOrderDetails(order)}>
-                                            <CardContent>
-                                                <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
-                                                    Bắt đầu lúc {formatTime(order.startTime)} giờ ngày {formatDate(order.date)}
+                        {displayedOrders.length === 0 ? (
+                            <Grid item xs={12}>
+                                <Typography variant="h6" align="center" color="textSecondary" sx={{ mt: 4 }}>
+                                    Không có đơn hàng nào.
+                                </Typography>
+                            </Grid>
+                        ) : (
+                            displayedOrders.map((order, idx) => (
+                                <Grid item xs={12} sm={6} md={4} key={idx}>
+                                    <Card sx={style.orderCard} onClick={() => handleOpenOrderDetails(order)}>
+                                        <CardContent>
+                                            <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
+                                                Bắt đầu lúc {formatTime(order.startTime)} giờ ngày {formatDate(order.date)}
+                                            </Typography>
+                                            <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.userName}</Typography>
+                                            <Typography variant="subtitle2" color="textSecondary">{order.addressNo}, {order.addressFormatted}</Typography>
+                                            <Box sx={style.priceSection}>
+                                                <Typography variant="h6" sx={{ color: '#1976D2' }}>
+                                                    Số tiền: {formatPrice(order.totalPrice)}
                                                 </Typography>
-                                                <Typography sx={{ mt: 2, fontWeight: 500 }}>{order.userName}</Typography>
-                                                <Typography variant="subtitle2" color="textSecondary">{order.addressFormatted}</Typography>
-                                                <Box sx={style.priceSection}>
-                                                    <Typography variant="h6" sx={{ color: '#1976D2' }}>
-                                                        Số tiền: {formatPrice(order.totalPrice)}
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="subtitle2"
-                                                        sx={{
-                                                            ...style.status,
-                                                            color:
-                                                                order.status === 'active' ? '#1976D2' :
-                                                                    order.status === 'completed' ? '#5CBB52' :
-                                                                        order.status === 'pending' ? '#FBC11B' :
-                                                                            order.status === 'canceled' ? '#E4293D' :
-                                                                                order.status === 'paymentFail' ? '#E4293D' :
-                                                                                    order.status === 'accepted' ? '#4FC3F7' :
-                                                                                        order.status === 'inProgress' ? '#9575CD' :
-                                                                                            '#E4293D',
-                                                            backgroundColor: colorMap[order.status]?.blurBackground || "#fff",
-                                                            borderColor: colorMap[order.status]?.border || "#ccc",
-                                                        }}
-                                                    >
-                                                        {statusLabelMap[order.status] || 'Không xác định'}
-                                                    </Typography>
-                                                </Box>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                ))
-                            )}
-                        </Grid>
-
+                                                <Typography
+                                                    variant="subtitle2"
+                                                    sx={{
+                                                        ...style.status,
+                                                        color:
+                                                            order.status === 'active' ? '#1976D2' :
+                                                                order.status === 'completed' ? '#5CBB52' :
+                                                                    order.status === 'pending' ? '#FBC11B' :
+                                                                        order.status === 'canceled' ? '#E4293D' :
+                                                                            order.status === 'paymentFail' ? '#E4293D' :
+                                                                                order.status === 'accepted' ? '#4FC3F7' :
+                                                                                    order.status === 'inProgress' ? '#9575CD' :
+                                                                                        '#E4293D',
+                                                        backgroundColor: colorMap[order.status]?.blurBackground || "#fff",
+                                                        borderColor: colorMap[order.status]?.border || "#ccc",
+                                                    }}
+                                                >
+                                                    {statusLabelMap[order.status] || 'Không xác định'}
+                                                </Typography>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))
+                        )}
                     </Grid>
 
                     {open && (
@@ -343,7 +365,7 @@ const OrderHistorySection = () => {
                             onClose={handleClose}
                             disableAutoFocus
                         >
-                            <OrderDetails selectedOrder={selectedOrder} handleClose={handleClose} />
+                            <OrderDetails fetchBookings={fetchBookings} selectedOrder={selectedOrder} handleClose={handleClose} />
                         </Modal>
                     )}
 

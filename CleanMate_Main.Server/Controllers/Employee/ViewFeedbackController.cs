@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,11 +15,13 @@ namespace CleanMate_Main.Server.Controllers.Employee
     {
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
-        public ViewFeedbackController(IEmployeeService employeeService, UserManager<AspNetUser> userManager)
+        public ViewFeedbackController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _userHelper = userHelper;
         }
 
         [HttpGet("history")]
@@ -26,13 +29,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                var userId = await GetCurrentUserIdAsync();
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                }
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var feedbackHistory = await _employeeService.GetFeedbackHistoryAsync(userId);
+                if (user == null)
+                    return Unauthorized(new { message = "Không tìm thấy người dùng." });
+
+                var feedbackHistory = await _employeeService.GetFeedbackHistoryAsync(user.Id);
                 return Ok(new { success = true, data = feedbackHistory });
             }
             catch (Exception ex)
@@ -41,16 +43,6 @@ namespace CleanMate_Main.Server.Controllers.Employee
             }
         }
 
-        private async Task<string> GetCurrentUserIdAsync()
-        {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return null;
-            }
-
-            var user = await _userManager.FindByEmailAsync(userEmail);
-            return user?.Id;
-        }
+        
     }
 }

@@ -142,10 +142,11 @@ const SignUpPageEmployee = (props) => {
                 navigate('/login', {replace: true}); 
             } catch (error) {
                 toast.error(error.message);
+                navigate('/register/employee', { replace: true }); 
             }
         } else {
             validator.showMessages();
-            toast.error('Các mục không được để trống!');
+            toast.error('Vui lòng kiểm tra lại các trường thông tin!');
         }
     };
     return (

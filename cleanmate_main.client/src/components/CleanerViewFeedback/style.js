@@ -15,6 +15,7 @@
         transition: 'all 0.3s ease',
     },
     workCard: {
+        height: '200px',
         border: '1px solid #eee',
         borderRadius: '12px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.03)',

@@ -378,7 +378,7 @@ const Payment = () => {
                             <DialogTitle>Xác nhận thanh toán</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Bạn có chắc chắn muốn thanh toán qua <strong>{selectedMethod === "CleanMate" ? "Ví CleanMate" : "Chuyển khoản ngân hàng"}</strong> với số tiền <strong>{price.toLocaleString()} VND</strong>?
+                                        Bạn có chắc chắn muốn thanh toán qua <strong>{selectedMethod === "CleanMate" ? "Ví CleanMate" : selectedMethod === 'cash' ? "Tiền mặt" : "Chuyển khoản ngân hàng"}</strong> với số tiền <strong>{price.toLocaleString()} VND</strong>?
                                 </DialogContentText>
                             </DialogContent>
                             <DialogActions>

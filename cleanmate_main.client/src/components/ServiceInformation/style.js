@@ -42,8 +42,63 @@ export const style = {
         color: primaryColor,
     },
     subHeaderTitle: {
-        fontSize: '16px',
-        color: '#1565C0'
+        fontSize: '18px',
+        color: '#1565C0',
+        fontWeight: 'bold',
+    },
+    subHeaderIcon: {
+        textAlign: 'center',
+        color: primaryColor,
+    },
+    privacyList: {
+        display: 'flex',
+        alignItems: 'center',   
+        flexWrap: 'nowrap',
+        gap: 3,                         
+        marginTop: 5,
+        paddingBottom: 5,
+        borderBottom: '1px solid #ccc',
+    },
+    privacyItem: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 1,
+        width: {
+            xs: '20%',   
+            sm: '18%',   
+            md: '18%',   
+        },
+        textAlign: 'center',
+        marginBottom: 2,
+    },
+    privacyIconContainer: {
+        width: '40px',
+        height: '40px',
+        margin: '0 auto',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: '50%',
+        backgroundColor: '#f2f2f2'
+    },
+    ruleContainer: {
+        marginTop: 2,
+    },
+    ruleItem: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        mt: 1,
+    },
+    shiftContainer: {
+        marginTop: 2,
+    },
+    taskCard: {
+        width: '100%',
+        border: `1px solid ${primaryColor}`,
+        borderRadius: '15px',
     },
     footer: {
         backgroundColor: '#fff',
@@ -100,17 +155,5 @@ export const style = {
     },
     specificAddress: {
         color: '#666',
-    },
-    viewCleaningToolsContainer: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItem: 'center',
-        backgroundColor: '#f3f3f3',
-        borderRadius: '5px',
-        padding: '5px 10px',
-        marginTop: '5px',
-        height: '50px',
-        width: '100%',
-        cursor: 'pointer'
     }
 };

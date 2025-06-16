@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,24 +16,21 @@ namespace CleanMate_Main.Server.Controllers.Wallet
     {
         private readonly IUserWalletService _walletService;
         private readonly UserManager<AspNetUser> _userManager;
-        public WalletController(IUserWalletService walletService, UserManager<AspNetUser> userManager)
+        private readonly UserHelper<AspNetUser> _userHelper;
+        public WalletController(IUserWalletService walletService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
             _walletService = walletService;
             _userManager = userManager;
+            _userHelper = userHelper;
         }
 
         [HttpGet("get-wallet")]
         public async Task<IActionResult> GetWalletByUserId()
         {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userHelper.GetCurrentUserAsync();
 
-            if (string.IsNullOrEmpty(userEmail))
-                return Unauthorized();
-
-            var user = await _userManager.FindByEmailAsync(userEmail);
-
-            //if (User.Identity?.Name != user.Id && !User.IsInRole("Admin"))
-            //    return Unauthorized(new { message = "Bạn không có quyền truy cập ví này." });
+            if (user == null)
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             try
             {

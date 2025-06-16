@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DTO;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.DTO.Payos;
 using CleanMate_Main.Server.Models.DTO.vnPay;
 using CleanMate_Main.Server.Models.Entities;
@@ -32,6 +33,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
         private readonly IConfiguration _configuration;
         private readonly IPayosService _payOsService;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
 
         public PaymentsController(IVnPayService vnPayService,
@@ -40,7 +42,8 @@ namespace CleanMate_Main.Server.Controllers.Payments
                                   IPaymentService paymentService,
                                   IConfiguration configuration,
                                   IPayosService payOsService,
-                                  UserManager<AspNetUser> userManager)
+                                  UserManager<AspNetUser> userManager,
+                                  UserHelper<AspNetUser> userHelper)
         {
             _vnPayService = vnPayService;
             _walletService = walletService;
@@ -49,6 +52,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
             _configuration = configuration;
             _payOsService = payOsService;
             _userManager = userManager;
+            _userHelper = userHelper;
         }
 
         [HttpPost("deposit-vnpay")]
@@ -128,7 +132,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     Amount = bookingDto.TotalPrice.Value,
                     PaymentMethod = PaymentType.vnPay,
                     PaymentStatus = "Unpaid",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeVN.GetNow()
                 };
 
                 var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
@@ -171,7 +175,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     Amount = bookingDto.TotalPrice.Value,
                     PaymentMethod = PaymentType.PayOS,
                     PaymentStatus = "Unpaid",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeVN.GetNow()
                 };
 
                 var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
@@ -211,13 +215,10 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 return BadRequest("Thông tin đặt lịch không hợp lệ.");
 
             // Lấy userId từ Claims
-            var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(userMail))
-                return Unauthorized("Không tìm thấy thông tin người dùng.");
+            var user = await _userHelper.GetCurrentUserAsync();
 
-            var user = await _userManager.FindByEmailAsync(userMail);
             if (user == null)
-                return Unauthorized("Người dùng không tồn tại.");
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             var wallet = await _walletService.GetWalletAsync(user.Id);
             if (wallet == null)
@@ -238,7 +239,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     Amount = bookingDto.TotalPrice.Value,
                     PaymentMethod = PaymentType.CleanMate_Coin,
                     PaymentStatus = "Paid",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeVN.GetNow()
                 };
 
                 var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
@@ -287,13 +288,10 @@ namespace CleanMate_Main.Server.Controllers.Payments
                 return BadRequest("Thông tin đặt lịch không hợp lệ.");
 
             // Lấy userId từ Claims
-            var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(userMail))
-                return Unauthorized("Không tìm thấy thông tin người dùng.");
+            var user = await _userHelper.GetCurrentUserAsync();
 
-            var user = await _userManager.FindByEmailAsync(userMail);
             if (user == null)
-                return Unauthorized("Người dùng không tồn tại.");
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             try
             {
@@ -307,7 +305,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     Amount = bookingDto.TotalPrice.Value,
                     PaymentMethod = PaymentType.Cash,
                     PaymentStatus = "Unpaid",
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeVN.GetNow()
                 };
 
                 var savedPayment = await _paymentService.AddNewPaymentAsync(payment);
@@ -362,7 +360,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                         if (!updated)
                             return BadRequest(new { message = "Cập nhật ví thất bại", response });
                         // Redirect to deposit success page
-                        var depositQueryString = $"deposit=success&date={Uri.EscapeDataString(DateTime.Now.ToString("dd/MM/yyyy"))}&coin={Uri.EscapeDataString(amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND")}";
+                        var depositQueryString = $"deposit=success&date={Uri.EscapeDataString(DateTimeVN.GetNow().ToString("dd/MM/yyyy"))}&coin={Uri.EscapeDataString(amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND")}";
                         return Redirect($"{_configuration["SettingDomain:BaseUrl"]}/booking-success?{depositQueryString}");
 
                     //Trường hợp thanh toán booking bằng vnPay
@@ -412,13 +410,10 @@ namespace CleanMate_Main.Server.Controllers.Payments
         public async Task<IActionResult> DepositPaymentCallbackPayOS()
         {
             // Lấy userMail từ Claims
-            var userMail = User.FindFirst(ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(userMail))
-                return Unauthorized("Không tìm thấy thông tin người dùng.");
+            var user = await _userHelper.GetCurrentUserAsync();
 
-            var user = await _userManager.FindByEmailAsync(userMail);
             if (user == null)
-                return Unauthorized("Người dùng không tồn tại.");
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             // Lấy response
             var response = _payOsService.ProcessReturnUrl(Request.Query);
@@ -450,7 +445,7 @@ namespace CleanMate_Main.Server.Controllers.Payments
                     // Chuẩn bị dữ liệu để gửi về frontend
                     var depositDetails = new
                     {
-                        Date = DateTime.Now.ToString("dd/MM/yyyy"),
+                        Date = DateTimeVN.GetNow().ToString("dd/MM/yyyy"),
                         Coin = amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND"
                     };
 

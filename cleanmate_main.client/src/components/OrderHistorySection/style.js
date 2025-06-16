@@ -19,6 +19,7 @@
         padding: '0 16px',
     },
     tabCard: {
+        height: '155px',
         border: '2px solid',
         borderRadius: '12px',
         cursor: 'pointer',

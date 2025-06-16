@@ -93,7 +93,7 @@ const ResetPassword = () => {
         if (validator.allValid()) {
             try {
                 push('/loading', { replace: true });
-                 //Gửi request tới API đặt lại mật khẩu
+                //Gửi request tới API đặt lại mật khẩu
                 const response = await axios.post('/Authen/reset-password', {
                     userId: userId,
                     token: token,
@@ -104,15 +104,18 @@ const ResetPassword = () => {
                     push('/login', { replace: true });
                 } else {
                     toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    push('/reset-password', { replace: true })
                 }
             } catch (error) {
                 if (error.response?.status === 404) {
                     toast.error('Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.');
+                    push('/reset-password', { replace: true })
                 } else {
                     toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
+                    push('/reset-password', { replace: true })
                 }
             }
-        }else {
+        } else {
             validator.showMessages();
             toast.error('Vui lòng nhập mật khẩu hợp lệ.');
         }
@@ -164,7 +167,7 @@ const ResetPassword = () => {
                             </FormControl>
                             {validator.message('password', value.password, 'required|strong_password')}
                         </Grid>
-                        
+
                         <Grid item xs={12}>
                             <Grid className="formFooter">
                                 <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Đổi mật khẩu</Button>

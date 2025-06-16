@@ -22,7 +22,7 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import ReactLoading from 'react-loading';
 import Feedback from '../../components/Feedback/Feedback';
 
-const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
+const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handleClose }) => {
     const [openFeedback, setOpenFeedback] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [connection, setConnection] = useState(null);
@@ -69,7 +69,7 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
             const result = await res.json();
             if (res.ok && result.success) {
                 toast.success('Bạn đã xác nhận công việc thành công.');
-                //fetchWorkDetails(); // Manual refresh as a fallback
+                fetchBookings(); // Manual refresh as a fallback
                 if (onOrderListRefresh) onOrderListRefresh(); // Trigger list refresh manually
 
             } else {
@@ -87,7 +87,7 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
 
     const handleCloseFeedback = () => {
         setOpenFeedback(false);
-        handleClose(); 
+        handleClose();
         setTimeout(() => {
             window.location.reload();
         }, 200);
@@ -162,7 +162,7 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
                         </Box>
                         <Box sx={{ mb: 1 }}>
                             <Typography sx={styles.contentTitle}>Địa chỉ</Typography>
-                            <Typography sx={styles.content}>{selectedOrder.addressFormatted}</Typography>
+                                <Typography sx={styles.content}>{`${selectedOrder.addressNo}, ${selectedOrder.addressFormatted}`}</Typography>
                         </Box>
 
                         <Box sx={{ mb: 1 }}>
@@ -195,7 +195,11 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
 
                         <Box sx={styles.bookingContent}>
                             <Typography sx={styles.bookingTitle}>Hình thức thanh toán</Typography>
-                            <Typography sx={styles.content}>{selectedOrder.payment}</Typography>
+                            <Typography sx={styles.content}>{selectedOrder.paymentMethod}</Typography>
+                        </Box>
+                        <Box sx={styles.bookingContent}>
+                            <Typography sx={styles.bookingTitle}>Trạng thái thanh toán</Typography>
+                            <Typography sx={styles.content}>{selectedOrder.paymentStatus}</Typography>
                         </Box>
 
                         <Box sx={styles.bookingContent}>
@@ -221,13 +225,13 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
                         onClose={handleCloseFeedback}
                         disableAutoFocus
                     >
-                            <Feedback
-                                selectedOrder={selectedOrder}
-                                loading={loading}
-                                setLoading={setLoading}
-                                onOrderListRefresh={onOrderListRefresh}
-                                handleClose={handleClose}
-                            />
+                        <Feedback
+                            selectedOrder={selectedOrder}
+                            loading={loading}
+                            setLoading={setLoading}
+                            onOrderListRefresh={onOrderListRefresh}
+                            handleClose={handleClose}
+                        />
                     </Modal>
 
                     {selectedOrder.status === 'paymentFail' && (

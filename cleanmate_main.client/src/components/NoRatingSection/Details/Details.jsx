@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useContext, useState } from 'react';
 import {
     Box,
     Typography,
@@ -11,9 +11,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import ReactLoading from 'react-loading';
 import Feedback from '../../Feedback/Feedback';
+import { WorkContext } from '../../../context/WorkProvider';
 
 const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
-    const [openFeedback, setOpenFeedback] = useState(false);
+    const { openFeedback, setOpenFeedback } = useContext(WorkContext);
     const [loading, setLoading] = useState(false);
 
     const handleOpenFeedback = () => {

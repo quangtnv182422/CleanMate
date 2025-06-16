@@ -7,6 +7,7 @@ const WorkProvider = ({ children }) => {
     const [data, setData] = useState([]);
     const [selectedWork, setSelectedWork] = useState(null);
     const [open, setOpen] = useState(false);
+    const [openFeedback, setOpenFeedback] = useState(false);
     const { user } = useAuth();
 
     const handleOpen = async (bookingId) => {
@@ -90,7 +91,9 @@ const WorkProvider = ({ children }) => {
         handleOpen,
         handleClose,
         open,
-        handleAcceptWork
+        handleAcceptWork,
+        openFeedback,
+        setOpenFeedback
     }}>{children}</WorkContext.Provider>
 }
 

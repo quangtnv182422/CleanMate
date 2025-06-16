@@ -87,7 +87,7 @@ const WorkList = () => {
     const { user, loading } = useAuth();
     const role = user?.roles?.[0] || '';
     const [connection, setConnection] = useState(null);
-    console.log(selectedWork)
+    console.log(data)
     const formatPrice = (price) => {
         return price.toLocaleString('vi-VN', {
             style: 'currency',
@@ -354,7 +354,7 @@ const WorkList = () => {
                                     <TableCell>{row.customerFullName}</TableCell>
                                     <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
                                     <TableCell sx={{ maxWidth: 160 }}>{row.duration}</TableCell>
-                                    <TableCell>{row.address}</TableCell>
+                                    <TableCell>{row.addressNo}, {row.address}</TableCell>
                                     <TableCell>{row.note ? row.note : 'Không có ghi chú'}</TableCell>
                                     <TableCell>{formatPrice(row.totalPrice)}</TableCell>
                                     <TableCell>

@@ -31,10 +31,18 @@
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: '16px',
+        paddingBottom: '10px',
     },
     status: {
         padding: '4px 8px',
         border: '1px solid #ccc',
         borderRadius: '8px',
+    },
+    feedbackContainer: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px 0',
+        borderTop: '1px solid #eee',
     }
 };

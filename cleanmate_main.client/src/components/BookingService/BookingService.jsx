@@ -273,314 +273,314 @@ const BookingService = () => {
                 </Box>
                 <Box sx={{ p: 1 }}>
                     {*//* Địa điểm làm việc *//*}
-                    <Box mb={2} sx={{ position: 'relative' }}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <LocationOnIcon sx={{ mr: 1 }} />
-                            Địa điểm làm việc
-                        </Typography>
-                        <Typography ml={4}>
-                            {userAddress.length === 0 ? (
-                                'Hãy đặt địa chỉ đầu tiên'
-                            ) : (
-                                <>
-                                    <Typography sx={style.googleMapAddress}>{selectedAddress?.gG_DispalyName}</Typography>
-                                    <Typography sx={style.addressNo}>{selectedAddress?.addressNo}</Typography>
-                                </>
-                            )}
-                        </Typography>
-                        {userAddress.length === 0 ? (
-                            <Button
-                                variant="outlined"
-                                sx={{ ml: 4, mt: 1, fontSize: '12px' }}
-                                onClick={() => window.location.href = `/map.html?service=${serviceId}`}
-                            >
-                                Thêm địa chỉ mới
-                            </Button>
-                        ) : (
-                            <>
-                                <Button
-                                    variant="outlined"
-                                    sx={{
-                                        ml: 4,
-                                        mt: 1,
-                                        fontSize: '12px',
-                                    }}
-                                    onClick={toggleDropdown}
-                                >
-                                    Thay đổi
-                                </Button>
-                                {showDropdown && (
-                                    <Box sx={style.chooseAddressContainer}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    color: '#1565C0',
-                                                    fontWeight: 'bold',
-                                                }}
-                                            >
-                                                Chọn địa chỉ
-                                            </Typography>
-                                            <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
-                                        </Box>
-                                        {userAddress.map((item) => {
-                                            const isSelected = selectedAddress?.addressId === item.addressId;
-                                            return (
-                                                <Box
-                                                    key={item.addressId}
-                                                    sx={{
-                                                        mt: 1,
-                                                        px: 0.5,
-                                                        py: 1,
-                                                        cursor: 'pointer',
-                                                        borderRadius: '4px',
-                                                        backgroundColor: isSelected ? '#f1f1f1' : 'transparent',
-                                                        color: isSelected ? '#fff' : 'inherit',
-                                                        '&:hover': {
-                                                            backgroundColor: isSelected ? '#f1f1f1' : '#f0f0f0',
-                                                            color: '#1565C0',
-                                                        },
-                                                    }}
-                                                    onClick={() => handleSelectAddress(item)}
-                                                >
-                                                    <Typography sx={style.googleMapAddress}>{item.gG_DispalyName}</Typography>
-                                                    <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
-
-                                                    {*//* Nút Đặt làm mặc định *//*}
-                                                    {item.isDefault ? (
-                                                        <Button
-                                                            variant="contained"
-                                                            size="small"
-                                                            disabled
-                                                            sx={{ mt: 1, backgroundColor: 'gray' }}
-                                                        >
-                                                            Địa chỉ mặc định
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            variant="contained"
-                                                            size="small"
-                                                            sx={{ mt: 1 }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation(); // Ngăn sự kiện click lan tỏa
-                                                                updateDefaultAddress(item);
-                                                            }}
-                                                        >
-                                                            Đặt làm mặc định
-                                                        </Button>
-                                                    )}
-                                                </Box>
-                                            );
-                                        })}
-                                        <Box sx={{ mt: 1 }}>
-                                            <Button
-                                                variant="outlined"
-                                                sx={{ width: '100%' }}
-                                                    onClick={() => window.location.href = `/map.html?service=${serviceId}`}
-                                            >
-                                                Chọn địa chỉ mới
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )}
-                            </>
-                        )}
-                    </Box>
-
-                    {*//* Số lượng nhân viên *//*}
-                    <Box mb={2}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <GroupIcon sx={{ mr: 1 }} />
-                            Số lượng nhân viên
-                        </Typography>
-                        <Box mt={1} display="flex" gap={1} sx={{ justifyContent: 'center', width: '100%' }}>
-                            <Button
-                                sx={{ width: '100%' }}
-                                variant={selectedEmployee === 1 ? 'contained' : 'outlined'}
-                                onClick={() => setSelectedEmployee(1)}
-                            >
-                                1 x Nhân viên
-                            </Button>
-                            <Button
-                                disabled
-                                sx={{ width: '100%' }}
-                                variant={selectedEmployee === 2 ? 'contained' : 'outlined'}
-                                onClick={() => setSelectedEmployee(2)}
-                            >
-                                2 x Nhân viên
-                            </Button>
-                        </Box>
-                    </Box>
-
-                    {*//* Thời gian dọn dẹp *//*}
-                    <Box sx={{ mb: 2 }}>
-                        <Typography fontWeight="bold" mb={1} sx={style.subHeaderTitle}>
-                            <AccessAlarmOutlinedIcon sx={{ mr: 1 }} />
-                            Thời gian dọn dẹp
-                        </Typography>
-                        <Grid container spacing={1}>
-                            {service.map((opt, index) => (
-                                <Grid item xs={6} sm={4} key={index}>
-                                    <Button
-                                        fullWidth
-                                        variant={selectedDuration === opt.durationTime ? 'contained' : 'outlined'}
-                                        onClick={() => handleChoosePrice(opt)}
-                                        sx={{ whiteSpace: 'pre-line', height: '70px', display: 'flex', flexDirection: 'column' }}
-                                    >
-                                        <p
-                                            style={{
-                                                ...style.durationSelectionText,
-                                                color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2',
-                                            }}
-                                        >
-                                            {opt.durationTime} giờ
-                                        </p>
-
-                                        <p
-                                            style={{
-                                                ...style.durationSelectionText,
-                                                color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2',
-                                            }}
-                                        >
-                                            Tối đa {opt.squareMeterSpecific}m² tổng sàn
-                                        </p>
-                                    </Button>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Box>
-
-                    {*//* Ngày làm việc *//*}
-                    <Box mb={2}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <CalendarToday sx={{ mr: 1 }} />
-                            Ngày làm việc
-                        </Typography>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', mt: 1, width: '100%' }}>
-                            {days.map((day) => (
-                                <Button
-                                    key={day.date}
-                                    variant={selectedDay === day.date ? 'contained' : 'outlined'}
-                                    onClick={() => handleDaySelect(day.date)}
-                                    sx={{
-                                        flex: '1 1 calc(14.28% - 8px)',
-                                        minWidth: 72,
-                                        p: 1,
-                                        flexDirection: 'column',
-                                        borderColor: '#4caf50',
-                                        color: '#4caf50',
-                                        borderWidth: 2,
-                                    }}
-                                >
-                                    {selectedDay === day.date ? (
-                                        <Typography sx={{ color: '#fff' }}>{day.label}</Typography>
-                                    ) : (
-                                        <Typography>{day.label}</Typography>
-                                    )}
-                                    {selectedDay === day.date ? (
-                                        <Typography variant="caption" sx={{ color: '#fff' }}>
-                                            {day.sub}
-                                        </Typography>
-                                    ) : (
-                                        <Typography variant="caption">{day.sub}</Typography>
-                                    )}
-                                </Button>
-                            ))}
-                        </Box>
-                    </Box>
-
-                    {*//* Giờ làm việc *//*}
-                    <Box mb={2}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <AccessTime sx={{ mr: 1 }} />
-                            Giờ làm việc
-                        </Typography>
-                        <Box>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['TimePicker']}>
-                                    <TimePicker
-                                        label="Hãy chọn giờ cụ thể"
-                                        ampm={false}
-                                        value={selectedSpecificTimes}
-                                        onChange={handleTimeChange}
-                                        minutesStep={15}
-                                        slotProps={{ textField: { fullWidth: true } }}
-                                        minTime={minTime}
-                                        maxTime={maxTime}
-                                        shouldDisableTime={shouldDisableTime}
-                                        open={open}
-                                        onOpen={() => setOpen(true)}
-                                        onClose={() => setOpen(false)}
-                                        slotProps={{
-                                            textField: {
-                                                fullWidth: true,
-                                                onClick: () => setOpen(true),
-                                            },
-                                        }}
-                                    />
-                                </DemoContainer>
-                            </LocalizationProvider>
-                        </Box>
-                    </Box>
-
-                    {*//* Ghi chú *//*}
-                    <Box mb={2}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <ChatBubbleIcon sx={{ mr: 1 }} />
-                            Ghi chú
-                        </Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            rows={8}
-                            placeholder="Nhập ghi chú để nhân viên có thể dễ dàng phục vụ bạn hơn"
-                            variant="outlined"
-                            sx={{
-                                mt: 1,
-                                border: '1px solid #00bcd4',
-                                borderRadius: 1,
-                            }}
-                        />
-                    </Box>
-
-                    {*//* Mã khuyến mãi *//*}
-                    <Box mb={2}>
-                        <Typography fontWeight="bold" sx={style.subHeaderTitle}>
-                            <ConfirmationNumberIcon sx={{ mr: 1 }} />
-                            Mã khuyến mãi
-                        </Typography>
+<Box mb={2} sx={{ position: 'relative' }}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <LocationOnIcon sx={{ mr: 1 }} />
+        Địa điểm làm việc
+    </Typography>
+    <Typography ml={4}>
+        {userAddress.length === 0 ? (
+            'Hãy đặt địa chỉ đầu tiên'
+        ) : (
+            <>
+                <Typography sx={style.googleMapAddress}>{selectedAddress?.gG_DispalyName}</Typography>
+                <Typography sx={style.addressNo}>{selectedAddress?.addressNo}</Typography>
+            </>
+        )}
+    </Typography>
+    {userAddress.length === 0 ? (
+        <Button
+            variant="outlined"
+            sx={{ ml: 4, mt: 1, fontSize: '12px' }}
+            onClick={() => window.location.href = `/map.html?service=${serviceId}`}
+        >
+            Thêm địa chỉ mới
+        </Button>
+    ) : (
+        <>
+            <Button
+                variant="outlined"
+                sx={{
+                    ml: 4,
+                    mt: 1,
+                    fontSize: '12px',
+                }}
+                onClick={toggleDropdown}
+            >
+                Thay đổi
+            </Button>
+            {showDropdown && (
+                <Box sx={style.chooseAddressContainer}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography
-                            sx={{ color: '#999', mt: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                        >
-                            Chọn mã khuyến mãi để được giảm giá
-                            <ArrowForwardIcon />
-                        </Typography>
-                    </Box>
-
-                    <Box sx={style.footer}>
-                        <Typography fontWeight="bold">{`${formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
-                        <Button
-                            variant="contained"
+                            variant="h6"
                             sx={{
-                                backgroundColor: '#ffc107',
-                                '&:hover': {
-                                    backgroundColor: '#1976D2',
-                                    color: '#fff',
-                                },
-                                color: '#425398',
+                                color: '#1565C0',
                                 fontWeight: 'bold',
                             }}
-                            onClick={handleSubmit}
                         >
-                            Tiếp tục
-                        </Button>
+                            Chọn địa chỉ
+                        </Typography>
+                        <CloseOutlinedIcon size="small" sx={{ cursor: 'pointer' }} onClick={toggleDropdown} />
                     </Box>
-                </Box>
-            </Box>
-        </div>
-    );
+                    {userAddress.map((item) => {
+                        const isSelected = selectedAddress?.addressId === item.addressId;
+                        return (
+                            <Box
+                                key={item.addressId}
+                                sx={{
+                                    mt: 1,
+                                    px: 0.5,
+                                    py: 1,
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                    backgroundColor: isSelected ? '#f1f1f1' : 'transparent',
+                                    color: isSelected ? '#fff' : 'inherit',
+                                    '&:hover': {
+                                        backgroundColor: isSelected ? '#f1f1f1' : '#f0f0f0',
+                                        color: '#1565C0',
+                                    },
+                                }}
+                                onClick={() => handleSelectAddress(item)}
+                            >
+                                <Typography sx={style.googleMapAddress}>{item.gG_DispalyName}</Typography>
+                                <Typography sx={style.specificAddress}>{item.addressNo}</Typography>
+
+                                {*//* Nút Đặt làm mặc định *//*}
+{item.isDefault ? (
+    <Button
+        variant="contained"
+        size="small"
+        disabled
+        sx={{ mt: 1, backgroundColor: 'gray' }}
+    >
+        Địa chỉ mặc định
+    </Button>
+) : (
+    <Button
+        variant="contained"
+        size="small"
+        sx={{ mt: 1 }}
+        onClick={(e) => {
+            e.stopPropagation(); // Ngăn sự kiện click lan tỏa
+            updateDefaultAddress(item);
+        }}
+    >
+        Đặt làm mặc định
+    </Button>
+)}
+</Box>
+);
+})}
+<Box sx={{ mt: 1 }}>
+<Button
+variant="outlined"
+sx={{ width: '100%' }}
+onClick={() => window.location.href = `/map.html?service=${serviceId}`}
+>
+Chọn địa chỉ mới
+</Button>
+</Box>
+</Box>
+)}
+</>
+)}
+</Box>
+
+{*//* Số lượng nhân viên *//*}
+<Box mb={2}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <GroupIcon sx={{ mr: 1 }} />
+        Số lượng nhân viên
+    </Typography>
+    <Box mt={1} display="flex" gap={1} sx={{ justifyContent: 'center', width: '100%' }}>
+        <Button
+            sx={{ width: '100%' }}
+            variant={selectedEmployee === 1 ? 'contained' : 'outlined'}
+            onClick={() => setSelectedEmployee(1)}
+        >
+            1 x Nhân viên
+        </Button>
+        <Button
+            disabled
+            sx={{ width: '100%' }}
+            variant={selectedEmployee === 2 ? 'contained' : 'outlined'}
+            onClick={() => setSelectedEmployee(2)}
+        >
+            2 x Nhân viên
+        </Button>
+    </Box>
+</Box>
+
+{*//* Thời gian dọn dẹp *//*}
+<Box sx={{ mb: 2 }}>
+    <Typography fontWeight="bold" mb={1} sx={style.subHeaderTitle}>
+        <AccessAlarmOutlinedIcon sx={{ mr: 1 }} />
+        Thời gian dọn dẹp
+    </Typography>
+    <Grid container spacing={1}>
+        {service.map((opt, index) => (
+            <Grid item xs={6} sm={4} key={index}>
+                <Button
+                    fullWidth
+                    variant={selectedDuration === opt.durationTime ? 'contained' : 'outlined'}
+                    onClick={() => handleChoosePrice(opt)}
+                    sx={{ whiteSpace: 'pre-line', height: '70px', display: 'flex', flexDirection: 'column' }}
+                >
+                    <p
+                        style={{
+                            ...style.durationSelectionText,
+                            color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2',
+                        }}
+                    >
+                        {opt.durationTime} giờ
+                    </p>
+
+                    <p
+                        style={{
+                            ...style.durationSelectionText,
+                            color: selectedDuration === opt.durationTime ? '#fff' : '#1976D2',
+                        }}
+                    >
+                        Tối đa {opt.squareMeterSpecific}m² tổng sàn
+                    </p>
+                </Button>
+            </Grid>
+        ))}
+    </Grid>
+</Box>
+
+{*//* Ngày làm việc *//*}
+<Box mb={2}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <CalendarToday sx={{ mr: 1 }} />
+        Ngày làm việc
+    </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', mt: 1, width: '100%' }}>
+        {days.map((day) => (
+            <Button
+                key={day.date}
+                variant={selectedDay === day.date ? 'contained' : 'outlined'}
+                onClick={() => handleDaySelect(day.date)}
+                sx={{
+                    flex: '1 1 calc(14.28% - 8px)',
+                    minWidth: 72,
+                    p: 1,
+                    flexDirection: 'column',
+                    borderColor: '#4caf50',
+                    color: '#4caf50',
+                    borderWidth: 2,
+                }}
+            >
+                {selectedDay === day.date ? (
+                    <Typography sx={{ color: '#fff' }}>{day.label}</Typography>
+                ) : (
+                    <Typography>{day.label}</Typography>
+                )}
+                {selectedDay === day.date ? (
+                    <Typography variant="caption" sx={{ color: '#fff' }}>
+                        {day.sub}
+                    </Typography>
+                ) : (
+                    <Typography variant="caption">{day.sub}</Typography>
+                )}
+            </Button>
+        ))}
+    </Box>
+</Box>
+
+{*//* Giờ làm việc *//*}
+<Box mb={2}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <AccessTime sx={{ mr: 1 }} />
+        Giờ làm việc
+    </Typography>
+    <Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker']}>
+                <TimePicker
+                    label="Hãy chọn giờ cụ thể"
+                    ampm={false}
+                    value={selectedSpecificTimes}
+                    onChange={handleTimeChange}
+                    minutesStep={15}
+                    slotProps={{ textField: { fullWidth: true } }}
+                    minTime={minTime}
+                    maxTime={maxTime}
+                    shouldDisableTime={shouldDisableTime}
+                    open={open}
+                    onOpen={() => setOpen(true)}
+                    onClose={() => setOpen(false)}
+                    slotProps={{
+                        textField: {
+                            fullWidth: true,
+                            onClick: () => setOpen(true),
+                        },
+                    }}
+                />
+            </DemoContainer>
+        </LocalizationProvider>
+    </Box>
+</Box>
+
+{*//* Ghi chú *//*}
+<Box mb={2}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <ChatBubbleIcon sx={{ mr: 1 }} />
+        Ghi chú
+    </Typography>
+    <TextField
+        fullWidth
+        multiline
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        rows={8}
+        placeholder="Nhập ghi chú để nhân viên có thể dễ dàng phục vụ bạn hơn"
+        variant="outlined"
+        sx={{
+            mt: 1,
+            border: '1px solid #00bcd4',
+            borderRadius: 1,
+        }}
+    />
+</Box>
+
+{*//* Mã khuyến mãi *//*}
+<Box mb={2}>
+    <Typography fontWeight="bold" sx={style.subHeaderTitle}>
+        <ConfirmationNumberIcon sx={{ mr: 1 }} />
+        Mã khuyến mãi
+    </Typography>
+    <Typography
+        sx={{ color: '#999', mt: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+    >
+        Chọn mã khuyến mãi để được giảm giá
+        <ArrowForwardIcon />
+    </Typography>
+</Box>
+
+<Box sx={style.footer}>
+    <Typography fontWeight="bold">{`${formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
+    <Button
+        variant="contained"
+        sx={{
+            backgroundColor: '#ffc107',
+            '&:hover': {
+                backgroundColor: '#1976D2',
+                color: '#fff',
+            },
+            color: '#425398',
+            fontWeight: 'bold',
+        }}
+        onClick={handleSubmit}
+    >
+        Tiếp tục
+    </Button>
+</Box>
+</Box>
+</Box>
+</div>
+);
 };
 
 export default BookingService;*/
@@ -599,6 +599,7 @@ import {
     Typography,
     Grid,
     TextField,
+    Modal
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
@@ -611,12 +612,16 @@ import AccessAlarmOutlinedIcon from '@mui/icons-material/AccessAlarmOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import WestIcon from '@mui/icons-material/West';
+import InfoIcon from '@mui/icons-material/Info';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import useAuth from '../../hooks/useAuth';
 import ReactLoading from 'react-loading';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import ViewCleaningTools from './ViewCleaningTools/ViewCleaningTools';
 
 
 // Kích hoạt plugin
@@ -660,6 +665,7 @@ const BookingService = () => {
     const [days, setDays] = useState([]);
     const [service, setService] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [openViewCleaningTools, setOpenViewCleaningTools] = useState(false);
     const [open, setOpen] = useState(false);
     const [isAvailable, setIsAvailable] = useState(null);
 
@@ -839,7 +845,7 @@ const BookingService = () => {
 
         console.log("Bắt đầu (UTC)", startTimeStr);
         console.log("Kết thúc (UTC)", endTimeStr);
-      
+
 
         try {
             const response = await axios.get(
@@ -907,8 +913,9 @@ const BookingService = () => {
             )}
             <Box sx={style.container}>
                 <Box sx={style.header}>
-                    <WestIcon sx={style.backIcon} onClick={() => navigate(`/service-single/${serviceId}`)} />
+                    <WestIcon sx={style.icon} onClick={() => navigate(`/service-single/${serviceId}`)} />
                     <Typography sx={style.headerTitle}>Dọn dẹp theo giờ</Typography>
+                    <InfoIcon sx={style.icon} onClick={() => navigate('/service-information?type=cleaning-per-hour')} />
                 </Box>
                 <Box sx={{ p: 1 }}>
                     {/* Địa điểm làm việc */}
@@ -1182,6 +1189,20 @@ const BookingService = () => {
                                 borderRadius: 1,
                             }}
                         />
+                        <Box sx={style.viewCleaningToolsContainer} onClick={() => setOpenViewCleaningTools(true)}>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                            }}>
+                                {/*Icon*/}
+                                <VerifiedIcon size="medium" color="success" />
+                                {/*Text*/}
+                                <Typography variant="body1">Đã bao gồm bộ dụng cụ dọn dẹp</Typography>
+                            </Box>
+                            {/*ArrowDown Icon*/}
+                            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'} }><VisibilityIcon size="small" /></Box>
+                        </Box>
                     </Box>
 
                     {/* Mã khuyến mãi */}
@@ -1218,6 +1239,15 @@ const BookingService = () => {
                     </Box>
                 </Box>
             </Box>
+            {openViewCleaningTools && (
+                <Modal
+                    open={openViewCleaningTools}
+                    onClose={() => setOpenViewCleaningTools(false)}
+                    disableAutoFocus
+                >
+                    <ViewCleaningTools setOpenViewCleaningTools={setOpenViewCleaningTools} />
+                </Modal>
+            )}
         </div>
     );
 };

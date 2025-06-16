@@ -53,7 +53,7 @@ const paymentMethods = [
         subLabel: 'Từ số dư tài khoản CleanMate',
         balance: '0 ₫',
         icon: <AccountBalanceWalletIcon sx={{ color: '#43A047' }} />,
-        available: true,
+        available: false,
         isRecommend: false,
     },
 ];

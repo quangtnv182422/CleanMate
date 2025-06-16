@@ -197,10 +197,10 @@ const WorkList = () => {
         }, []);
 
         const filteredData = useMemo(() => {
-            return data.reverse().filter((row) =>
+            return sortedByCreatedAt.filter((row) =>
                 row.customerFullName?.toLowerCase().includes(search.toLowerCase())
             );
-        }, [search]);
+        }, [search, sortedByCreatedAt]);
 
         const paginatedData = useMemo(() => {
             const startIndex = (page - 1) * rowsPerPage;
@@ -348,7 +348,7 @@ const WorkList = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {paginatedData.reverse().map((row) => (
+                            {paginatedData.map((row) => (
                                 <TableRow key={row.bookingId}>
                                     <TableCell>{row.serviceName}</TableCell>
                                     <TableCell>{row.customerFullName}</TableCell>

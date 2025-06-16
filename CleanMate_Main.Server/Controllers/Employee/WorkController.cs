@@ -50,7 +50,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 bool success = await _employeeService.BeginWorkRequestAsync(id, employeeId);
                 if (success)
                 {
-                    await _hubContext.Clients.All.SendAsync("WorkUpdated");
+                    await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate");
                     return Ok(new { success, message = "Công việc đã được cập nhật thành trạng thái Đang thực hiện." });
                 }
                 return BadRequest(new { success = false, message = "Không thể bắt đầu công việc." });
@@ -86,7 +86,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 {
                     var booking = await _employeeService.GetWorkDetailsAsync(id);
                     var payment = await _paymentService.GetPaymentsByBookingIdAsync(id);
-                    switch (payment.PaymentMethod) // Corrected switch statement syntax
+                    switch (payment.PaymentMethod)
                     {
                         case PaymentType.Cash:
                             await _paymentService.MarkBookingAsPaidAsync(payment.PaymentId,null);
@@ -105,7 +105,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                         default:
                             return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
                     }
-                    await _hubContext.Clients.All.SendAsync("WorkUpdated");
+                    await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate");
                     return Ok(new { success, message = "Công việc đã được cập nhật thành trạng thái Chờ xác nhận." });
                 }
                 return BadRequest(new { success = false, message = "Không thể hoàn thành công việc." });
@@ -138,7 +138,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 bool success = await _employeeService.CancelWorkRequestAsync(id, employeeId);
                 if (success)
                 {
-                    await _hubContext.Clients.All.SendAsync("WorkUpdated");
+                    await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate");
                     return Ok(new { success, message = "Công việc đã được hủy thành công." });
                 }
                 return BadRequest(new { success = false, message = "Không thể hủy công việc." });
@@ -153,7 +153,6 @@ namespace CleanMate_Main.Server.Controllers.Employee
             }
             catch (Exception ex)
             {
-                // Log the exception
                 return StatusCode(500, new { success = false, message = "Đã xảy ra lỗi không mong muốn khi hủy công việc." });
             }
         }

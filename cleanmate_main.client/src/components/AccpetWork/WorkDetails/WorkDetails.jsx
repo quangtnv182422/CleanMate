@@ -17,6 +17,7 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
     const [connection, setConnection] = useState(null);
     const [workData, setWorkData] = useState(selectWork); // State to hold work data
 
@@ -90,12 +91,12 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
     };
 
     const openInGoogleMaps = () => {
-        if (workData.placeID) {
-            window.open(`https://www.google.com/maps/place/?q=place_id:${workData.placeID}`, '_blank');
+        if (workData.address) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(workData.address)}`, '_blank');
         } else if (workData.latitude && workData.longitude) {
             window.open(`https://www.google.com/maps/search/?api=1&query=${workData.latitude},${workData.longitude}`, '_blank');
-        } else if (workData.address) {
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(workData.address)}`, '_blank');
+        } else if (workData.placeID) {
+            window.open(`https://www.google.com/maps/place/?q=place_id:${workData.placeID}`, '_blank');
         } else {
             toast.error("Không tìm thấy thông tin địa điểm.");
         }
@@ -149,7 +150,29 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
             toast.error("Không thể kết nối tới máy chủ.");
         }
     };
-
+    const handleCancelWork = async () => {
+        try {
+            const response = await fetch(`/work/${workData.bookingId}/cancel`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const result = await response.json();
+            if (response.ok && result.success) {
+                toast.success(result.message || 'Công việc đã được hủy thành công.');
+                fetchWorkDetails(); // Refresh work details
+                if (onWorkListRefresh) onWorkListRefresh(); // Notify parent to refresh list
+                handleClose();
+            } else {
+                toast.error(result.message || 'Không thể hủy công việc.');
+            }
+        } catch (error) {
+            console.error('Error canceling work:', error);
+            toast.error('Đã xảy ra lỗi khi hủy công việc.');
+        }
+    };
     return (
         <Box sx={styles.modal}>
             {/* Work information */}
@@ -215,7 +238,8 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
             {/* Buttons based on status */}
             {workData.statusId === 3 && (
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, mt: 3, mb: 3, mx: 1 }}>
-                    <Button variant="outlined" color="error">
+                    <Button variant="outlined" color="error"
+                        onClick={() => setCancelConfirmOpen(true)}>
                         Hủy việc
                     </Button>
                     <Button variant="outlined" color="primary" onClick={openInGoogleMaps}>
@@ -252,6 +276,30 @@ const WorkDetails = ({ selectWork, onWorkListRefresh, handleClose }) => {
                             setConfirmOpen(false);
                         }}
                         color="primary"
+                        variant="contained"
+                    >
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Confirmation Dialog for Cancellation */}
+            <Dialog open={cancelConfirmOpen} onClose={() => setCancelConfirmOpen(false)}>
+                <DialogTitle>Xác nhận hủy việc</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Bạn xác nhận muốn hủy việc?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setCancelConfirmOpen(false)} color="primary">
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            handleCancelWork();
+                            setCancelConfirmOpen(false);
+                        }}
+                        color="error"
                         variant="contained"
                     >
                         Xác nhận

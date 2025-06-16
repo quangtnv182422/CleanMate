@@ -2,9 +2,12 @@
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
+using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Repository.Wallet;
+using CleanMate_Main.Server.Services.Wallet;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CleanMate_Main.Server.Services.Employee
 {
@@ -12,12 +15,17 @@ namespace CleanMate_Main.Server.Services.Employee
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUserWalletRepo _userWalletRepo;
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IUserWalletService _userWalletService;
 
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IUserWalletRepo userWalletRepo)
+
+        public EmployeeService(IEmployeeRepository employeeRepository, IUserWalletRepo userWalletRepo, IBookingRepository bookingRepository, IUserWalletService userWalletService)
         {
             _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
             _userWalletRepo = userWalletRepo ?? throw new ArgumentNullException(nameof(_userWalletRepo));
+            _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
+            _userWalletService = userWalletService ?? throw new ArgumentNullException(nameof(userWalletService));
         }
 
         public async Task<IEnumerable<WorkListViewModel>> GetAllWorkAsync(int? status = null, string? employeeId = null)
@@ -38,10 +46,26 @@ namespace CleanMate_Main.Server.Services.Employee
         public async Task<bool> AcceptWorkRequestAsync(int bookingId, string employeeId)
         {
             var wallet = await _userWalletRepo.GetWalletByUserIdAsync(employeeId);
-            if (wallet.Balance < CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK)
+            var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
+
+            if (booking == null)
+            {
+                throw new KeyNotFoundException("Công việc không tồn tại.");
+            }
+
+            DateTime startTime = booking.Date.ToDateTime(booking.StartTime); 
+            DateTime currentTime = Common.CommonConstants.GetCurrentTime();
+
+            if (startTime < currentTime)
+            {
+                throw new KeyNotFoundException("Công việc đã quá thời hạn để nhận.");
+            }
+
+            if (wallet == null || wallet.Balance < CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK) 
             {
                 throw new InvalidOperationException($"Số dư ví không đủ. Bạn cần tối thiểu {CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK.ToString("N0")} coins để nhận công việc.");
             }
+
             var isValid = await ValidateWorkAcceptanceAsync(bookingId, employeeId);
             if (!isValid)
             {
@@ -100,22 +124,83 @@ namespace CleanMate_Main.Server.Services.Employee
 
         public async Task<bool> CancelWorkRequestAsync(int bookingId, string employeeId)
         {
-            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
             if (booking == null)
             {
                 throw new KeyNotFoundException("Công việc không tồn tại.");
             }
-            if (booking.EmployeeId != employeeId)
+            if (booking.CleanerId != employeeId)
             {
                 throw new InvalidOperationException("Bạn không có quyền hủy công việc này.");
             }
 
-            if (booking.StatusId != CommonConstants.BookingStatus.ACCEPT)
+            if (booking.BookingStatusId != CommonConstants.BookingStatus.ACCEPT)
             {
                 throw new InvalidOperationException("Chỉ có thể hủy công việc khi trạng thái là Đã nhận.");
             }
 
-            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.CANCEL, employeeId);
+            DateTime currentTime = CommonConstants.GetCurrentTime();
+            DateTime startTime = booking.Date.ToDateTime(booking.StartTime);
+            TimeSpan timeDifference = startTime - currentTime;
+
+            decimal refundAmount = 0m;
+            decimal refundPercentage = 0m;
+            int newStatus = CommonConstants.BookingStatus.CANCEL; 
+            if (timeDifference.TotalHours >= 8)
+            {
+                refundAmount = booking.TotalPrice.Value * (1.0m -CommonConstants.COMMISSION_PERCENTAGE);
+                refundPercentage = 1.0m;  // 100%
+                newStatus = CommonConstants.BookingStatus.NEW; // Set to NEW for >= 8 hours
+                employeeId = null;
+            }
+            else if (timeDifference.TotalHours >= 5)
+            {
+                refundAmount = 0m;
+                refundPercentage = 0.8m; // 80%
+                newStatus = CommonConstants.BookingStatus.NEW; // Set to NEW for >= 5 hours
+                employeeId = null;
+
+            }
+            else if (timeDifference.TotalHours >= 1)
+            {
+                refundPercentage = 0.5m; // 50%
+                refundAmount = -(booking.TotalPrice.Value * (0.5m - (1.0m - CommonConstants.COMMISSION_PERCENTAGE)));
+            }
+            else
+            {
+                refundPercentage = 0.0m; // 0%
+                refundAmount = - (booking.TotalPrice.Value * CommonConstants.COMMISSION_PERCENTAGE); // No refund for less than 1 hour
+            }
+
+                string refundReason = $"Hoàn tiền hủy công việc (mức hoàn: {refundPercentage * 100}%)";
+
+            if (refundAmount < 0)
+            {
+                try
+                {
+                    // Refund by deducting a negative amount (effectively adding to the wallet)
+                    await _userWalletService.DeductMoneyAsync(booking.CleanerId, -refundAmount, refundReason, bookingId);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Không thể hoàn tiền: {ex.Message}");
+                }
+            }
+            else if (refundAmount > 0)
+            {
+                try
+                {
+                    // Refund by adding to the wallet
+                    await _userWalletService.AddMoneyAsync(booking.CleanerId, refundAmount, refundReason, bookingId);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Không thể hoàn tiền: {ex.Message}");
+                }
+            }
+
+
+            return await _employeeRepository.ChangeWorkAsync(bookingId, newStatus, employeeId);
         }
 
         public async Task<bool> ConfirmDoneWorkRequestAsync(int bookingId)

@@ -73,7 +73,7 @@ const CleanerViewFeedback = () => {
     });
 
     const totalPages = Math.ceil(filteredWork.length / WORKS_PER_PAGE);
-    const displayedWork = filteredWork.slice(
+    const displayedWork = filteredWork.reverse().slice(
         (page - 1) * WORKS_PER_PAGE,
         page * WORKS_PER_PAGE
     );
@@ -151,7 +151,7 @@ const CleanerViewFeedback = () => {
                                 <Card sx={style.workCard} onClick={() => handleOpenFeedbackDetails(work)}>
                                     <CardContent>
                                         <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
-                                            Bắt đầu lúc {formatTime(work.startTime)} ngày {formatDate(work.date)}
+                                            Bắt đầu lúc <span style={style.dateTimeContent}>{formatTime(work.startTime)}</span> giờ ngày <span style={style.dateTimeContent}>{formatDate(work.date)}</span>
                                         </Typography>
                                         <Typography sx={{ mt: 2, fontWeight: 500 }}>{work.customerFullName}</Typography>
                                         <Typography variant="subtitle2" color="textSecondary">

@@ -354,7 +354,7 @@ const AdminDashboard = () => {
 
             setSortConfig({ key: vietnameseKey, direction });
             setData(sortedData);
-        }, [data]);
+        }, []);
 
         const handleCancelWork = async (bookingId) => {
             try {

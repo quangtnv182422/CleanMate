@@ -28,6 +28,7 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
     const [connection, setConnection] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    console.log(selectedOrder)
     useEffect(() => {
         const newConnection = new HubConnectionBuilder()
             .withUrl('/workHub') // Ensure this matches your server's SignalR hub endpoint
@@ -84,7 +85,13 @@ const OrderDetails = ({ selectedOrder, onOrderListRefresh, handleClose }) => {
         setOpenFeedback(true);
     }
 
-    const handleCloseFeedback = () => setOpenFeedback(false);
+    const handleCloseFeedback = () => {
+        setOpenFeedback(false);
+        handleClose(); 
+        setTimeout(() => {
+            window.location.reload();
+        }, 200);
+    };
 
     const formatPrice = (price) => {
         return price.toLocaleString("vi-VN", {

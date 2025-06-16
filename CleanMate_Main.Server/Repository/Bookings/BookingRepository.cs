@@ -49,6 +49,7 @@ namespace CleanMate_Main.Server.Repository.Bookings
                                 .Include(x => x.Cleaner)
                                 .Include(x => x.User)
                                 .Include(x => x.Feedbacks)
+                                .Include(x => x.Payments)
                                 .Where(x => x.UserId == userId);
 
             if (statusId.HasValue)

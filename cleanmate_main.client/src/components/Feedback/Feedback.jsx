@@ -119,7 +119,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
                 toast.success('Gửi đánh giá thành công.');
                 setTimeout(() => {
                     window.location.reload(); // Hoặc dùng navigate(0) nếu dùng useNavigate()
-                }, 1500);
+                }, 1000);
                 return true;
             } else {
                 toast.error(response.data.message || 'Gửi đánh giá thất bại.');
@@ -134,6 +134,17 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
 
     const handleSubmitFeedback = async () => {
         if (loading) return;
+
+        if (!ratingValue || ratingValue <= 0 || ratingValue > 5) {
+            toast.warning('Vui lòng chọn số sao trước khi gửi đánh giá.');
+            return;
+        }
+
+        if (selectedReasons.length === 0 && otherReason.trim() === '') {
+            toast.warning('Vui lòng chọn lý do đánh giá hoặc nhập lý do khác.');
+            return;
+        }
+
         setLoading(true);
 
         const success = await postFeedback(
@@ -233,7 +244,21 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
                 </Box>
             )}
 
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                {selectedOrder.status === "pending" && (
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        sx={{ mt: 1, mr: 0 }}
+                        onClick={() => {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 200);
+                        }}
+                    >
+                        Bỏ qua
+                    </Button>
+                )}
                 <Button
                     variant="contained"
                     color="success"

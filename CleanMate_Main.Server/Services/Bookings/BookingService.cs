@@ -63,7 +63,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 DurationSquareMeter = b.ServicePrice.Duration.SquareMeterSpecific,
                 Price = b.ServicePrice.Price,
                 CleanerId = b.CleanerId,
-                CleanerName = b.Cleaner?.UserName ?? "Chưa phân công",
+                CleanerName = b.Cleaner?.FullName ?? "Chưa phân công",
                 UserId = b.UserId,
                 UserName = b.User.FullName,
                 BookingStatusId = b.BookingStatusId,
@@ -72,11 +72,20 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Note = b.Note,
                 AddressId = b.AddressId,
                 AddressFormatted = b.Address?.GG_DispalyName ?? "Chưa có địa chỉ",
+                AddressNo = b.Address?.AddressNo ?? "Chưa có địa chỉ",
+                PaymentStatus = b.Payments.Any()
+                                        ? (b.Payments.First().PaymentStatus == "Unpaid" ? "Chưa thanh toán" : (b.Payments.First().PaymentStatus == "Paid" ? "Đã thanh toán" : b.Payments.First().PaymentStatus))
+                                        : "null",
+
+                 PaymentMethod = b.Payments.Any()
+                                        ? (b.Payments.First().PaymentMethod.ToString() == "Cash" ? "Tiền mặt" : b.Payments.First().PaymentMethod.ToString())
+                                        : "null",
                 Date = b.Date,
                 StartTime = b.StartTime,
                 TotalPrice = b.TotalPrice,
                 CreatedAt = b.CreatedAt,
                 UpdatedAt = b.UpdatedAt,
+                
                 HasFeedback = b.Feedbacks.Any()
             }).ToList();
 
@@ -93,7 +102,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Date = b.Date,
                 StartTime = b.StartTime,
                 Duration = b.ServicePrice.Duration.DurationTime,
-                Address = b.Address.GG_FormattedAddress,
+                Address = b.Address.GG_DispalyName,
                 Note = b.Note,
                 TotalPrice = b.TotalPrice ?? 0m,
                 Status = b.BookingStatus.Status,

@@ -165,6 +165,8 @@ namespace CleanMate_Main.Server.Services.Employee
             {
                 refundPercentage = 0.5m; // 50%
                 refundAmount = -(booking.TotalPrice.Value * (0.5m - (1.0m - CommonConstants.COMMISSION_PERCENTAGE)));
+                newStatus = CommonConstants.BookingStatus.NEW; // Set to NEW for >= 1 hours
+                employeeId = null;
             }
             else
             {

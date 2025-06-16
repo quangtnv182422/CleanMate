@@ -18,6 +18,8 @@
         public int? AddressId { get; set; }
         public string AddressFormatted { get; set; }
         public string AddressNo { get; set; }
+        public string PaymentMethod { get; set; }
+        public string PaymentStatus { get; set; }
         public DateOnly Date { get; set; }
         public TimeOnly StartTime { get; set; }
         public decimal? TotalPrice { get; set; }

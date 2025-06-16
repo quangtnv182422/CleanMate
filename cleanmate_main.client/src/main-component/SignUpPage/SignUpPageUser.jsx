@@ -128,10 +128,11 @@ const SignUpPageUser = () => {
                 navigate('/login', {replace: true});
             } catch (error) {
                 toast.error(error.message);
+                navigate('/register/user', { replace: true });
             }
         } else {
             validator.showMessages();
-            toast.error('Các mục không được để trống!');
+            toast.error('Vui lòng kiểm tra lại các trường thông tin!');
         }
     };
 

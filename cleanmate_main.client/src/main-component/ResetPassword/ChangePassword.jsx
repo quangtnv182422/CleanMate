@@ -100,17 +100,20 @@ const ChangePassword = () => {
                     push('/login', { replace: true })
                 } else {
                     toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    push('/change-password', { replace: true })         
                 }
             } catch (error) {
                 if (error.response?.status === 404) {
                     toast.error('Lỗi khi đổi mật khẩu. Vui lòng thử lại.');
+                    push('/change-password', { replace: true })    
                 } else {
                     toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
+                    push('/change-password', { replace: true })    
                 }
             }
         } else {
             validator.showMessages();
-            toast.error('Vui lòng nhập địa chỉ email hợp lệ.');
+            toast.error('Vui lòng nhập mật khẩu khác mật khẩu cũ.');
         }
     };
 

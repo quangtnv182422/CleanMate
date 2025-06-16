@@ -51,12 +51,19 @@ const ForgotPassword = (props) => {
                     push('/login', { replace: true })
                 } else {
                     toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    push('/forgot-password', { replace: true })
+
                 }
             } catch (error) {
                 if (error.response?.status === 404) {
                     toast.error('Email không tồn tại trong hệ thống.');
+                    push('/forgot-password', { replace: true })
+                } else if (error.response?.status === 400) {
+                    toast.error("Email không tồn tại hoặc chưa được xác thực.");
+                    push('/forgot-password', { replace: true })
                 } else {
                     toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
+                    push('/forgot-password', { replace: true })
                 }
             }
         } else {

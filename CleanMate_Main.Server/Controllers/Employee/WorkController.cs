@@ -89,14 +89,15 @@ namespace CleanMate_Main.Server.Controllers.Employee
                     switch (payment.PaymentMethod) // Corrected switch statement syntax
                     {
                         case PaymentType.Cash:
-                            await _userWalletService.DeductMoneyAsync(employeeId, (booking.decimalPrice - booking.decimalCommission), $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
                             await _paymentService.MarkBookingAsPaidAsync(payment.PaymentId,null);
                             break;
                         case PaymentType.vnPay:
-                            await _userWalletService.AddMoneyAsync(employeeId,booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            //await _userWalletService.AddMoneyAsync(employeeId,booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            throw new NotImplementedException("Phương thức thanh toán vnPay chưa được triển khai.");
                             break;
                         case PaymentType.PayOS:
-                            await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            throw new NotImplementedException("Phương thức thanh toán vnPay chưa được triển khai.");
+                            //await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
                             break;
                         case PaymentType.CleanMate_Coin:
                             await _userWalletService.AddMoneyAsync(employeeId, booking.decimalCommission, $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);

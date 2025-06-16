@@ -40,7 +40,10 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Address = address.GG_FormattedAddress,
                             Note = booking.Note,
                             TotalPrice = booking.TotalPrice ?? 0m,
-                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId)
+                            Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId),
+                            AddressNo = address.AddressNo,
+                            CreatedAt = booking.CreatedAt,
+                            UpdatedAt = booking.UpdatedAt
                         };
 
             return await query.ToListAsync();

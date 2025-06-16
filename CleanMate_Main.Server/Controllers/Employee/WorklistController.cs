@@ -1,6 +1,9 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
 using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.Services.Payments;
+using CleanMate_Main.Server.Services.Wallet;
 using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,12 +21,16 @@ namespace CleanMate_Main.Server.Controllers.Employee
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IHubContext<WorkHub> _hubContext;
+        private readonly IPaymentService _paymentService;
+        private readonly IUserWalletService _userWalletService;
 
-        public WorklistController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, IHubContext<WorkHub> hubContext)
+        public WorklistController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, IHubContext<WorkHub> hubContext, IPaymentService paymentService,IUserWalletService userWalletService)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _hubContext = hubContext;
+            _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
+            _userWalletService = userWalletService ?? throw new ArgumentNullException(nameof(userWalletService));
         }
 
         [HttpGet]
@@ -107,6 +114,22 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 bool success = await _employeeService.AcceptWorkRequestAsync(id, employeeId);
                 if (success)
                 {
+                    var booking = await _employeeService.GetWorkDetailsAsync(id);
+                    var payment = await _paymentService.GetPaymentsByBookingIdAsync(id);
+                    switch (payment.PaymentMethod)
+                    {
+                        case PaymentType.Cash:
+                            await _userWalletService.DeductMoneyAsync(employeeId, (booking.decimalPrice - booking.decimalCommission), $"Thanh toán tiền nhận công việc {booking.BookingId}", booking.BookingId);
+                            break;
+                        case PaymentType.vnPay:
+                            throw new NotImplementedException("Phương thức thanh toán vnPay chưa được triển khai.");
+                        case PaymentType.PayOS:
+                            throw new NotImplementedException("Phương thức thanh toán PayOS chưa được triển khai.");
+                        case PaymentType.CleanMate_Coin:
+                            break;
+                        default:
+                            return BadRequest(new { success = false, message = "Phương thức thanh toán không hợp lệ." });
+                    }
                     await _hubContext.Clients.All.SendAsync("ReceiveWorkUpdate", employeeId);
                     return Ok(new { success, message = "Công việc đã được nhận thành công." });
                 }

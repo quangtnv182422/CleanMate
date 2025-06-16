@@ -37,9 +37,11 @@ namespace CleanMate_Main.Server.Repository.Employee
                             Date = booking.Date,
                             StartTime = booking.StartTime,
                             Duration = duration.DurationTime,
-                            Address = address.GG_FormattedAddress,
+                            Address = address.GG_DispalyName,
                             Note = booking.Note,
                             TotalPrice = booking.TotalPrice ?? 0m,
+                            CreatedAt = booking.CreatedAt,
+                            UpdatedAt = booking.UpdatedAt,
                             Status = Common.CommonConstants.GetStatusString(booking.BookingStatusId)
                         };
 

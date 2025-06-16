@@ -1,5 +1,6 @@
 ﻿using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Feedbacks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,12 +17,14 @@ namespace CleanMate_Main.Server.Controllers.Customer
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _feedbackService;
+        private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
 
-        public FeedbackController(IFeedbackService feedbackService, UserManager<AspNetUser> userManager)
+        public FeedbackController(IFeedbackService feedbackService, UserManager<AspNetUser> userManager, IEmployeeService employeeService)
         {
             _feedbackService = feedbackService;
             _userManager = userManager;
+            _employeeService = employeeService;
         }
 
         [HttpPost]
@@ -45,6 +48,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
                 }
 
                 await _feedbackService.AddFeedbackAsync(dto.BookingId, user.Id, dto.CleanerId, dto.Rating, dto.Content);
+                await _employeeService.RecalculateCleanerRatingAsync(dto.CleanerId, (int) dto.Rating);
                 return Ok("Feedback đã được thêm thành công.");
             }
             catch (Exception ex)

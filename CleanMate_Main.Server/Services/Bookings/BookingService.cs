@@ -93,7 +93,7 @@ namespace CleanMate_Main.Server.Services.Bookings
                 Date = b.Date,
                 StartTime = b.StartTime,
                 Duration = b.ServicePrice.Duration.DurationTime,
-                Address = b.Address.GG_FormattedAddress,
+                Address = b.Address.GG_DispalyName,
                 Note = b.Note,
                 TotalPrice = b.TotalPrice ?? 0m,
                 Status = b.BookingStatus.Status,

@@ -198,7 +198,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.MapHub<WorkHub>("/workHub");
+
+
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowReactApp"); 
@@ -207,6 +208,8 @@ app.UseAuthorization();
 
 
 app.MapControllers();
+
+app.MapHub<WorkHub>("/workHub");
 
 app.MapFallbackToFile("/index.html");
 

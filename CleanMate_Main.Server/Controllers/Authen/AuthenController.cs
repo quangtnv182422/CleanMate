@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DTO;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.ViewModels.Authen;
 using CleanMate_Main.Server.Services.Authentication;
@@ -23,17 +24,20 @@ namespace CleanMate_Main.Server.Controllers.Authen
         private readonly IUserWalletService _walletService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IEmployeeService _employeeService;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
         public AuthenController(
             IAuthenService authenService,
             UserManager<AspNetUser> userManager,
             IUserWalletService walletService,
-            IEmployeeService employeeService)
+            IEmployeeService employeeService,
+            UserHelper<AspNetUser> userHelper)
         {
             _authenService = authenService;
             _userManager = userManager;
             _walletService = walletService;
             _employeeService = employeeService;
+            _userHelper = userHelper;
         }
 
         //đăng kí dành cho khách hàng
@@ -96,7 +100,7 @@ namespace CleanMate_Main.Server.Controllers.Authen
                 HttpOnly = true,
                 Secure = true, 
                 SameSite = SameSiteMode.None, 
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTimeVN.GetNow().AddDays(7)
             });
 
             return Ok(new { message = "Đăng nhập thành công" });
@@ -114,15 +118,10 @@ namespace CleanMate_Main.Server.Controllers.Authen
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userEmail))
-                return Unauthorized();
-
-            var user = await _userManager.FindByEmailAsync(userEmail);
+            var user = await _userHelper.GetCurrentUserAsync();
 
             if (user == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
             // Lấy roles nếu cần
             var roles = await _userManager.GetRolesAsync(user);

@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.Entities;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +16,12 @@ namespace CleanMate_Main.Server.Controllers.Employee
 
         private readonly IEmployeeService _employeeService;
         private readonly UserManager<AspNetUser> _userManager;
-        public EmployeeProfileController(IEmployeeService employeeService, UserManager<AspNetUser> userManager)
+        private readonly UserHelper<AspNetUser> _userHelper;
+        public EmployeeProfileController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _userHelper = userHelper;
         }
 
         [HttpGet]
@@ -26,11 +29,8 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
@@ -52,11 +52,8 @@ namespace CleanMate_Main.Server.Controllers.Employee
         {
             try
             {
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userEmail))
-                    return Unauthorized(new { message = "Không tìm thấy email người dùng." });
+                var user = await _userHelper.GetCurrentUserAsync();
 
-                var user = await _userManager.FindByEmailAsync(userEmail);
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 

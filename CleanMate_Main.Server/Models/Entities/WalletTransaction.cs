@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using CleanMate_Main.Server.Models.Enum;
+using CleanMate_Main.Server.Common.Utils;
 
 namespace CleanMate_Main.Server.Models.Entities
 {
@@ -23,7 +24,7 @@ namespace CleanMate_Main.Server.Models.Entities
         [MaxLength(255)]
         public string? Description { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTimeVN.GetNow();
 
         public int? RelatedBookingId { get; set; }
 

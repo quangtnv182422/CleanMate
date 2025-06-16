@@ -7,7 +7,7 @@ namespace CleanMate_Main.Server.Common
         public const int DefaultPageSize = 9;
         public static readonly TimeSpan TIME_INTERVAL = TimeSpan.FromMinutes(20);
         // time interval between each work shift calculated in minutes
-        public static readonly decimal COMMISSION_PERCENTAGE = 0.80m; 
+        public static readonly decimal COMMISSION_PERCENTAGE = 0.80m;
         //Commission percentage 
         public static readonly decimal MINIMUM_DEBIT_AMOUNT = 200000m; //toi thieu can 200k coin
         public static readonly decimal MINIMUM_DEPOSIT_AMOUNT = 200000m; //nap toi thieu 200k coin
@@ -43,10 +43,18 @@ namespace CleanMate_Main.Server.Common
             string result = amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
             return result;
         }
-        public static string ChangeTimeType(TimeOnly time) {
+        public static string ChangeTimeType(TimeOnly time)
+        {
             string result = time.Minute == 0 ? $"{time.Hour} giờ" : $"{time.Hour} giờ {time.Minute} phút";
             return result;
         }
-
+        public static DateTime GetCurrentTime()
+        {
+            DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc(
+                 DateTime.UtcNow,
+                 TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
+             );
+            return currentTime;
+        }
     }
 }

@@ -104,6 +104,8 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 //vietqr
 builder.Services.AddScoped<IVIetQRService, VietQRService>();
+//User Helper
+builder.Services.AddScoped(typeof(CleanMate_Main.Server.Common.Utils.UserHelper<>));
 
 // Cấu hình JWT (dành cho API)
 builder.Services.AddAuthentication(options =>

@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Models.Enum;
@@ -26,7 +27,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             {
                 UserId = userId,
                 Balance = 0, // mới tạo nên số dư = 0
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTimeVN.GetNow()
             };
 
             return await _walletRepo.AddNewWalletAsync(newWallet);

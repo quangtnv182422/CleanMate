@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using CleanMate_Main.Server.Common.Utils;
 
 namespace CleanMate_Main.Server.Models.Entities
 {
@@ -32,7 +33,7 @@ namespace CleanMate_Main.Server.Models.Entities
         public WithdrawStatus Status { get; set; } = WithdrawStatus.Pending;
 
         [Required]
-        public DateTime RequestedAt { get; set; } = DateTime.Now;
+        public DateTime RequestedAt { get; set; } = DateTimeVN.GetNow();
 
         public DateTime? ProcessedAt { get; set; }
 

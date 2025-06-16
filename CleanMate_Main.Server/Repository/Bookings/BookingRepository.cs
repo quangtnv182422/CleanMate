@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
@@ -135,7 +136,7 @@ namespace CleanMate_Main.Server.Repository.Bookings
 
             // Cập nhật trạng thái booking sang CANCELED
             booking.BookingStatusId = CommonConstants.BookingStatus.CANCEL;
-            booking.UpdatedAt = DateTime.Now; // Cập nhật thời gian hủy
+            booking.UpdatedAt = DateTimeVN.GetNow(); // Cập nhật thời gian hủy
 
             await _context.SaveChangesAsync();
 

@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DTO;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Services.Address;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +17,13 @@ namespace CleanMate_Main.Server.Controllers.Customer
     {
         private readonly IAddressService _addressService;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly UserHelper<AspNetUser> _userHelper;
 
-        public AddressController(IAddressService addressService, UserManager<AspNetUser> userManager)
+        public AddressController(IAddressService addressService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
             _addressService = addressService;
             _userManager = userManager;
+            _userHelper = userHelper;
         }
 
         [HttpPost("add-address")]
@@ -49,14 +52,10 @@ namespace CleanMate_Main.Server.Controllers.Customer
         [HttpGet("get-address")]
         public async Task<ActionResult<List<CustomerAddress>>> GetAddressInUse()
         {
-            var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userHelper.GetCurrentUserAsync();
 
-            if (string.IsNullOrEmpty(userEmail))
-                return Unauthorized("User email not found in token");
-
-            var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
-                return Unauthorized("User not found");
+                return Unauthorized();
 
             var addresses = await _addressService.GetAddressInUseByCustomerId(user.Id);
 

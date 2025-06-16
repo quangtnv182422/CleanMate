@@ -87,6 +87,7 @@ namespace CleanMate_Main.Server.Repository.Employee
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Booking with ID {bookingId} not found.");
         }
 
+
         public async Task<IEnumerable<WorkListViewModel>> FindWorkByEmployeeIdAsync(string employeeId)
         {
             var query = from booking in _context.Bookings
@@ -140,8 +141,11 @@ namespace CleanMate_Main.Server.Repository.Employee
                 {
                     booking.CleanerId = employeeId;
                 }
-
-                await _context.SaveChangesAsync();
+                else
+                {
+                    booking.CleanerId = null;
+                }
+                    await _context.SaveChangesAsync();
                 return true; // Successfully updated
             }
             catch
@@ -428,7 +432,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                     CustomerFullName = fb.CustomerFullName ?? "",
                     Rating = fb.Feedback.Rating ?? 0,
                     Comment = fb.Feedback.Content ?? "",
-                    ReviewDate = fb.Feedback.CreatedAt ?? DateTime.UtcNow
+                    ReviewDate = fb.Feedback.CreatedAt ?? CommonConstants.GetCurrentTime()
                 })
                 .ToListAsync();
 
@@ -444,7 +448,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         }
         public async Task<decimal> GetMonthlyEarningsAsync(string employeeId)
         {
-            var currentMonth = DateTime.UtcNow;
+            var currentMonth = CommonConstants.GetCurrentTime();
             var startOfMonth = new DateOnly(currentMonth.Year, currentMonth.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
@@ -462,7 +466,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         }
         public async Task<IEnumerable<MonthlyEarningViewModel>> GetEarningsByMonthAsync(string employeeId)
         {
-            var currentDate = DateTime.UtcNow;
+            var currentDate = CommonConstants.GetCurrentTime();
             var currentYear = currentDate.Year;
             var currentMonth = currentDate.Month;
 

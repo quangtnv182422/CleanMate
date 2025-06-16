@@ -1,4 +1,5 @@
-﻿using CleanMate_Main.Server.Models.DTO.vnPay;
+﻿using CleanMate_Main.Server.Common.Utils;
+using CleanMate_Main.Server.Models.DTO.vnPay;
 using CleanMate_Main.Server.Proxy.vnPay.vnPayLib;
 
 namespace CleanMate_Main.Server.Proxy.vnPay
@@ -15,7 +16,7 @@ namespace CleanMate_Main.Server.Proxy.vnPay
         {
             var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["TimeZoneId"]);
             var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
-            var tick = DateTime.Now.Ticks.ToString();
+            var tick = DateTimeVN.GetNow().Ticks.ToString();
             var pay = new VnPayLibrary();
             var urlCallBack = _configuration["Vnpay:PaymentBackReturnUrl"];
 

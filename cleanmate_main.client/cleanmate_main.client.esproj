@@ -9,7 +9,7 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\components\BookingService\" />
+    <Folder Include="src\components\BookingService\ViewCleaningTools\" />
     <Folder Include="src\components\ConfirmBooking\" />
     <Folder Include="src\components\BookingConfirmation\" />
     <Folder Include="src\components\GoogleMap\" />

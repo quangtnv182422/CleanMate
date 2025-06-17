@@ -7,5 +7,7 @@ namespace CleanMate_Main.Server.Services.Customer
         Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search);
         Task LockUserAccountAsync(string userId);
         Task UnlockUserAccountAsync(string userId);
+        Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId);
+        Task<bool> UpdateCustomerProfileAsync(CustomerProfileViewModel profile);
     }
 }

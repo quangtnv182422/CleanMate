@@ -1,27 +1,32 @@
 ﻿using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Repository.Employee;
+using CleanMate_Main.Server.Services.Customer;
 using CleanMate_Main.Server.Services.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System;
+using System.Threading.Tasks;
 
-namespace CleanMate_Main.Server.Controllers.Employee
+namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Cleaner")]
-    public class EmployeeProfileController : Controller
+    [Authorize(Roles = "Customer")]
+    public class CustomerProfileController : ControllerBase
     {
-
+        private readonly ICustomerService _customerService;
         private readonly IEmployeeService _employeeService;
+
         private readonly UserManager<AspNetUser> _userManager;
         private readonly UserHelper<AspNetUser> _userHelper;
-        public EmployeeProfileController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
+
+        public CustomerProfileController(ICustomerService customerService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper, IEmployeeService employeeService)
         {
-            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
+            _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _userHelper = userHelper;
+            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
         }
 
         [HttpGet]
@@ -34,7 +39,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetCustomerProfileAsync(user.Id);
                 return Ok(profile);
             }
             catch (KeyNotFoundException ex)
@@ -48,7 +53,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
         }
 
         [HttpPut("edit")]
-        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileEmployeeViewModel model)
+        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileCustomerViewModel model)
         {
             try
             {
@@ -57,12 +62,9 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetCustomerProfileAsync(user.Id);
                 profile.AvatarUrl = model.ProfileImage ?? profile.AvatarUrl;
-                profile.BankName = model.BankName ?? profile.BankName;
-                profile.BankNo = model.BankNo ?? profile.BankNo;
-
-                var success = await _employeeService.UpdatePersonalProfileAsync(profile);
+                var success = await _customerService.UpdateCustomerProfileAsync(profile);
                 return Ok(new { success, message = success ? "Cập nhật hồ sơ thành công." : "Cập nhật hồ sơ thất bại." });
             }
             catch (ArgumentException ex)
@@ -78,15 +80,29 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật hồ sơ." });
             }
         }
+        [HttpGet("{cleanerId}")]
+        public async Task<IActionResult> GetCleanerProfile(string cleanerId)
+        {
+            try
+            {
+                var profile = await _employeeService.GetPersonalProfileAsync(cleanerId);
+                if (profile == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy nhân viên." });
+                }
+                return Ok(profile);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin nhân viên." });
+            }
+        }
     }
 
-    public class UpdateProfileEmployeeViewModel
+    public class UpdateProfileCustomerViewModel
     {
         public string? ProfileImage { get; set; }
-        public string? BankName { get; set; }
-        public string? BankNo { get; set; }
         public DateTime? Dob { get; set; }
 
     }
 }
-

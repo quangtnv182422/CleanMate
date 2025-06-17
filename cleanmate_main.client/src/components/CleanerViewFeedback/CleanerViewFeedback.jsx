@@ -35,7 +35,6 @@ const CleanerViewFeedback = () => {
 
     const handleClose = () => setOpen(false);
 
-    console.log(selectedWork)
 
     useEffect(() => {
         const fetchFeedbackHistory = async () => {
@@ -55,7 +54,6 @@ const CleanerViewFeedback = () => {
 
                 const result = await response.json();
                 if (result.success) {
-                    console.log(result);
                     setWork(result.data); // Set the feedback history data
                 } else {
                     console.error('Failed to fetch feedback history:', result.message);

@@ -1,10 +1,28 @@
-/*==========================================
+﻿/*==========================================
 6. wpo-team-single
 ===========================================*/
 
 .team-pg-area{
     max-width: 1080px;
     margin: 0 auto;
+}
+
+.team-info-wrap {
+    .row {
+        display: flex;
+        align-items: stretch; // giúp các cột bằng chiều cao nhau
+        flex-wrap: wrap;
+    }
+
+    .col-lg-6 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .team-info-img,
+    .team-info-text {
+        height: 100%;
+    }
 }
 
 .team-info-img {
@@ -39,26 +57,27 @@
     box-shadow: 0px 6px 20px 4px rgba(176, 191, 238, .12);
     padding: 58px 50px;
 
-    ul{
-        li{
+    ul {
+        li {
             font-size: 17px;
             color: #1d2327;
             font-weight: 700;
             margin-bottom: 22px;
             list-style: none;
 
-            &:last-child{
+            &:last-child {
                 padding-bottom: 0;
             }
 
-            span{
+            span {
                 font-size: 16px;
                 color: #8c8c8c;
                 display: inline-block;
                 position: relative;
                 padding-left: 5px;
             }
-            &:last-child{
+
+            &:last-child {
                 margin-bottom: 0;
             }
         }
@@ -92,11 +111,11 @@
 }
 .exprience-wrap p {
     color: #5d5851;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .exprience-wrap {
-    padding-bottom: 40px;
+    padding-bottom: 10px;
 
     h2{
         font-weight: 700;
@@ -305,7 +324,7 @@
 
 
 .education-area {
-    max-width: 600px;
+    max-width: 1200px;
 }
 .education-area ul{
     list-style: none;

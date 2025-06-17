@@ -364,6 +364,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         {
             var query = from user in _context.Users
                         join profile in _context.CleanerProfiles on user.Id equals profile.UserId
+                        join wallet in _context.UserWallets on user.Id equals wallet.UserId
                         where user.Id == employeeId
                         select new PersonalProfileViewModel
                         {
@@ -380,7 +381,8 @@ namespace CleanMate_Main.Server.Repository.Employee
                             ActiveAreas = profile.Area ?? "",
                             IsAvailable = profile.Available ?? false,
                             ExperienceYears = profile.ExperienceYear ?? 0,
-                            AverageRating = profile.Rating ?? 0
+                            AverageRating = profile.Rating ?? 0,
+                            Balance = wallet.Balance
                         };
 
             return await query.FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Profile for employee ID {employeeId} not found.");

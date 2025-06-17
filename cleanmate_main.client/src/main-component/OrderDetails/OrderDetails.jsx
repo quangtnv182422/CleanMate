@@ -28,7 +28,6 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
     const [connection, setConnection] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    console.log(selectedOrder)
     useEffect(() => {
         const newConnection = new HubConnectionBuilder()
             .withUrl('/workHub') // Ensure this matches your server's SignalR hub endpoint

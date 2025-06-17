@@ -1,6 +1,7 @@
 ﻿using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Repository.Customer

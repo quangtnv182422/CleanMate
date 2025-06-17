@@ -1,5 +1,7 @@
 ﻿using CleanMate_Main.Server.Models.DTO;
+using CleanMate_Main.Server.Models.Entities;
 using CleanMate_Main.Server.Repository.Customer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Services.Customer
@@ -9,29 +11,30 @@ namespace CleanMate_Main.Server.Services.Customer
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _repository;
-
-        public CustomerService(ICustomerRepository repository)
+        private readonly UserManager<AspNetUser> _userManager;
+        public CustomerService(ICustomerRepository repository, UserManager<AspNetUser> userManager)
         {
             _repository = repository;
+            _userManager = userManager;
         }
 
         public async Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search)
         {
             return await _repository.GetCustomerListAsync(search);
-            }
+        }
 
         public async Task LockUserAccountAsync(string userId)
-            {
+        {
             await _repository.LockUserAccountAsync(userId);
-            }
+        }
 
         public async Task UnlockUserAccountAsync(string userId)
-            {
+        {
             await _repository.UnlockUserAccountAsync(userId);
-    }
+        }
         public async Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId)
         {
-            var user = await _customerRepository.GetUserById(userId);
+            var user = await _repository.GetUserById(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException("Không tìm thấy người dùng.");
@@ -56,7 +59,7 @@ namespace CleanMate_Main.Server.Services.Customer
                 throw new ArgumentException("UserId không được để trống.");
             }
 
-            var user = await _customerRepository.GetUserById(profile.UserId);
+            var user = await _repository.GetUserById(profile.UserId);
             if (user == null)
             {
                 throw new KeyNotFoundException("Không tìm thấy người dùng để cập nhật.");
@@ -70,7 +73,9 @@ namespace CleanMate_Main.Server.Services.Customer
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
-        public class CustomerProfileViewModel
+    }
+
+    public class CustomerProfileViewModel
     {
         public string UserId { get; set; }
         public string FullName { get; set; }

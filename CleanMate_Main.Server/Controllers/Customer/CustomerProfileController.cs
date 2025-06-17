@@ -1,6 +1,8 @@
 ﻿using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Services.Customer;
+using CleanMate_Main.Server.Services.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +17,17 @@ namespace CleanMate_Main.Server.Controllers.Customer
     public class CustomerProfileController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly IEmployeeService _employeeService;
+
         private readonly UserManager<AspNetUser> _userManager;
         private readonly UserHelper<AspNetUser> _userHelper;
 
-        public CustomerProfileController(ICustomerService customerService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
+        public CustomerProfileController(ICustomerService customerService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper, IEmployeeService employeeService)
         {
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _userHelper = userHelper ?? throw new ArgumentNullException(nameof(userHelper));
+            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
         }
 
         [HttpGet]
@@ -74,6 +79,23 @@ namespace CleanMate_Main.Server.Controllers.Customer
             catch (Exception)
             {
                 return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật hồ sơ." });
+            }
+        }
+        [HttpGet("{cleanerId}")]
+        public async Task<IActionResult> GetCleanerProfile(string cleanerId)
+        {
+            try
+            {
+                var profile = await _employeeService.GetPersonalProfileAsync(cleanerId);
+                if (profile == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy nhân viên." });
+                }
+                return Ok(profile);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy thông tin nhân viên." });
             }
         }
     }

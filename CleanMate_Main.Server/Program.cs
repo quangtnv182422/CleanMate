@@ -8,6 +8,7 @@ using CleanMate_Main.Server.Repository.Address;
 using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
+using CleanMate_Main.Server.Repository.Customer;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Repository.Feedbacks;
 using CleanMate_Main.Server.Repository.Payments;
@@ -19,6 +20,7 @@ using CleanMate_Main.Server.Services.Authentication;
 using CleanMate_Main.Server.Services.Bookings;
 using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
+using CleanMate_Main.Server.Services.Customer;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Feedbacks;
 using CleanMate_Main.Server.Services.Payments;
@@ -77,6 +79,9 @@ builder.Services.AddScoped<IAllService_Service, AllService_Service>();
 //All Employee Service
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 //Booking
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();

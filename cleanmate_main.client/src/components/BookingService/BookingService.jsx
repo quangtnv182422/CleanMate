@@ -843,9 +843,6 @@ const BookingService = () => {
         const startTimeStr = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
         const endTimeStr = endTime.format('YYYY-MM-DD HH:mm:ss');
 
-        console.log("Bắt đầu (UTC)", startTimeStr);
-        console.log("Kết thúc (UTC)", endTimeStr);
-
 
         try {
             const response = await axios.get(

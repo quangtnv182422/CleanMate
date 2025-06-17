@@ -1,27 +1,28 @@
 ﻿using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.Entities;
-using CleanMate_Main.Server.Services.Employee;
+using CleanMate_Main.Server.Services.Customer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System;
+using System.Threading.Tasks;
 
-namespace CleanMate_Main.Server.Controllers.Employee
+namespace CleanMate_Main.Server.Controllers.Customer
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Cleaner")]
-    public class EmployeeProfileController : Controller
+    [Authorize(Roles = "Customer")]
+    public class CustomerProfileController : ControllerBase
     {
-
-        private readonly IEmployeeService _employeeService;
+        private readonly ICustomerService _customerService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly UserHelper<AspNetUser> _userHelper;
-        public EmployeeProfileController(IEmployeeService employeeService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
+
+        public CustomerProfileController(ICustomerService customerService, UserManager<AspNetUser> userManager, UserHelper<AspNetUser> userHelper)
         {
-            _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
+            _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _userHelper = userHelper;
+            _userHelper = userHelper ?? throw new ArgumentNullException(nameof(userHelper));
         }
 
         [HttpGet]
@@ -34,7 +35,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetPersonalProfileAsync(user.Id);
                 return Ok(profile);
             }
             catch (KeyNotFoundException ex)
@@ -57,12 +58,9 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _employeeService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetPersonalProfileAsync(user.Id);
                 profile.AvatarUrl = model.ProfileImage ?? profile.AvatarUrl;
-                profile.BankName = model.BankName ?? profile.BankName;
-                profile.BankNo = model.BankNo ?? profile.BankNo;
-
-                var success = await _employeeService.UpdatePersonalProfileAsync(profile);
+                var success = await _customerService.UpdatePersonalProfileAsync(profile);
                 return Ok(new { success, message = success ? "Cập nhật hồ sơ thành công." : "Cập nhật hồ sơ thất bại." });
             }
             catch (ArgumentException ex)
@@ -83,10 +81,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
     public class UpdateProfileViewModel
     {
         public string? ProfileImage { get; set; }
-        public string? BankName { get; set; }
-        public string? BankNo { get; set; }
         public DateTime? Dob { get; set; }
 
     }
 }
-

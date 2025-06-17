@@ -108,7 +108,6 @@ const AcceptWork = () => {
                 .catch(err => console.error('SignalR Connection Error: ', err));
 
             connection.on('ReceiveWorkUpdate', () => {
-                console.log('WorkUpdated event received');
                 fetchWorkList(); // Refresh the work list on update
             });
 

@@ -19,6 +19,7 @@ const Profile = (props) => {
     const SubmitHandler = (e) => {
         e.preventDefault();
     }
+    console.log(user);
 
     return (
         <Fragment>

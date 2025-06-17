@@ -15,8 +15,8 @@ namespace CleanMate_Main.Server.Repository.Customer
         public async Task<AspNetUser> GetUserById(string userId)
         {
             var user = await _context.Users
-                                                .Where(x => x.Id == userId)
-                                                .FirstOrDefaultAsync();
+                .Where(x => x.Id == userId)
+                .FirstOrDefaultAsync();
             return user;
         }
     }

@@ -1,51 +1,72 @@
-﻿using CleanMate_Main.Server.Models.ViewModels.Employee;
-using CleanMate_Main.Server.Repository.Bookings;
-using CleanMate_Main.Server.Repository.Employee;
-using CleanMate_Main.Server.Repository.Wallet;
-using CleanMate_Main.Server.Services.Wallet;
+﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Repository.Customer;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanMate_Main.Server.Services.Customer
 {
+
+
     public class CustomerService : ICustomerService
     {
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IUserWalletRepo _userWalletRepo;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly UserManager<AspNetUser> _userManager;
 
-        public CustomerService(IEmployeeRepository employeeRepository, IUserWalletRepo userWalletRepo)
+        public CustomerService(ICustomerRepository customerRepository, UserManager<AspNetUser> userManager)
         {
-            _employeeRepository = employeeRepository ?? throw new ArgumentNullException(nameof(employeeRepository));
-            _userWalletRepo = userWalletRepo ?? throw new ArgumentNullException(nameof(_userWalletRepo));
+            _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
-        public async Task<PersonalProfileViewModel> GetPersonalProfileAsync(string employeeId)
+
+        public async Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId)
         {
-            var user = await _employeeRepository.GetPersonalProfileAsync(employeeId);
-            var wallet = await _userWalletRepo.GetWalletByUserIdAsync(employeeId);
-            PersonalProfileViewModel model = new PersonalProfileViewModel
+            var user = await _customerRepository.GetUserById(userId);
+            if (user == null)
             {
-                UserId = employeeId,
+                throw new KeyNotFoundException("Không tìm thấy người dùng.");
+            }
+
+            var profile = new CustomerProfileViewModel
+            {
+                UserId = userId,
                 FullName = user.FullName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                AvatarUrl = user.AvatarUrl,
-                Gender = user.Gender,
-                Dob = user.Dob,
-                Balance = wallet?.Balance
+                AvatarUrl = user.ProfileImage
+                // Add other customer-specific fields as needed
             };
-            return model;
+            return profile;
         }
 
-        public async Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile)
+        public async Task<bool> UpdateCustomerProfileAsync(CustomerProfileViewModel profile)
         {
             if (string.IsNullOrEmpty(profile.UserId))
             {
                 throw new ArgumentException("UserId không được để trống.");
             }
-            var success = await _employeeRepository.UpdatePersonalProfileAsync(profile);
-            if (!success)
+
+            var user = await _customerRepository.GetUserById(profile.UserId);
+            if (user == null)
             {
-                throw new InvalidOperationException("Cập nhật hồ sơ thất bại.");
+                throw new KeyNotFoundException("Không tìm thấy người dùng để cập nhật.");
             }
-            return true;
+
+            user.FullName = profile.FullName ?? user.FullName;
+            user.Email = profile.Email ?? user.Email;
+            user.PhoneNumber = profile.PhoneNumber ?? user.PhoneNumber;
+            user.ProfileImage = profile.AvatarUrl ?? user.ProfileImage;
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
+    }
+
+    public class CustomerProfileViewModel
+    {
+        public string UserId { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string AvatarUrl { get; set; }
+        // Add other customer-specific fields (e.g., Address) as needed
     }
 }

@@ -79,6 +79,7 @@ builder.Services.AddScoped<IAllService_Service, AllService_Service>();
 //All Employee Service
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+//All Customer Service
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 

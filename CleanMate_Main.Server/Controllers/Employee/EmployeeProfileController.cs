@@ -48,7 +48,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
         }
 
         [HttpPut("edit")]
-        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileViewModel model)
+        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileEmployeeViewModel model)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace CleanMate_Main.Server.Controllers.Employee
         }
     }
 
-    public class UpdateProfileViewModel
+    public class UpdateProfileEmployeeViewModel
     {
         public string? ProfileImage { get; set; }
         public string? BankName { get; set; }

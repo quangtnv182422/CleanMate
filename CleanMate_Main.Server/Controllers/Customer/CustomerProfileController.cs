@@ -26,7 +26,6 @@ namespace CleanMate_Main.Server.Controllers.Customer
         {
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _userHelper = userHelper ?? throw new ArgumentNullException(nameof(userHelper));
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
         }
 
@@ -40,7 +39,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _customerService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetCustomerProfileAsync(user.Id);
                 return Ok(profile);
             }
             catch (KeyNotFoundException ex)
@@ -54,7 +53,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
         }
 
         [HttpPut("edit")]
-        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileViewModel model)
+        public async Task<IActionResult> EditProfile([FromBody] UpdateProfileCustomerViewModel model)
         {
             try
             {
@@ -63,9 +62,9 @@ namespace CleanMate_Main.Server.Controllers.Customer
                 if (user == null)
                     return Unauthorized(new { message = "Không tìm thấy người dùng." });
 
-                var profile = await _customerService.GetPersonalProfileAsync(user.Id);
+                var profile = await _customerService.GetCustomerProfileAsync(user.Id);
                 profile.AvatarUrl = model.ProfileImage ?? profile.AvatarUrl;
-                var success = await _customerService.UpdatePersonalProfileAsync(profile);
+                var success = await _customerService.UpdateCustomerProfileAsync(profile);
                 return Ok(new { success, message = success ? "Cập nhật hồ sơ thành công." : "Cập nhật hồ sơ thất bại." });
             }
             catch (ArgumentException ex)
@@ -100,7 +99,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
         }
     }
 
-    public class UpdateProfileViewModel
+    public class UpdateProfileCustomerViewModel
     {
         public string? ProfileImage { get; set; }
         public DateTime? Dob { get; set; }

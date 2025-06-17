@@ -4,7 +4,7 @@ namespace CleanMate_Main.Server.Services.Customer
 {
     public interface ICustomerService
     {
-        Task<PersonalProfileViewModel> GetPersonalProfileAsync(string userId);
-        Task<bool> UpdatePersonalProfileAsync(PersonalProfileViewModel profile);
+        Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId);
+        Task<bool> UpdateCustomerProfileAsync(CustomerProfileViewModel profile);
     }
 }

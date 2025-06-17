@@ -52,7 +52,7 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/Authen': { 
+            '^/Authen': {
                 target,
                 secure: false
             },
@@ -120,7 +120,11 @@ export default defineConfig({
             '^/customerprofile': {
                 target,
                 secure: false
-            }
+            },
+            '^/employeeprofile': {
+                target,
+                secure: false
+            },
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),
         https: {

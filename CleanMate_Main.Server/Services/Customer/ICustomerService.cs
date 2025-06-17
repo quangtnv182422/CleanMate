@@ -1,8 +1,8 @@
 ﻿using CleanMate_Main.Server.Models.DTO;
 
-namespace CleanMate_Main.Server.Repository.Customer
+namespace CleanMate_Main.Server.Services.Customer
 {
-    public interface ICustomerRepository
+    public interface ICustomerService
     {
         Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search);
         Task LockUserAccountAsync(string userId);

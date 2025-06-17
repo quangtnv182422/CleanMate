@@ -17,6 +17,7 @@ namespace CleanMate_Main.Server.Repository.CleanService.CleanPerHour
         {
             return await _context.CleanerProfiles
                 .Include(c => c.User)
+                .Where(c => c.Available == true)
                 .Select(c => new CleanerDTO
                 {
                     CleanerId = c.UserId,

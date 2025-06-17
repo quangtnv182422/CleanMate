@@ -192,6 +192,9 @@ namespace CleanMate_Main.Server.Services.Authentication
             if (!user.EmailConfirmed)
                 return (false, null, "Email chưa được xác thực. Vui lòng kiểm tra hộp thư để xác nhận tài khoản.");
 
+            if (user.LockoutEnabled)
+                return (false, null, "Tài khoản của quý vị đã bị khóa, vui lòng liên hệ bộ phần CSKH để được hỗ trợ.");
+
             if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 // Lấy roles

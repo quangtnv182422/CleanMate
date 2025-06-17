@@ -503,7 +503,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         {
             return await _context.CleanerProfiles
                 .Include(c => c.User)
-                //.Where(c => c.Available) //đoạn này làm để sau làm logic chọn lúc rảnh
+                .Where(c => c.Available == true) //đoạn này làm để sau làm logic chọn lúc rảnh
                 .Select(c => new CleanerDTO
                 {
                     CleanerId = c.UserId,

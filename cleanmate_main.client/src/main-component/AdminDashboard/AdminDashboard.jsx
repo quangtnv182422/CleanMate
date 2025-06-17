@@ -371,6 +371,7 @@ const AdminDashboard = () => {
                 }
                 
                 toast.success("Công việc đã được hủy thành công!");
+                fetchBooking();
             } catch (error) {
                 console.error('Error canceling work:', error);
                 toast.error("Lỗi khi hủy công việc!");
@@ -531,6 +532,7 @@ const AdminDashboard = () => {
                                                 value={selectedCleaner[row.bookingId]?.cleanerId || row.cleanerId || ''}
                                                 onChange={(e) => handleSelectCleaner(row.bookingId, e)}
                                                 label="Nhân viên"
+                                                sx={{ minWidth: 120, textAlign: 'left' }}
                                             >
                                                 {cleaners.map((cleaner) => (
                                                     <MenuItem

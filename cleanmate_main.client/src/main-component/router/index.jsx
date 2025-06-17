@@ -46,6 +46,7 @@ import AdminDashboard from '../AdminDashboard/AdminDashboard';
 import ChangePassword from '../ResetPassword/ChangePassword';
 import ResetPassword from '../ResetPassword/ResetPassword';
 import ServiceInformation from '../../components/ServiceInformation/ServiceInformation';
+import Voucher from '../Voucher/Voucher';
 
 const AllRoute = () => {
     const location = useLocation();
@@ -95,7 +96,8 @@ const AllRoute = () => {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/change-password" element={<ChangePassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/service-information" element={<ServiceInformation/>} />
+                <Route path="/service-information" element={<ServiceInformation />} />
+                <Route path="/voucher" element={<Voucher />} />
             </Routes>
         </div>
     );

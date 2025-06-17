@@ -1,4 +1,5 @@
 ﻿const primaryColor = '#1565C0';
+
 export const style = {
     container: {
         width: '100%',

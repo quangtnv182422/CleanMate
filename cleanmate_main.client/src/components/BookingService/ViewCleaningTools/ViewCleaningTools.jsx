@@ -33,6 +33,21 @@ const style = {
         },
         maxHeight: '80vh',
         overflowY: 'auto',
+        // Custom scrollbar
+        '&::-webkit-scrollbar': {
+            width: '6px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#c1c1c1',
+            borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#a0a0a0',
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f0f0f0',
+            borderRadius: '4px',
+        },
     },
     toolItem: {
         display: 'flex',

@@ -131,7 +131,7 @@ const ServiceInformation = () => {
 
                 <Box sx={{ px: 1, py: 5, borderBottom: '1px solid #ccc' }}>
                     <Typography variant="body2" sx={style.subHeaderTitle}>Ca làm lẻ</Typography>
-                    <Typography variant="body1" sx={{ mt: 2 }}>1 người làm từ 2 đến 4 tiếng, có công cụ, dụng cụ.</Typography>
+                    <Typography variant="body1" sx={{ mt: 2 }}>1 người làm từ 1 đến 3 tiếng, có công cụ, dụng cụ.</Typography>
                 </Box>
 
                 <Box sx={{ px: 1, py: 5, borderBottom: '1px solid #ccc' }}>

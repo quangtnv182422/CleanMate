@@ -90,7 +90,7 @@ const HeaderTopbar = () => {
                         <div className="row">
                             <div className="contact-info col col-lg-7 col-md-7 col-sm-12 col-12">
                                 <ul style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                                    <li style={{cursor: 'pointer'}} onClick={() => navigate('/terms') }>Chính sách & Điều khoản</li>
+                                    <li style={{ cursor: 'pointer' }} onClick={() => navigate('/terms')}>Chính sách & Điều khoản</li>
                                     {user && (
                                         <li>Ví CleanMate: {formatCoin(coin)}</li>
                                     )}
@@ -161,20 +161,20 @@ const HeaderTopbar = () => {
                                 <div className="login-cta col col-lg-5 col-md-5 col-sm-12 col-12 ">
                                     <button className="btn sign-in-btn" onClick={() => navigate("/login")}>Đăng nhập</button>
                                     <div className="dropdown-container" ref={dropdownRef}>
-                                        <button className="btn sign-up-btn" onClick={toggleDropdown}>
+                                        <button className="btn sign-up-btn" onClick={() => navigateTo("/register/user")}>
                                             Đăng ký
                                         </button>
 
-                                        {showDropdown && (
-                                            <div className="dropdown-menu show">
-                                                <div className="dropdown-item" onClick={() => navigateTo("/register/user")}>
-                                                    Đăng ký người dùng
-                                                </div>
-                                                <div className="dropdown-item" onClick={() => navigateTo("/register/employee")}>
-                                                    Đăng ký nhân viên
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/*{showDropdown && (*/}
+                                        {/*    <div className="dropdown-menu show">*/}
+                                        {/*        <div className="dropdown-item" onClick={() => navigateTo("/register/user")}>*/}
+                                        {/*            Đăng ký người dùng*/}
+                                        {/*        </div>*/}
+                                        {/*        <div className="dropdown-item" onClick={() => navigateTo("/register/employee")}>*/}
+                                        {/*            Đăng ký nhân viên*/}
+                                        {/*        </div>*/}
+                                        {/*    </div>*/}
+                                        {/*)}*/}
                                     </div>
                                 </div>
                             )}

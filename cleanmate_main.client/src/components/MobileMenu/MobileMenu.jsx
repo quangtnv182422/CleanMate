@@ -236,49 +236,49 @@ const MobileMenu = () => {
                                 color: '#fff',
                                 backgroundColor: '#FBC11B'
                             }}
-                            onClick={handleToggleMenu}
+                                onClick={() => navigate('/register/user')}
                         >
                             Đăng ký
                         </button>
                     </Box>
                 )}
-                {openMenu && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: '500px',
-                            left: '6px', // Hiển thị menu bên phải nút
-                            backgroundColor: 'white',
-                            borderRadius: '6px',
-                            zIndex: 999
-                        }}
-                    >
-                        <button
-                            className="btn"
-                            style={{
-                                width: '94%',
-                                marginBottom: '5px',
-                                backgroundColor: '#007bff',
-                                color: 'white'
-                            }}
-                            onClick={() => navigate('/register/user')}
-                        >
-                            Đăng ký người dùng
-                        </button>
+                {/*{openMenu && (*/}
+                {/*    <div*/}
+                {/*        style={{*/}
+                {/*            position: 'absolute',*/}
+                {/*            top: '500px',*/}
+                {/*            left: '6px', // Hiển thị menu bên phải nút*/}
+                {/*            backgroundColor: 'white',*/}
+                {/*            borderRadius: '6px',*/}
+                {/*            zIndex: 999*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <button*/}
+                {/*            className="btn"*/}
+                {/*            style={{*/}
+                {/*                width: '94%',*/}
+                {/*                marginBottom: '5px',*/}
+                {/*                backgroundColor: '#007bff',*/}
+                {/*                color: 'white'*/}
+                {/*            }}*/}
+                {/*            onClick={() => navigate('/register/user')}*/}
+                {/*        >*/}
+                {/*            Đăng ký người dùng*/}
+                {/*        </button>*/}
 
-                        <button
-                            className="btn"
-                            style={{
-                                width: '94%',
-                                backgroundColor: '#28a745',
-                                color: 'white'
-                            }}
-                            onClick={() => navigate('/register/employee')}
-                        >
-                            Đăng ký nhân viên
-                        </button>
-                    </div>
-                )}
+                {/*        <button*/}
+                {/*            className="btn"*/}
+                {/*            style={{*/}
+                {/*                width: '94%',*/}
+                {/*                backgroundColor: '#28a745',*/}
+                {/*                color: 'white'*/}
+                {/*            }}*/}
+                {/*            onClick={() => navigate('/register/employee')}*/}
+                {/*        >*/}
+                {/*            Đăng ký nhân viên*/}
+                {/*        </button>*/}
+                {/*    </div>*/}
+                {/*)}*/}
             </div>
 
             <div className="showmenu" onClick={() => setMenuState(!menuActive)}>

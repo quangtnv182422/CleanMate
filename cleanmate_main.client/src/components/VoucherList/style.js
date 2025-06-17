@@ -1,5 +1,5 @@
 ﻿export const style = {
-    noRatingSection: {
+    voucherSection: {
         margin: '40px 0',
         backgroundColor: "#fff",
         marginBottom: '200px',
@@ -15,7 +15,7 @@
         cursor: 'pointer',
         transition: 'all 0.3s ease',
     },
-    workCard: {
+    voucherItemCard: {
         border: '1px solid #eee',
         borderRadius: '12px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
@@ -23,9 +23,12 @@
         '&:hover': {
             boxShadow: '0 5px 8px rgba(0,0,0,0.5)',
             '@media (max-width: 600px)': {
-                boxShadow: '0 2px 4px rgba(0,0,0,0.03)', 
+                boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
             },
-        }, 
+        },
+    },
+    icon: {
+        marginRight: '8px',
     },
     priceSection: {
         display: 'flex',
@@ -46,4 +49,4 @@
         padding: '10px 0',
         borderTop: '1px solid #eee',
     }
-};
+}

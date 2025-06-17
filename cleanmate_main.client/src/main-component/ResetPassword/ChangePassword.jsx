@@ -9,17 +9,22 @@ import {
     MenuItem,
     Grid,
     TextField,
-    Button
+    Button,
+    Box,
+    Typography
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import SimpleReactValidator from "simple-react-validator";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import ReactLoading from 'react-loading';
 import axios from 'axios';
 
 const ChangePassword = () => {
-    const push = useNavigate()
+    const push = useNavigate();
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const [value, setValue] = useState({
         currentPassword: '',
@@ -40,6 +45,7 @@ const ChangePassword = () => {
 
     const changeHandler = (e) => {
         setValue({ ...value, [e.target.name]: e.target.value });
+        setError(null);
         validator.showMessages();
     };
 
@@ -88,10 +94,10 @@ const ChangePassword = () => {
 
         if (validator.allValid()) {
             try {
-                push('/loading', { replace: true })
+                setLoading(true);
                 // Gửi request tới API quên mật khẩu
                 const response = await axios.post('/Authen/change-password', {
-                    currentPassword: value.currentPassword, 
+                    currentPassword: value.currentPassword,
                     newPassWord: value.newPassword,
                 });
 
@@ -100,119 +106,143 @@ const ChangePassword = () => {
                     push('/login', { replace: true })
                 } else {
                     toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
-                    push('/change-password', { replace: true })         
+                    setError('Đã xảy ra lỗi. Vui lòng thử lại.');
                 }
             } catch (error) {
                 if (error.response?.status === 404) {
                     toast.error('Lỗi khi đổi mật khẩu. Vui lòng thử lại.');
-                    push('/change-password', { replace: true })    
+                    setError('Lỗi khi đổi mật khẩu. Vui lòng thử lại.');
                 } else {
                     toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
-                    push('/change-password', { replace: true })    
+                    setError('Lỗi máy chủ. Vui lòng thử lại sau.');
                 }
+            } finally {
+                setLoading(false);
             }
         } else {
             validator.showMessages();
-            toast.error('Vui lòng nhập mật khẩu khác mật khẩu cũ.');
+            if (value.currentPassword === '') {
+                setError('Vui lòng nhập mật khẩu cũ.');
+            } else if (value.newPassword === '') {
+                setError('Vui lòng nhập mật khẩu mới.');
+            } else {
+                setError('Mật khẩu mới không được trùng mật khẩu cũ.');
+            }
         }
     };
 
     return (
-        <Grid className="loginWrapper">
-
-            <Grid className="loginForm">
-                <h2>Đặt lại mật khẩu</h2>
-                <p>Khởi tạo lại mật khẩu của bạn</p>
-                <form onSubmit={submitForm}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                            <FormControl sx={{ width: '100%' }} variant="outlined">
-                                <InputLabel htmlFor="outlined-adornment-password">Mật khẩu cũ</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="currentPassword"
-                                    value={value.currentPassword}
-                                    onBlur={(e) => changeHandler(e)}
-                                    onChange={(e) => changeHandler(e)}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label={
-                                                    showPassword ? 'hide the password' : 'display the password'
-                                                }
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                onMouseUp={handleMouseUpPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    label="Mật khẩu cũ"
-                                    sx={{
-                                        input: {
-                                            '&::-ms-reveal': { display: 'none' },
-                                            '&::-ms-clear': { display: 'none' },
-                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
-                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+        <div style={{ position: 'relative' }}>
+            {loading && (
+                <Box sx={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: '1000',
+                }}>
+                    <ReactLoading type="spinningBubbles" color="#122B82" width={100} height={100} />
+                </Box>
+            )}
+            <Grid className="loginWrapper">
+                <Grid className="loginForm">
+                    <h2>Đặt lại mật khẩu</h2>
+                    <p>Khởi tạo lại mật khẩu của bạn</p>
+                    <form onSubmit={submitForm}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12}>
+                                <FormControl sx={{ width: '100%' }} variant="outlined">
+                                    <InputLabel htmlFor="outlined-adornment-password">Mật khẩu cũ</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="currentPassword"
+                                        value={value.currentPassword}
+                                        onBlur={(e) => changeHandler(e)}
+                                        onChange={(e) => changeHandler(e)}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label={
+                                                        showPassword ? 'hide the password' : 'display the password'
+                                                    }
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    onMouseUp={handleMouseUpPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                </IconButton>
+                                            </InputAdornment>
                                         }
-                                    }}
-                                />
-                            </FormControl>
-                            {validator.message('currentPassword', value.currentPassword, 'required|strong_password')}
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl sx={{ width: '100%' }} variant="outlined">
-                                <InputLabel htmlFor="outlined-adornment-password">Xác nhận mật khẩu</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="newPassword"
-                                    value={value.newPassword}
-                                    onBlur={(e) => changeHandler(e)}
-                                    onChange={(e) => changeHandler(e)}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label={
-                                                    showPassword ? 'hide the password' : 'display the password'
-                                                }
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                onMouseUp={handleMouseUpPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    label="Xác nhận mật khẩu"
-                                    sx={{
-                                        input: {
-                                            '&::-ms-reveal': { display: 'none' },
-                                            '&::-ms-clear': { display: 'none' },
-                                            '&::-webkit-credentials-auto-fill-button': { display: 'none' },
-                                            '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                        label="Mật khẩu cũ"
+                                        sx={{
+                                            input: {
+                                                '&::-ms-reveal': { display: 'none' },
+                                                '&::-ms-clear': { display: 'none' },
+                                                '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                                '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                            }
+                                        }}
+                                    />
+                                </FormControl>
+                                {validator.message('currentPassword', value.currentPassword, 'required|strong_password')}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControl sx={{ width: '100%' }} variant="outlined">
+                                    <InputLabel htmlFor="outlined-adornment-password">Xác nhận mật khẩu</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="newPassword"
+                                        value={value.newPassword}
+                                        onBlur={(e) => changeHandler(e)}
+                                        onChange={(e) => changeHandler(e)}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label={
+                                                        showPassword ? 'hide the password' : 'display the password'
+                                                    }
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    onMouseUp={handleMouseUpPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                </IconButton>
+                                            </InputAdornment>
                                         }
-                                    }}
-                                />
-                            </FormControl>
-                            {validator.message('newPassword', value.newPassword, `required|strong_password|password_match:${value.currentPassword}`)}
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Grid className="formFooter">
-                                <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Đổi mật khẩu</Button>
+                                        label="Xác nhận mật khẩu"
+                                        sx={{
+                                            input: {
+                                                '&::-ms-reveal': { display: 'none' },
+                                                '&::-ms-clear': { display: 'none' },
+                                                '&::-webkit-credentials-auto-fill-button': { display: 'none' },
+                                                '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                            }
+                                        }}
+                                    />
+                                </FormControl>
+                                {validator.message('newPassword', value.newPassword, `required|strong_password|password_match:${value.currentPassword}`)}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Grid className="formFooter" sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant="subtitle1" color="error" sx={{ textAlign: 'center' }}>{error}</Typography>
+                                    <Button fullWidth className="cBtn cBtnLarge cBtnTheme" type="submit">Đổi mật khẩu</Button>
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </form>
-                <div className="shape-img">
-                    <i className="fi flaticon-honeycomb"></i>
-                </div>
+                    </form>
+                    <div className="shape-img">
+                        <i className="fi flaticon-honeycomb"></i>
+                    </div>
+                </Grid>
             </Grid>
-        </Grid>
+        </div>
     )
 };
 

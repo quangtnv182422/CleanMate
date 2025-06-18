@@ -389,6 +389,48 @@
     padding: 0 10px 5px;
 }
 
+.cleaner-wallet{
+    padding-top: 60px;
+}
+
+.cleaner-wallet-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.cleaner-wallet-wrapper h3 {
+    color: #1976D2;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.cleaner-wallet-wrapper p {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1976D2;
+    margin: 0;
+}
+
+.cleaner-wallet-wrapper button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    background-color: #1976D2;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.cleaner-wallet-wrapper button:hover {
+    background-color: #1557a0;
+}
+
 .exprience-area {
     padding-top: 60px;
 }

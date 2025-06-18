@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models;
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.DTO;
@@ -64,10 +65,10 @@ namespace CleanMate_Main.Server.Repository.Employee
                             ServiceName = service.Name,
                             ServiceDescription = duration.SquareMeterSpecific + "m² làm trong " + duration.DurationTime + " giờ",
                             Duration = $"{duration.DurationTime} giờ",
-                            Price = Common.CommonConstants.ChangeMoneyType(servicePrice.Price),
-                            Commission = Common.CommonConstants.ChangeMoneyType(Math.Floor(servicePrice.Price * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000),
+                            Price = ChangeType.ChangeMoneyType(servicePrice.Price),
+                            Commission = ChangeType.ChangeMoneyType(Math.Floor(servicePrice.Price * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
-                            StartTime = Common.CommonConstants.ChangeTimeType(booking.StartTime),
+                            StartTime = ChangeType.ChangeTimeType(booking.StartTime),
                             Address = address.GG_DispalyName,
                             AddressNo = address.AddressNo,
                             Note = booking.Note,
@@ -434,7 +435,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                     CustomerFullName = fb.CustomerFullName ?? "",
                     Rating = fb.Feedback.Rating ?? 0,
                     Comment = fb.Feedback.Content ?? "",
-                    ReviewDate = fb.Feedback.CreatedAt ?? CommonConstants.GetCurrentTime()
+                    ReviewDate = fb.Feedback.CreatedAt ?? DateTimeVN.GetNow()
                 })
                 .ToListAsync();
 
@@ -450,7 +451,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         }
         public async Task<decimal> GetMonthlyEarningsAsync(string employeeId)
         {
-            var currentMonth = CommonConstants.GetCurrentTime();
+            var currentMonth = DateTimeVN.GetNow();
             var startOfMonth = new DateOnly(currentMonth.Year, currentMonth.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
@@ -468,7 +469,7 @@ namespace CleanMate_Main.Server.Repository.Employee
         }
         public async Task<IEnumerable<MonthlyEarningViewModel>> GetEarningsByMonthAsync(string employeeId)
         {
-            var currentDate = CommonConstants.GetCurrentTime();
+            var currentDate = DateTimeVN.GetNow();
             var currentYear = currentDate.Year;
             var currentMonth = currentDate.Month;
 

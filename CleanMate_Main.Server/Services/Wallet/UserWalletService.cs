@@ -66,7 +66,7 @@ namespace CleanMate_Main.Server.Services.Wallet
                 throw new ArgumentException("Số tiền yêu cầu phải lớn hơn 0.");
             }
             if (amount < CommonConstants.MINIMUM_DEBIT_AMOUNT) {
-                throw new ArgumentException($"Sô tiền cần rút phải lớn hơn {CommonConstants.ChangeMoneyType(CommonConstants.MINIMUM_DEBIT_AMOUNT)}");
+                throw new ArgumentException($"Sô tiền cần rút phải lớn hơn {ChangeType.ChangeMoneyType(CommonConstants.MINIMUM_DEBIT_AMOUNT)}");
             }
 
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);
@@ -100,7 +100,7 @@ namespace CleanMate_Main.Server.Services.Wallet
             }
             if (amount < CommonConstants.MINIMUM_DEPOSIT_AMOUNT)
             {
-                throw new ArgumentException($"Số tiền nạp phải lớn hơn {CommonConstants.ChangeMoneyType(CommonConstants.MINIMUM_DEPOSIT_AMOUNT)}.");
+                throw new ArgumentException($"Số tiền nạp phải lớn hơn {ChangeType.ChangeMoneyType(CommonConstants.MINIMUM_DEPOSIT_AMOUNT)}.");
             }
 
             var wallet = await _walletRepo.GetWalletByUserIdAsync(userId);

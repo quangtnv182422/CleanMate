@@ -38,23 +38,5 @@ namespace CleanMate_Main.Server.Common
                 _ => "Không xác định"
             };
         }
-        public static string ChangeMoneyType(decimal amount)
-        {
-            string result = amount.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " VND";
-            return result;
-        }
-        public static string ChangeTimeType(TimeOnly time)
-        {
-            string result = time.Minute == 0 ? $"{time.Hour} giờ" : $"{time.Hour} giờ {time.Minute} phút";
-            return result;
-        }
-        public static DateTime GetCurrentTime()
-        {
-            DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc(
-                 DateTime.UtcNow,
-                 TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
-             );
-            return currentTime;
-        }
     }
 }

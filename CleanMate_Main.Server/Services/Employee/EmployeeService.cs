@@ -225,7 +225,7 @@ namespace CleanMate_Main.Server.Services.Employee
                 throw new InvalidOperationException("Công việc phải ở trạng thái Chờ xác nhận để có thể xác nhận hoàn thành.");
             }
 
-            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE);
+            return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.DONE, booking.EmployeeId);
         }
 
         public async Task<AcceptWorkNotificationViewModel> GetCustomerInfoAsync(int bookingId)

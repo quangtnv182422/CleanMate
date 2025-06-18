@@ -141,10 +141,10 @@ namespace CleanMate_Main.Server.Repository.Employee
                 {
                     booking.CleanerId = employeeId;
                 }
-                else
+                /*else
                 {
                     booking.CleanerId = null;
-                }
+                }*/
                     await _context.SaveChangesAsync();
                 return true; // Successfully updated
             }

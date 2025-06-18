@@ -2,6 +2,7 @@
 using CleanMate_Main.Server.Models.DbContext;
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanMate_Main.Server.Repository.Customer
@@ -9,18 +10,19 @@ namespace CleanMate_Main.Server.Repository.Customer
     public class CustomerRepository : ICustomerRepository
     {
         private readonly CleanMateMainDbContext _context;
+        private readonly UserManager<AspNetUser> _userManager;
 
-        public CustomerRepository(CleanMateMainDbContext context)
+        public CustomerRepository(CleanMateMainDbContext context, UserManager<AspNetUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<List<CustomerListItemDTO>> GetCustomerListAsync()
         {
-            var query = _context.Users
-                .Where(u => u.Roles.Any(r => r.Name == "Customer"));
+            var usersInCustomerRole = await _userManager.GetUsersInRoleAsync("Customer");
 
-            var customers = await query
+            var customerList = usersInCustomerRole
                 .OrderBy(u => u.UserName)
                 .Select(u => new CustomerListItemDTO
                 {
@@ -31,9 +33,9 @@ namespace CleanMate_Main.Server.Repository.Customer
                     PhoneNumber = u.PhoneNumber,
                     IsActive = !u.LockoutEnabled || (u.LockoutEnd == null || u.LockoutEnd < DateTimeVN.GetNow())
                 })
-                .ToListAsync();
+                .ToList();
 
-            return customers;
+            return customerList;
         }
 
         public async Task LockUserAccountAsync(string userId)

@@ -136,15 +136,15 @@ namespace CleanMate_Main.Server.Repository.Employee
                 }
 
                 booking.BookingStatusId = status;
-                booking.CleanerId = employeeId;
-                /*if (!string.IsNullOrEmpty(employeeId))
+
+                if (!string.IsNullOrEmpty(employeeId))
                 {
-                    
+                    booking.CleanerId = employeeId;
                 }
                 else
                 {
                     booking.CleanerId = null;
-                }*/
+                }
                 await _context.SaveChangesAsync();
                 return true; // Successfully updated
             }

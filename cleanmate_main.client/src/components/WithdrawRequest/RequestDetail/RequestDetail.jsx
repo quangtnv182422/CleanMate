@@ -52,6 +52,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             const result = await response.json();
             if (response.ok && result.success) {
                 toast.success('Yêu cầu đã bị từ chối');
+                fetchRequestList();
                 handleCloseRejectModal();
                 handleClose();
             } else {
@@ -77,6 +78,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             const result = await response.json();
             if (response.ok && result.success) {
                 toast.success('Yêu cầu đã được duyệt');
+                fetchRequestList();
                 handleClose();
             } else {
                 toast.error(result.message || 'Thao tác thất bại.');
@@ -101,6 +103,7 @@ const RequestDetail = ({ selectedRequest, handleClose }) => {
             const result = await response.json();
             if (response.ok && result.success) {
                 toast.success('Xác nhận chuyển tiền thành công');
+                fetchRequestList();
                 handleClose();
             } else {
                 toast.error(result.message || 'Thao tác thất bại.');

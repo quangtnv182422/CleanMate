@@ -262,6 +262,7 @@ const WithdrawRequest = () => {
                     >
                         <RequestDetail
                             selectedRequest={selectedRequest}
+                            fetchRequestList={fetchRequestList}
                             handleClose={handleClose}
                             onActionComplete={refreshList} // Pass callback to refresh list
                         />

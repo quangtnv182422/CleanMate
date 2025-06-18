@@ -18,9 +18,9 @@ namespace CleanMate_Main.Server.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomerList([FromQuery] string search)
+        public async Task<IActionResult> GetCustomerList()
         {
-            var customers = await _customerService.GetCustomerListAsync(search);
+            var customers = await _customerService.GetCustomerListAsync();
             return Ok(customers);
         }
 

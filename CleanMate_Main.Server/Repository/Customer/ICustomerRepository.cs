@@ -5,7 +5,7 @@ namespace CleanMate_Main.Server.Repository.Customer
 {
     public interface ICustomerRepository
     {
-        Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search);
+        Task<List<CustomerListItemDTO>> GetCustomerListAsync();
         Task LockUserAccountAsync(string userId);
         Task UnlockUserAccountAsync(string userId);
         Task<AspNetUser> GetUserById(string userId);

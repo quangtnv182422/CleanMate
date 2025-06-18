@@ -15,15 +15,10 @@ namespace CleanMate_Main.Server.Repository.Customer
             _context = context;
         }
 
-        public async Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search)
+        public async Task<List<CustomerListItemDTO>> GetCustomerListAsync()
         {
             var query = _context.Users
                 .Where(u => u.Roles.Any(r => r.Name == "Customer"));
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(u => u.UserName.Contains(search) || u.Email.Contains(search));
-            }
 
             var customers = await query
                 .OrderBy(u => u.UserName)

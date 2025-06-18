@@ -7,7 +7,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+   // [Authorize(Roles = "Admin")]
     public class CustomerListController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -18,9 +18,9 @@ namespace CleanMate_Main.Server.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomerList([FromQuery] string search)
+        public async Task<IActionResult> GetCustomerList()
         {
-            var customers = await _customerService.GetCustomerListAsync(search);
+            var customers = await _customerService.GetCustomerListAsync();
             return Ok(customers);
         }
 

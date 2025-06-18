@@ -18,9 +18,9 @@ namespace CleanMate_Main.Server.Services.Customer
             _userManager = userManager;
         }
 
-        public async Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search)
+        public async Task<List<CustomerListItemDTO>> GetCustomerListAsync()
         {
-            return await _repository.GetCustomerListAsync(search);
+            return await _repository.GetCustomerListAsync();
         }
 
         public async Task LockUserAccountAsync(string userId)

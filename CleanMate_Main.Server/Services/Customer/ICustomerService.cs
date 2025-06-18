@@ -4,7 +4,7 @@ namespace CleanMate_Main.Server.Services.Customer
 {
     public interface ICustomerService
     {
-        Task<List<CustomerListItemDTO>> GetCustomerListAsync(string search);
+        Task<List<CustomerListItemDTO>> GetCustomerListAsync();
         Task LockUserAccountAsync(string userId);
         Task UnlockUserAccountAsync(string userId);
         Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId);

@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Common;
+using CleanMate_Main.Server.Common.Utils;
 using CleanMate_Main.Server.Models.DTO;
 using CleanMate_Main.Server.Models.ViewModels.Customer;
 using CleanMate_Main.Server.Models.ViewModels.Employee;
@@ -54,7 +55,7 @@ namespace CleanMate_Main.Server.Services.Employee
             }
 
             DateTime startTime = booking.Date.ToDateTime(booking.StartTime); 
-            DateTime currentTime = Common.CommonConstants.GetCurrentTime();
+            DateTime currentTime = DateTimeVN.GetNow();
 
             if (startTime < currentTime)
             {
@@ -139,7 +140,7 @@ namespace CleanMate_Main.Server.Services.Employee
                 throw new InvalidOperationException("Chỉ có thể hủy công việc khi trạng thái là Đã nhận.");
             }
 
-            DateTime currentTime = CommonConstants.GetCurrentTime();
+            DateTime currentTime = DateTimeVN.GetNow();
             DateTime startTime = booking.Date.ToDateTime(booking.StartTime);
             TimeSpan timeDifference = startTime - currentTime;
 

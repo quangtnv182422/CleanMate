@@ -48,13 +48,5 @@ namespace CleanMate_Main.Server.Common
             string result = time.Minute == 0 ? $"{time.Hour} giờ" : $"{time.Hour} giờ {time.Minute} phút";
             return result;
         }
-        public static DateTime GetCurrentTime()
-        {
-            DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc(
-                 DateTime.UtcNow,
-                 TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
-             );
-            return currentTime;
-        }
     }
 }

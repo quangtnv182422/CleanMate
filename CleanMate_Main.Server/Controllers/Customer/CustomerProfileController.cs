@@ -27,6 +27,7 @@ namespace CleanMate_Main.Server.Controllers.Customer
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _employeeService = employeeService ?? throw new ArgumentNullException(nameof(employeeService));
+            _userHelper = userHelper ?? throw new ArgumentNullException(nameof(userHelper));
         }
 
         [HttpGet]

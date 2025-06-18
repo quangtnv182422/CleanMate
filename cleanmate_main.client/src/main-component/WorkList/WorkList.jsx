@@ -56,6 +56,7 @@ import Revenue from '../../components/Revenue/Revenue';
 import DepositCoin from '../../components/Coin/DepositCoin';
 import WithdrawCoin from '../../components/Coin/WithdrawCoin';
 import CleanerViewFeedback from '../../components/CleanerViewFeedback/CleanerViewFeedback';
+import Profile from '../Profile/Profile';
 
 // Placeholder components for other pages
 const ReportsPage = () => (
@@ -427,6 +428,8 @@ const WorkList = () => {
                 return <DepositCoin />;
             case 7:
                 return <WithdrawCoin />;
+            case 8:
+                return <Profile handleTabChange={handleTabChange} />
             default:
                 return <WorkListPage />;
         }
@@ -500,10 +503,6 @@ const WorkList = () => {
             title: 'Rút tiền',
             icon: <CurrencyExchangeIcon sx={style.drawerIcon} />,
         },
-        {
-            title: 'Settings',
-            icon: <SettingsOutlinedIcon sx={style.drawerIcon} />,
-        },
     ];
 
     return (
@@ -531,7 +530,7 @@ const WorkList = () => {
                     },
                 }}
             >
-                <Box sx={style.userAvatar} onClick={() => navigate('/profile') }>
+                <Box sx={style.userAvatar} onClick={() => handleTabChange(null, 8)}>
                     <img src={userImage} alt="Avatar của người dùng" />
                     <Box>
                         <Typography sx={style.userFullName}>{user?.fullName}</Typography>

@@ -122,26 +122,26 @@ const TeamSinglePage = (props) => {
                                 {/*    </ul>*/}
                                 {/*</div>*/}
                                 <div className="wpo-contact-area ex-wiget">
-                                    <h2>Contact Me</h2>
+                                    <h2>Liên hệ chúng tôi</h2>
                                     <div className="quote-form">
                                         <form onSubmit={SubmitHandler}>
                                             <div className="form-group half-col">
-                                                <input type="text" className="form-control" placeholder="Name:" name="name" />
+                                                <input type="text" className="form-control" placeholder="Họ và tên:" name="name" />
                                             </div>
                                             <div className="form-group half-col">
                                                 <input type="email" className="form-control" placeholder="Email:" name="email" />
                                             </div>
                                             <div className="form-group half-col">
-                                                <input type="text" className="form-control" placeholder="Subject:" name="subject" />
+                                                <input type="text" className="form-control" placeholder="Tiêu đề:" name="subject" />
                                             </div>
                                             <div className="form-group half-col">
-                                                <input type="text" className="form-control" placeholder="Your Address:" name="address" />
+                                                <input type="text" className="form-control" placeholder="Địa chỉ:" name="address" />
                                             </div>
                                             <div className="form-group full-col">
-                                                <textarea className="form-control" name="note" placeholder="Description..."></textarea>
+                                                <textarea className="form-control" name="note" placeholder="Điều bạn muốn nhắn nhủ..."></textarea>
                                             </div>
                                             <div className="form-group full-col">
-                                                <button className="btn theme-btn" type="submit"><i className="fa fa-angle-double-right" aria-hidden="true"></i> Get In Touch</button>
+                                                <button className="btn theme-btn" type="submit"><i className="fa fa-angle-double-right" aria-hidden="true"></i> Gửi thông tin</button>
                                             </div>
                                         </form>
                                     </div>

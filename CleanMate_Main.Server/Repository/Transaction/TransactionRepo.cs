@@ -91,7 +91,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
                     Description = $"Rút tiền theo yêu cầu #{requestId}",
                     CreatedAt = DateTimeVN.GetNow()
                 };
-                _context.WalletTransactions.Add(walletTransaction);
+                int transactionId = await AddTransactionAsync(walletTransaction);
 
                 // Update withdraw request
                 var request = await _context.WithdrawRequests.FindAsync(requestId);
@@ -101,7 +101,7 @@ namespace CleanMate_Main.Server.Repository.Transaction
                 }
 
                 request.ProcessedAt = DateTimeVN.GetNow();
-                request.TransactionId = walletTransaction.TransactionId;
+                request.TransactionId = transactionId;
 
                 await _context.SaveChangesAsync();
 

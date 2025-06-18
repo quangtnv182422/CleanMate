@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom'; // Added for navigation
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Grid,
@@ -18,8 +18,8 @@ import {
 import { style } from './style.js';
 import RequestDetail from '../WithdrawRequest/RequestDetail/RequestDetail';
 import * as signalR from '@microsoft/signalr';
-import { toast } from 'react-toastify'; // Added for toast notifications
-import useAuth from '../../hooks/useAuth'; // Added for user authentication
+import { toast } from 'react-toastify';
+import useAuth from '../../hooks/useAuth';
 
 // Updated status list with "Tất cả" (all) as -1 to avoid conflict with "Đang chờ" (0)
 const statusList = [
@@ -39,10 +39,10 @@ const WithdrawRequest = () => {
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState(-1); // Default to "Tất cả" (-1)
     const [selectedRequest, setSelectedRequest] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false); // Changed to false initially
     const [connection, setConnection] = useState(null);
-    const { user, loading: authLoading } = useAuth(); // Added useAuth for user info
-    const navigate = useNavigate(); // Added for navigation
+    const { user, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
     const role = user?.roles?.[0] || '';
 
     const handleClose = () => {
@@ -51,14 +51,16 @@ const WithdrawRequest = () => {
     };
 
     const fetchRequestList = useCallback(async () => {
-        if (loading) return;
+        if (authLoading) return; // Only check authLoading initially
         if (!user || role !== 'Admin') {
             toast.error("Bạn không có quyền truy cập vào trang này");
             navigate('/home');
             return;
         }
 
+        console.log('Fetching request list...', { user, role }); // Debug log
         try {
+            setLoading(true);
             const response = await fetch('/withdrawrequest', {
                 method: 'GET',
                 credentials: 'include',
@@ -70,41 +72,53 @@ const WithdrawRequest = () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            setRequests(result.data || []);
+
+            const result = await response.json();
+            console.log('API Response:', result); // Debug log
+            if (result.success) {
+                setRequests(result.data || []);
+            } else {
+                console.error('Failed to fetch withdraw requests:', result.message);
+                setRequests([]);
+            }
         } catch (error) {
-            console.error('Error fetching work list:', error);
+            console.error('Error fetching withdraw requests:', error);
+        } finally {
+            console.log('Loading complete'); // Debug log
+            setLoading(false);
         }
-    }, [loading, user, role, navigate, setRequests]);
+    }, [authLoading, user, role, navigate]);
 
+    // Initialize SignalR connection
     useEffect(() => {
-        fetchRequestList();
-    }, [fetchRequestList]);
-
-    // Khởi tạo connection trong useEffect
-    useEffect(() => {
-        const withdrawHubConnection = new signalR.HubConnectionBuilder()
-            .withUrl("/workHub")
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl('/workHub')
+            .withAutomaticReconnect()
+            .configureLogging(signalR.LogLevel.Information)
             .build();
-        setConnection(withdrawHubConnection);
+        setConnection(newConnection);
     }, []);
 
-    // Kết nối và lắng nghe sự kiện
+    // Start connection and listen for updates
     useEffect(() => {
         if (connection) {
             if (connection.state === signalR.HubConnectionState.Disconnected) {
                 connection.start()
                     .then(() => console.log('SignalR Connected'))
-                    .catch(err => console.error('SignalR Connection Error: ', err));
+                    .catch(err => console.error('SignalR Connection Error:', err));
             }
 
             connection.on('ReceiveWorkUpdate', () => {
+                console.log('Received WorkUpdate, refreshing list');
                 fetchRequestList();
             });
 
             return () => {
                 connection.off('ReceiveWorkUpdate');
                 if (connection.state !== signalR.HubConnectionState.Disconnected) {
-                    connection.stop();
+                    connection.stop()
+                        .then(() => console.log('SignalR Disconnected'))
+                        .catch(err => console.error('Error stopping SignalR:', err));
                 }
             };
         }
@@ -142,13 +156,9 @@ const WithdrawRequest = () => {
 
     const formatTime = (dateTime) => {
         if (!dateTime) return '';
-
-        // Cắt bỏ phần dư sau mili giây (đảm bảo trình duyệt parse đúng)
-        const cleanDateTime = dateTime.split('.')[0];
-
+        const cleanDateTime = dateTime.split('.')[0]; // Remove milliseconds
         const date = new Date(cleanDateTime);
         if (isNaN(date)) return '';
-
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${hours}:${minutes}`;
@@ -156,17 +166,20 @@ const WithdrawRequest = () => {
 
     const formatDate = (dateTime) => {
         if (!dateTime) return '';
-
-        const cleanDateTime = dateTime.split('.')[0];
+        const cleanDateTime = dateTime.split('.')[0]; // Remove milliseconds
         const date = new Date(cleanDateTime);
         if (isNaN(date)) return '';
-
         return date.toLocaleDateString('vi-VN');
     };
 
     const handleOpen = (request) => {
         setSelectedRequest(request);
         setOpen(true);
+    };
+
+    // Callback to refresh list from RequestDetail
+    const refreshList = () => {
+        fetchRequestList();
     };
 
     return (
@@ -226,12 +239,12 @@ const WithdrawRequest = () => {
                                                 variant="subtitle2"
                                                 sx={{
                                                     ...style.status,
-                                                    color: statusList.find(s => s.id === request.statusId)?.color || '#000000',
-                                                    backgroundColor: statusList.find(s => s.id === request.statusId)?.bgColor || 'transparent',
-                                                    borderColor: statusList.find(s => s.id === request.statusId)?.borderColor || '#000000',
+                                                    color: statusList.find(s => s.id === request.status)?.color || '#000000',
+                                                    backgroundColor: statusList.find(s => s.id === request.status)?.bgColor || 'transparent',
+                                                    borderColor: statusList.find(s => s.id === request.status)?.borderColor || '#000000',
                                                 }}
                                             >
-                                                {statusList.find(s => s.id === request.statusId)?.label || 'Không xác định'}
+                                                {statusList.find(s => s.id === request.status)?.label || 'Không xác định'}
                                             </Typography>
                                         </Box>
                                     </CardContent>
@@ -247,7 +260,11 @@ const WithdrawRequest = () => {
                         onClose={handleClose}
                         disableAutoFocus
                     >
-                        <RequestDetail selectedRequest={selectedRequest} handleClose={handleClose} />
+                        <RequestDetail
+                            selectedRequest={selectedRequest}
+                            handleClose={handleClose}
+                            onActionComplete={refreshList} // Pass callback to refresh list
+                        />
                     </Modal>
                 )}
 

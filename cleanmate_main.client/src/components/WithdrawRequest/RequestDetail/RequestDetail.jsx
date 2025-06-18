@@ -13,7 +13,7 @@ import {
 import { toast } from 'react-toastify';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
-const RequestDetail = ({ selectedRequest, handleClose }) => {
+const RequestDetail = ({ selectedRequest, handleClose, fetchRequestList }) => {
     const [openRejectModal, setOpenRejectModal] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [connection, setConnection] = useState(null);

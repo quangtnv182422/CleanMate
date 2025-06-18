@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useCallback, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -8,8 +9,12 @@ import {
     DialogTitle,
     DialogContent,
     DialogContentText,
-    DialogActions
+    DialogActions,
+    Card,
+    CardContent,
+    Avatar
 } from '@mui/material';
+import { deepPurple, teal, yellow } from '@mui/material/colors';
 import { styles } from './style';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { toast } from 'react-toastify';
@@ -19,14 +24,19 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import StarRateIcon from '@mui/icons-material/StarRate';
 import ReactLoading from 'react-loading';
 import Feedback from '../../components/Feedback/Feedback';
+import { BookingContext } from '../../context/BookingProvider';
 
 const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handleClose }) => {
+    const { fetchNoRatingBooking } = useContext(BookingContext);
     const [openFeedback, setOpenFeedback] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [connection, setConnection] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [cleaner, setCleaner] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const newConnection = new HubConnectionBuilder()
@@ -69,7 +79,7 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
             if (res.ok && result.success) {
                 toast.success('Bạn đã xác nhận công việc thành công.');
                 fetchBookings(); // Manual refresh as a fallback
-                if (onOrderListRefresh) onOrderListRefresh(); // Trigger list refresh manually
+                //if (onOrderListRefresh) onOrderListRefresh(); // Trigger list refresh manually
 
             } else {
                 toast.error(result.message || 'Không thể xác nhận công việc.');
@@ -80,16 +90,43 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
         }
     }
 
+    const fetchCleanerDetails = useCallback(async () => {
+        if (!selectedOrder?.cleanerId) return;
+        try {
+            setLoading(true);
+            const response = await fetch(`/customerprofile/${selectedOrder.cleanerId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch cleaner details');
+            }
+
+            const data = await response.json();
+            setCleaner(data)
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedOrder.cleanerId])
+
+    useEffect(() => {
+        fetchCleanerDetails();
+    }, [fetchCleanerDetails])
+
     const handleOpenFeedback = () => {
         setOpenFeedback(true);
     }
 
     const handleCloseFeedback = () => {
         setOpenFeedback(false);
+        fetchNoRatingBooking();
         handleClose();
-        setTimeout(() => {
-            window.location.reload();
-        }, 200);
     };
 
     const formatPrice = (price) => {
@@ -161,7 +198,7 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
                         </Box>
                         <Box sx={{ mb: 1 }}>
                             <Typography sx={styles.contentTitle}>Địa chỉ</Typography>
-                                <Typography sx={styles.content}>{`${selectedOrder.addressNo}, ${selectedOrder.addressFormatted}`}</Typography>
+                            <Typography sx={styles.content}>{`${selectedOrder.addressNo}, ${selectedOrder.addressFormatted}`}</Typography>
                         </Box>
 
                         <Box sx={{ mb: 1 }}>
@@ -171,7 +208,61 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
 
                         <Box sx={{ mb: 1 }}>
                             <Typography sx={styles.contentTitle}>Nhân viên</Typography>
-                            <Typography sx={styles.content}>{selectedOrder?.cleanerName}</Typography>
+                            {cleaner ? (
+                                    <Card sx={{
+                                        maxWidth: '100%',
+                                        margin: 'auto',
+                                        border: '1px solid #1976D2',
+                                        borderRadius: 2,
+                                        overflow: 'hidden',
+                                        mt: 2,
+                                        padding: 1,
+
+                                        '&:hover': {
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                                        }
+                                    }}
+                                        onClick={() => navigate(`/team-single?cleanerId=${cleaner.userId}`) }
+                                >
+                                    <CardContent sx={{ textAlign: 'center', display: 'flex', gap: 2, padding: '8px !important' }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                            <Avatar
+                                                sx={{
+                                                    bgcolor: deepPurple[500],
+                                                    width: 60,
+                                                    height: 60,
+                                                    margin: '0 auto 8px',
+                                                    border: '3px solid #fff',
+                                                }}
+                                                alt={cleaner.fullName}
+                                                src={cleaner.avatarUrl || undefined}
+                                            />
+                                            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.25 }}>
+                                                <StarRateIcon sx={{ color: yellow[800] }} />
+                                                {cleaner.averageRating}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box sx={{ textAlign: 'start' }}>
+                                            <Typography variant="h6" color={teal[700]} gutterBottom sx={{ fontWeight: 'bold' }}>
+                                                {cleaner.fullName}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                Số điện thoại: <span style={{ fontWeight: 'bold' }}>{cleaner.phoneNumber}</span>
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                Khu vực hoạt động: <span style={{ fontWeight: 'bold' }}> {cleaner.activeAreas}</span>
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                Số năm kinh nghiệm: <span style={{ fontWeight: 'bold' }}>{cleaner.experienceYears} năm</span>
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <Typography sx={styles.content}>{selectedOrder?.cleanerName}</Typography>
+                            )}
                         </Box>
 
                         <Box sx={{ mb: 1 }}>
@@ -229,7 +320,7 @@ const OrderDetails = ({ fetchBookings, selectedOrder, onOrderListRefresh, handle
                             loading={loading}
                             setLoading={setLoading}
                             onOrderListRefresh={onOrderListRefresh}
-                            handleClose={handleClose}
+                            handleClose={handleCloseFeedback}
                         />
                     </Modal>
 

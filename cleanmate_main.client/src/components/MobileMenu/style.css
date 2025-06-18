@@ -12,6 +12,26 @@
     overflow-y: scroll;
 }
 
+
+/* Scrollbar customization */
+.mobileMenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobileMenu::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 4px;
+}
+
+.mobileMenu::-webkit-scrollbar-thumb:hover {
+    background-color: #a0a0a0;
+}
+
+.mobileMenu::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
 .responsivemenu .card-body {
     background: #243352;
 }

@@ -42,6 +42,7 @@ import { BookingStatusContext } from '../../context/BookingStatusProvider';
 import WithdrawRequest from '../../components/WithdrawRequest/WithdrawRequest';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import Dashboard from '../../components/Dashboard/Dashboard';
+import CustomerList from '../../components/CustomerList/CustomerList';
 
 const drawerWidth = 300;
 
@@ -53,10 +54,6 @@ const colorMap = {
     'Chờ xác nhận': '#FFD700',      // Vàng
     'Hoàn thành': '#28A745',        // Xanh lá
 };
-
-const UserList = () => {
-    return <h1>UserList</h1>
-}
 
 const CleanerList = () => {
     return <h1>CleanerList</h1>
@@ -591,7 +588,7 @@ const AdminDashboard = () => {
             case 1:
                 return <WorkListPage />;
             case 2:
-                return <UserList />
+                return <CustomerList />
             case 3:
                 return <CleanerList />
             case 4:

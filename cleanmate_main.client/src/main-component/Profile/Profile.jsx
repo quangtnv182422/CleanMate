@@ -20,8 +20,6 @@ const Profile = ({ handleTabChange }) => {
     const [customer, setCustomer] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    console.log(customer)
-
     const SubmitHandler = (e) => {
         e.preventDefault();
     }
@@ -102,7 +100,7 @@ const Profile = ({ handleTabChange }) => {
                                         <h2>{cleaner?.fullName}</h2>
                                         <ul>
                                             <li>Tên người dùng: <span>{cleaner?.fullName}</span></li>
-                                            <li>Phone:<span>{cleaner?.phoneNumber}</span></li>
+                                            <li>Số điện thoại:<span>{cleaner?.phoneNumber}</span></li>
                                             <li>Email:<span>{cleaner?.email}</span></li>
                                             <li>Kinh nghiệm:<span>{cleaner?.experienceYears === 0 ? "Chưa có kinh nghiệm" : `${cleaner?.experienceYears} năm`}</span></li>
                                             <li>Khu vực hoạt động:<span>{cleaner?.activeAreas}</span></li>
@@ -120,7 +118,7 @@ const Profile = ({ handleTabChange }) => {
                                         <ul>
                                             <li>Tên người dùng: <span>{customer?.fullName}</span></li>
                                             <li>Email:<span>{customer?.email}</span></li>
-                                            {/*<li>Phone:<span>{user?.phoneNumber}</span></li>*/}
+                                            <li>Số điện thoại:<span>{customer?.phoneNumber}</span></li>
                                             {/*<li>Kinh nghiệm:<span>{cleaner?.experienceYears === 0 ? "Chưa có kinh nghiệm" : `${cleaner?.experienceYears} năm`}</span></li>*/}
                                             {/*<li>Khu vực hoạt động:<span>{cleaner?.activeAreas}</span></li>*/}
                                             {/*<li>Ngân hàng: <span>{cleaner?.bankName}</span></li>*/}
@@ -229,22 +227,22 @@ const Profile = ({ handleTabChange }) => {
                                             <div className="quote-form">
                                                 <form onSubmit={SubmitHandler}>
                                                     <div className="form-group half-col">
-                                                        <input type="text" className="form-control" placeholder="Name:" name="name" />
+                                                        <input type="text" className="form-control" placeholder="Họ và tên:" name="name" />
                                                     </div>
                                                     <div className="form-group half-col">
                                                         <input type="email" className="form-control" placeholder="Email:" name="email" />
                                                     </div>
                                                     <div className="form-group half-col">
-                                                        <input type="text" className="form-control" placeholder="Subject:" name="subject" />
+                                                        <input type="text" className="form-control" placeholder="Tiêu đề:" name="subject" />
                                                     </div>
                                                     <div className="form-group half-col">
-                                                        <input type="text" className="form-control" placeholder="Your Address:" name="address" />
+                                                        <input type="text" className="form-control" placeholder="Địa chỉ:" name="address" />
                                                     </div>
                                                     <div className="form-group full-col">
-                                                        <textarea className="form-control" name="note" placeholder="Description..."></textarea>
+                                                        <textarea className="form-control" name="note" placeholder="Điều bạn muốn nhắn nhủ..."></textarea>
                                                     </div>
                                                     <div className="form-group full-col">
-                                                        <button className="btn theme-btn" type="submit"><i className="fa fa-angle-double-right" aria-hidden="true"></i> Get In Touch</button>
+                                                        <button className="btn theme-btn" type="submit"><i className="fa fa-angle-double-right" aria-hidden="true"></i> Gửi thông tin</button>
                                                     </div>
                                                 </form>
                                             </div>

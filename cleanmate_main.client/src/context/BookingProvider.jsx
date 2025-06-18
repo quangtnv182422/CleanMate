@@ -91,30 +91,6 @@ import useAuth from '../hooks/useAuth';
 
 export const BookingContext = createContext();
 
-const array = new Array(10).fill().map((_, index) => ({
-    bookingId: 20 + index,
-    servicePriceId: 1,
-    serviceName: "Dọn nhà theo giờ",
-    durationTime: 1,
-    durationSquareMeter: "15",
-    price: 160000.00,
-    cleanerId: null,
-    cleanerName: "Oanh Dung",
-    userId: "07a6f7c7-d23b-470a-9724-658000feab3a",
-    userName: "Hoang Tien",
-    bookingStatusId: 6,
-    status: "Hoàn thành",
-    statusDescription: "Công việc này mới được đăng bởi khách hàng",
-    note: "Need thorough cleaning",
-    addressId: 1,
-    addressFormatted: "390 Đ. Nguyễn Văn Cừ, Ngọc Lâm, Long Biên, Hà Nội, Vietnam",
-    date: "2025-05-25",
-    startTime: "10:00:00",
-    totalPrice: 250000.00,
-    createdAt: "2025-06-09T18:06:30.543",
-    updatedAt: "2025-06-09T18:06:30.543"
-}));
-
 
 const BookingProvider = ({ children }) => {
     const [services, setServices] = useState([]);

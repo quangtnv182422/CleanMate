@@ -35,7 +35,7 @@ const TeamSection = (props) => {
                                     </div>
                                     <div className="wpo-team-text">
                                         <span>{team.title}</span>
-                                        <h2><Link onClick={ClickHandler} to={`/team-single/${team.Id}`}>{team.name}</Link></h2>
+                                        <h2><Link onClick={ClickHandler} to={`/team-single?id=${team.Id}`}>{team.name}</Link></h2>
                                     </div>
                                 </div>
                             </div>

@@ -13,6 +13,7 @@ using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Repository.Feedbacks;
 using CleanMate_Main.Server.Repository.Payments;
 using CleanMate_Main.Server.Repository.Transaction;
+using CleanMate_Main.Server.Repository.Vouchers;
 using CleanMate_Main.Server.Repository.Wallet;
 using CleanMate_Main.Server.SeedData;
 using CleanMate_Main.Server.Services.Address;
@@ -26,6 +27,7 @@ using CleanMate_Main.Server.Services.Feedbacks;
 using CleanMate_Main.Server.Services.Payments;
 using CleanMate_Main.Server.Services.Smtp;
 using CleanMate_Main.Server.Services.Transaction;
+using CleanMate_Main.Server.Services.Vouchers;
 using CleanMate_Main.Server.Services.Wallet;
 using CleanMate_Main.Server.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -79,10 +81,6 @@ builder.Services.AddScoped<IAllService_Service, AllService_Service>();
 //All Employee Service
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-//All Customer Service
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-
 //Booking
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -104,6 +102,9 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 //Customer
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+//Voucher
+builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
 //PayOS
 builder.Services.AddScoped<IPayosService, PayosService>();
 //emailSender

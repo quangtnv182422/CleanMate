@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -288,10 +289,13 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.DiscountPercentage)
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("Discount_Percentage");
-                entity.Property(e => e.VoucherCode).HasMaxLength(50).IsUnicode(false); // Mã voucher
-                entity.HasIndex(e => e.VoucherCode).IsUnique(); // Đảm bảo mã là unique
-                entity.Property(e => e.IsEventVoucher).HasDefaultValue(false); // Voucher sự kiện
-                entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("ACTIVE"); // Trạng thái mặc định là ACTIVE
+                entity.Property(e => e.VoucherCode).HasMaxLength(50).IsUnicode(false);
+                entity.HasIndex(e => e.VoucherCode).IsUnique();
+                entity.Property(e => e.IsEventVoucher).HasDefaultValue(false);
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .HasDefaultValue(VoucherStatus.ACTIVE.ToString()) // Giá trị mặc định là "ACTIVE"
+                    .HasConversion<string>(); // Ánh xạ nullable enum sang string
             });
 
             modelBuilder.Entity<UserWallet>(entity =>

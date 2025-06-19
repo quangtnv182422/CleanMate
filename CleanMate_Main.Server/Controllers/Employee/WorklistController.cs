@@ -62,7 +62,6 @@ namespace CleanMate_Main.Server.Controllers.Employee
                 // Return work items for the specified status and employee
                 workItems = await _employeeService.GetAllWorkAsync(status, employeeId);
             }
-
             return Ok(workItems);
         }
         [HttpGet("{id}")]

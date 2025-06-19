@@ -31,7 +31,9 @@ namespace CleanMate_Main.Server.Services.Employee
 
         public async Task<IEnumerable<WorkListViewModel>> GetAllWorkAsync(int? status = null, string? employeeId = null)
         {
+            int check = await _employeeRepository.CheckAndCancelPastDueWorkAsync();
             return await _employeeRepository.FindAllWorkAsync(status, employeeId);
+
         }
 
         public async Task<WorkDetailsViewModel> GetWorkDetailsAsync(int bookingId)
@@ -84,20 +86,37 @@ namespace CleanMate_Main.Server.Services.Employee
 
         public async Task<bool> BeginWorkRequestAsync(int bookingId, string employeeId)
         {
-            var booking = await _employeeRepository.FindWorkByIdAsync(bookingId);
+            var booking = await _bookingRepository.GetBookingByIdAsync(bookingId);
             if (booking == null)
             {
                 throw new KeyNotFoundException("Công việc không tồn tại.");
             }
 
-            if (booking.EmployeeId != employeeId)
+            if (booking.CleanerId != employeeId)
             {
                 throw new InvalidOperationException("Bạn không có quyền bắt đầu công việc này.");
             }
 
-            if (booking.StatusId != CommonConstants.BookingStatus.ACCEPT)
+            if (booking.BookingStatusId != CommonConstants.BookingStatus.ACCEPT)
             {
                 throw new InvalidOperationException("Công việc phải ở trạng thái Đã nhận để bắt đầu.");
+            }
+
+            DateTime startTime = booking.Date.ToDateTime(booking.StartTime);
+            DateTime currentTime = DateTimeVN.GetNow(); 
+
+            if (booking.Date != DateOnly.FromDateTime(currentTime))
+            {
+                throw new KeyNotFoundException("Công việc chỉ có thể được bắt đầu vào đúng ngày làm việc.");
+            }
+
+            TimeSpan tenMinutes = TimeSpan.FromMinutes(10);
+            DateTime startWindow = startTime - tenMinutes;
+            DateTime endWindow = startTime + tenMinutes;
+
+            if (currentTime < startWindow || currentTime > endWindow)
+            {
+                throw new KeyNotFoundException("Công việc chỉ có thể được bắt đầu trong vòng ±10 phút từ thời gian bắt đầu.");
             }
 
             return await _employeeRepository.ChangeWorkAsync(bookingId, CommonConstants.BookingStatus.IN_PROGRESS, employeeId);

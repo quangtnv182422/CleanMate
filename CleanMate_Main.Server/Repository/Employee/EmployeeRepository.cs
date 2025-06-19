@@ -46,7 +46,6 @@ namespace CleanMate_Main.Server.Repository.Employee
                             CreatedAt = booking.CreatedAt,
                             UpdatedAt = booking.UpdatedAt
                         };
-
             return await query.ToListAsync();
         }
 
@@ -543,6 +542,36 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .CountAsync();
             return existingRatingsCount;
         }
+        public async Task<int> CheckAndCancelPastDueWorkAsync()
+        {
+            try
+            {
+                var currentTime = DateTimeVN.GetNow();
+                var newBookings = await _context.Bookings
+                    .Where(b => b.BookingStatusId == CommonConstants.BookingStatus.NEW)
+                    .ToListAsync();
+                var pastDueBookings = newBookings
+                    .Where(b => b.Date.ToDateTime(b.StartTime) < currentTime)
+                    .ToList();
 
+                if (!pastDueBookings.Any())
+                {
+                    return 0; // No bookings to update
+                }
+
+                foreach (var booking in pastDueBookings)
+                {
+                    booking.BookingStatusId = CommonConstants.BookingStatus.CANCEL;
+                    _context.Bookings.Update(booking);
+                }
+
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking/canceling past due work: {ex.Message}");
+                return 0;
+            }
+        }
     }
 }

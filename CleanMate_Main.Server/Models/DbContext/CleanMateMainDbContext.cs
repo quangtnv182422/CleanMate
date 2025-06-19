@@ -294,7 +294,7 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.IsEventVoucher).HasDefaultValue(false);
                 entity.Property(e => e.Status)
                     .HasMaxLength(20)
-                    .HasDefaultValue(VoucherStatus.ACTIVE.ToString()) // Giá trị mặc định là "ACTIVE"
+                   /* .HasDefaultValue(VoucherStatus.ACTIVE.ToString()) // Giá trị mặc định là "ACTIVE"*/
                     .HasConversion<string>(); // Ánh xạ nullable enum sang string
             });
 

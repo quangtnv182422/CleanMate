@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanMate_Main.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateAddNewDB : Migration
+    public partial class AddNewDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,13 +107,13 @@ namespace CleanMate_Main.Server.Migrations
                     VoucherId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Discount_Percentage = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
-                    ExpireDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    Discount_Percentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
+                    ExpireDate = table.Column<DateOnly>(type: "date", nullable: false),
                     VoucherCode = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     IsEventVoucher = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, defaultValue: "ACTIVE")
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {

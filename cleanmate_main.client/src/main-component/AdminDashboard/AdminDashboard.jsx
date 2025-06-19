@@ -67,10 +67,10 @@ const AdminDashboard = () => {
 
     const [status, setStatus] = useState(0);
     const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [tabValue, setTabValue] = useState(0);
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+
 
     const [data, setData] = useState([]);
     const [cleaners, setCleaners] = useState([]);
@@ -274,51 +274,28 @@ const AdminDashboard = () => {
         const [openConfirm, setOpenConfirm] = useState(false);
         const [selectedBooking, setSelectedBooking] = useState(null);
 
-        const sortedByCreatedAt = useMemo(() => {
-            return [...data].sort((a, b) => {
-                const dateA = new Date(a.createdAt).getTime();
-                const dateB = new Date(b.createdAt).getTime();
-                return dateB - dateA; // công việc mới nhất lên đầu
-            });
-        }, []);
+        // Mặc định sắp xếp theo createdAt (giảm dần)
+        const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
 
-        const handleOpenConfirm = (booking) => {
-            setSelectedBooking(booking);
-            setOpenConfirm(true)
-        }
-        
-        const filteredData = useMemo(() => {
-            return sortedByCreatedAt.filter((row) =>
-                row.customerFullName?.toLowerCase().includes(search.toLowerCase()) ||
-                row.cleanerName?.toLowerCase().includes(search.toLowerCase())
-            );
-        }, [search, sortedByCreatedAt]);
+        // Sử dụng sortConfig để sắp xếp dữ liệu
+        const sortedData = useMemo(() => {
+            const sortableData = [...data].sort((a, b) => {
+                if (!sortConfig.key) return 0; 
 
-        const paginatedData = useMemo(() => {
-            const startIndex = (page - 1) * rowsPerPage;
-            return filteredData.slice(startIndex, startIndex + rowsPerPage);
-        }, [filteredData]);
+                const keyMapping = {
+                    'tên': 'serviceName',
+                    'khách hàng': 'customerFullName',
+                    'người dọn': 'cleanerName',
+                    'giờ làm': 'startTime',
+                    'làm trong': 'duration',
+                    'địa chỉ': 'address',
+                    'ghi chú': 'note',
+                    'số tiền': 'totalPrice',
+                    'trạng thái': 'status',
+                    'createdAt': 'createdAt', 
+                };
 
-        const handleSort = useCallback((vietnameseKey) => {
-            const keyMapping = {
-                'tên': 'serviceName',
-                'khách hàng': 'customerFullName',
-                'người dọn': 'cleanerName',
-                'giờ làm': 'startTime',
-                'làm trong': 'duration',
-                'địa chỉ': 'address',
-                'ghi chú': 'note',
-                'số tiền': 'totalPrice',
-                'trạng thái': 'status',
-            };
-
-            let direction = 'asc';
-            if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
-                direction = 'desc';
-            }
-            const englishKey = keyMapping[vietnameseKey] || vietnameseKey;
-
-            const sortedData = [...data].sort((a, b) => {
+                const englishKey = keyMapping[sortConfig.key] || sortConfig.key;
                 let valueA = a[englishKey];
                 let valueB = b[englishKey];
 
@@ -330,7 +307,6 @@ const AdminDashboard = () => {
                     valueA = valueA || 'không có ghi chú';
                     valueB = valueB || 'không có ghi chú';
                 }
-
                 if (englishKey === 'startTime') {
                     const dateTimeA = new Date(`${a.date}T${a.startTime}`);
                     const dateTimeB = new Date(`${b.date}T${b.startTime}`);
@@ -339,41 +315,64 @@ const AdminDashboard = () => {
                 } else if (englishKey === 'totalPrice') {
                     valueA = Number(valueA);
                     valueB = Number(valueB);
+                } else if (englishKey === 'createdAt') {
+                    valueA = new Date(valueA).getTime();
+                    valueB = new Date(valueB).getTime();
                 } else if (typeof valueA === 'string') {
                     valueA = valueA.toLowerCase();
                     valueB = valueB?.toLowerCase();
                 }
 
-                if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-                if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+                if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
                 return 0;
             });
 
+            return sortableData;
+        }, [data, sortConfig]);
+
+        const filteredData = useMemo(() => {
+            return sortedData.filter((row) =>
+                row.customerFullName?.toLowerCase().includes(search.toLowerCase()) ||
+                row.cleanerName?.toLowerCase().includes(search.toLowerCase())
+            );
+        }, [search, sortedData]);
+
+        const paginatedData = useMemo(() => {
+            const startIndex = (page - 1) * rowsPerPage;
+            return filteredData.slice(startIndex, startIndex + rowsPerPage);
+        }, [filteredData, page, rowsPerPage]);
+
+        const handleSort = useCallback((vietnameseKey) => {
+            let direction = 'asc';
+            if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
+                direction = 'desc';
+            }
             setSortConfig({ key: vietnameseKey, direction });
-            setData(sortedData);
-        }, []);
+        }, [sortConfig]);
+
+        const handleOpenConfirm = (booking) => {
+            setSelectedBooking(booking);
+            setOpenConfirm(true);
+        };
 
         const handleCancelWork = async (bookingId) => {
             try {
                 const response = await fetch(`/managebooking/cancel-booking`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({ bookingId }),
                 });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
                 toast.success("Công việc đã được hủy thành công!");
                 fetchBooking();
             } catch (error) {
                 console.error('Error canceling work:', error);
                 toast.error("Lỗi khi hủy công việc!");
             }
-        }
+        };
 
         return (
             <Box>

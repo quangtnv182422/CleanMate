@@ -575,7 +575,7 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VoucherId"));
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
@@ -587,11 +587,11 @@ namespace CleanMate_Main.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<decimal?>("DiscountPercentage")
+                    b.Property<decimal>("DiscountPercentage")
                         .HasColumnType("decimal(5, 2)")
                         .HasColumnName("Discount_Percentage");
 
-                    b.Property<DateOnly?>("ExpireDate")
+                    b.Property<DateOnly>("ExpireDate")
                         .HasColumnType("date");
 
                     b.Property<bool>("IsEventVoucher")
@@ -600,10 +600,9 @@ namespace CleanMate_Main.Server.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Status")
-                        .ValueGeneratedOnAdd()
+                        .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("ACTIVE");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("VoucherCode")
                         .HasMaxLength(50)

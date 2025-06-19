@@ -15,5 +15,13 @@ public partial class Voucher
 
     public DateOnly? ExpireDate { get; set; }
 
+    public string? VoucherCode { get; set; } // Mã voucher ẩn
+
+    public bool IsEventVoucher { get; set; } // Đánh dấu voucher sự kiện
+
+    public string? CreatedBy { get; set; } // Admin tạo voucher
+
+    public string? Status { get; set; } // Trạng thái voucher
+
     public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
 }

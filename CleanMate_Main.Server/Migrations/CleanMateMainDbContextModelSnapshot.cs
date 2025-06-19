@@ -509,8 +509,16 @@ namespace CleanMate_Main.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserVoucherId"));
 
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -572,6 +580,9 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -583,8 +594,28 @@ namespace CleanMate_Main.Server.Migrations
                     b.Property<DateOnly?>("ExpireDate")
                         .HasColumnType("date");
 
+                    b.Property<bool>("IsEventVoucher")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("ACTIVE");
+
+                    b.Property<string>("VoucherCode")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
+
                     b.HasKey("VoucherId")
                         .HasName("PK__Voucher__3AEE7921AB741345");
+
+                    b.HasIndex("VoucherCode")
+                        .IsUnique()
+                        .HasFilter("[VoucherCode] IS NOT NULL");
 
                     b.ToTable("Voucher", (string)null);
                 });

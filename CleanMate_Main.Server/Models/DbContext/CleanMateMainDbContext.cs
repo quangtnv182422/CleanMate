@@ -261,6 +261,9 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
 
+                entity.Property(e => e.IsUsed).HasDefaultValue(false); // Mặc định chưa sử dụng
+                entity.Property(e => e.UsedAt).HasColumnType("datetime"); // Thời điểm sử dụng
+
                 entity.HasOne(d => d.User).WithMany(p => p.UserVouchers)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -285,6 +288,10 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.DiscountPercentage)
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("Discount_Percentage");
+                entity.Property(e => e.VoucherCode).HasMaxLength(50).IsUnicode(false); // Mã voucher
+                entity.HasIndex(e => e.VoucherCode).IsUnique(); // Đảm bảo mã là unique
+                entity.Property(e => e.IsEventVoucher).HasDefaultValue(false); // Voucher sự kiện
+                entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("ACTIVE"); // Trạng thái mặc định là ACTIVE
             });
 
             modelBuilder.Entity<UserWallet>(entity =>

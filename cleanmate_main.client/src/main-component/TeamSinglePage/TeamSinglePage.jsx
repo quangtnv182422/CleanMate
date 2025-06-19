@@ -1,13 +1,23 @@
-﻿import React, { Fragment } from 'react';
+﻿import React, { Fragment, useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
+import { yellow } from '@mui/material/colors';
 import Navbar from '../../components/Navbar/Navbar'
 import PageTitle from '../../components/pagetitle/PageTitle'
 import Scrollbar from '../../components/scrollbar/scrollbar'
-import { useParams } from 'react-router-dom'
 import Team from '../../api/team';
 import Footer from '../../components/footer/Footer'
+import userImage from '../../images/user-image.png';
+import StarRateIcon from '@mui/icons-material/StarRate';
 
 const TeamSinglePage = (props) => {
-    const { id } = useParams()
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+
+    const id = query.get('id'); // Lấy id từ URL
+    const cleanerId = query.get('cleanerId'); // Lấy cleanerId từ URL
+
+    const [cleaner, setCleaner] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const TeamDetails = Team.find(item => item.Id === id)
 
@@ -15,36 +25,90 @@ const TeamSinglePage = (props) => {
         e.preventDefault()
     }
 
+    const fetchCleanerDetails = useCallback(async () => {
+        if (!cleanerId) return;
+        try {
+            setLoading(true);
+            const response = await fetch(`/customerprofile/${cleanerId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
+            if (!response.ok) {
+                throw new Error('Failed to fetch cleaner details');
+            }
+
+            const data = await response.json();
+            setCleaner(data)
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [cleanerId])
+
+    useEffect(() => {
+        fetchCleanerDetails();
+    }, [fetchCleanerDetails])
 
     return (
         <Fragment>
-            <Navbar/>
-            <PageTitle pageTitle={TeamDetails.name} pagesub={TeamDetails.title} />
+            <Navbar />
             <div className="team-pg-area section-padding">
                 <div className="container">
                     <div className="team-info-wrap">
-                        <div className="row align-items-center">
-                            <div className="col-lg-6">
-                                <div className="team-info-img">
-                                    <img src={TeamDetails.tImg} alt="" />
+                        {cleanerId ? (
+                            <>
+                                <div className="row align-items-center">
+                                    <div className="col-lg-6">
+                                        <div className="team-info-img">
+                                            <img src={userImage} alt="" />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-6">
+                                        <div className="team-info-text">
+                                            <h2>{cleaner.fullName}</h2>
+                                            <ul>
+                                                <li>Tên người dùng: <span>{cleaner?.fullName}</span></li>
+                                                <li>Giới tính: <span>{cleaner?.gender ? 'Nam' : 'Nữ'}</span></li>
+                                                <li>Số điện thoại:<span>{cleaner?.phoneNumber}</span></li>
+                                                <li>Email:<span>{cleaner?.email}</span></li>
+                                                <li>Kinh nghiệm:<span>{cleaner?.experienceYears === 0 ? "Chưa có kinh nghiệm" : `${cleaner?.experienceYears} năm`}</span></li>
+                                                <li>Khu vực hoạt động:<span>{cleaner?.activeAreas}</span></li>
+                                                <li style={{ display: 'flex', alignItems: 'center', color: '#1d2327' }}>Đánh giá trung bình: {cleaner?.averageRating} <StarRateIcon sx={{ fontSize: 18, ml: 0.25, color: yellow[800] }} /></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="col-lg-6">
-                                <div className="team-info-text">
-                                    <h2>{TeamDetails.name}</h2>
-                                    <ul>
-                                        <li>Position: <span>Siniour Leader</span></li>
-                                        <li>Practice Area:<span>{TeamDetails.title}</span></li>
-                                        <li>Experience:<span>12 Years</span></li>
-                                        <li>Address:<span>Millington, Ave, TN 38053</span></li>
-                                        <li>Phone:<span>+00 568 746 987</span></li>
-                                        <li>Email:<span>youremail@gmail.com</span></li>
-                                        <li>Fax:<span>568 746 987</span></li>
-                                    </ul>
+                            </>
+                        ) : (
+                            <>
+                                <div className="row align-items-center">
+                                    <div className="col-lg-6">
+                                        <div className="team-info-img">
+                                            <img src={TeamDetails?.tImg} alt="" />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-6">
+                                        <div className="team-info-text">
+                                            <h2>{TeamDetails?.name}</h2>
+                                            <ul>
+                                                <li>Position: <span>Siniour Leader</span></li>
+                                                <li>Practice Area:<span>{TeamDetails.title}</span></li>
+                                                <li>Experience:<span>12 Years</span></li>
+                                                <li>Address:<span>Millington, Ave, TN 38053</span></li>
+                                                <li>Phone:<span>+00 568 746 987</span></li>
+                                                <li>Email:<span>youremail@gmail.com</span></li>
+                                                <li>Fax:<span>568 746 987</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </>
+                        )}
                     </div>
                     <div className="exprience-area">
                         <div className="row">
@@ -151,7 +215,7 @@ const TeamSinglePage = (props) => {
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
             <Scrollbar />
         </Fragment>
     )

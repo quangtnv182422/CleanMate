@@ -255,11 +255,7 @@ const Feedback = ({ selectedOrder, loading, setLoading, onOrderListRefresh, hand
                         variant="outlined"
                         color="error"
                         sx={{ mt: 1, mr: 0 }}
-                        onClick={() => {
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 200);
-                        }}
+                        onClick={handleClose}
                     >
                         Bỏ qua
                     </Button>

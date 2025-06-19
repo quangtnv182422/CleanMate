@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -261,6 +262,9 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
 
+                entity.Property(e => e.IsUsed).HasDefaultValue(false); // Mặc định chưa sử dụng
+                entity.Property(e => e.UsedAt).HasColumnType("datetime"); // Thời điểm sử dụng
+
                 entity.HasOne(d => d.User).WithMany(p => p.UserVouchers)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -285,6 +289,13 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.DiscountPercentage)
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("Discount_Percentage");
+                entity.Property(e => e.VoucherCode).HasMaxLength(50).IsUnicode(false);
+                entity.HasIndex(e => e.VoucherCode).IsUnique();
+                entity.Property(e => e.IsEventVoucher).HasDefaultValue(false);
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                   /* .HasDefaultValue(VoucherStatus.ACTIVE.ToString()) // Giá trị mặc định là "ACTIVE"*/
+                    .HasConversion<string>(); // Ánh xạ nullable enum sang string
             });
 
             modelBuilder.Entity<UserWallet>(entity =>

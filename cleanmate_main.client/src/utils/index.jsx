@@ -1,4 +1,4 @@
-function getFlashProducts(products) {
+﻿function getFlashProducts(products) {
     return products.filter(item => item.sale === true).slice(0, 8);
 }
 
@@ -30,6 +30,14 @@ function checkLengNull(data) {
         return data.length > 0;
     }
     return false;
+}
+
+function calculateRating(rating) {
+    if (rating !== null && rating !== undefined) {
+        const total = rating.reduce((acc, item) => acc + item.rating, 0);
+        return total / rating.length;
+    }
+    return 0;
 }
 
 function isEquals(a, b) {
@@ -97,5 +105,6 @@ export {
     isEquals,
     minValueOne,
     getCompareList,
-    searchFilter
+    searchFilter,
+    calculateRating
 };

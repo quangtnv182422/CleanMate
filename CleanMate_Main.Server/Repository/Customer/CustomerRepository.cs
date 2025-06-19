@@ -31,7 +31,7 @@ namespace CleanMate_Main.Server.Repository.Customer
                     Email = u.Email,
                     CreatedDate = u.CreatedDate,
                     PhoneNumber = u.PhoneNumber,
-                    IsActive = !u.LockoutEnabled || (u.LockoutEnd == null || u.LockoutEnd < DateTimeVN.GetNow())
+                    IsActive = !u.LockoutEnabled
                 })
                 .ToList();
 

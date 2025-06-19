@@ -7,6 +7,7 @@ import {
     CardContent,
     Button,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import classNames from 'classnames/bind';
@@ -32,6 +33,8 @@ const BookingSuccess = () => {
         coin: searchParams.get('coin') || 'N/A',
     };
 
+    const theme = useTheme();
+
     return (
         <Box
             sx={{
@@ -42,7 +45,15 @@ const BookingSuccess = () => {
                 bgcolor: '#f0f4f8',
             }}
         >
-            <Card sx={{ width: 400, textAlign: 'center', p: 3 }}>
+            <Card sx={{
+                width: 500,
+                textAlign: 'center',
+                p: 3,
+
+                '@media (max-width: 600px)': {
+                    width: '90%',
+                }
+            }}>
                 <CardContent>
                     {deposit && deposit === "success" ? (
                         <>
@@ -90,24 +101,41 @@ const BookingSuccess = () => {
                                 <Typography variant="body2"><span className={cx('booking-success-title')}>Người chịu trách nhiệm dọn dẹp:</span> {bookingDetails.cleaner}</Typography>
                                 <Typography variant="body2"><span className={cx('booking-success-title')}>Tổng tiền phải thanh toán:</span> {bookingDetails.payment}</Typography>
                             </Box>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={cx('view-booking-details-button')}
-                                onClick={() => navigate('/booking-details', {
-                                    state: bookingDetails
-                                })} // Adjust route as needed
-                                sx={{ mt: 3, mr: 1 }}
-                            >
-                                Xem chi tiết đơn hàng
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                onClick={() => navigate('/home')}
-                                sx={{ mt: 3 }}
-                            >
-                                Quay về trang chủ
-                            </Button>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        gap: 1,
+                                        mt: 2,
+                                        alignItems: 'center',
+                                        width: '100%',
+                                        flexDirection: { xs: 'column', sm: 'row' },
+                                        [theme.breakpoints.down('sm')]: {
+                                            gap: 0.5, 
+                                        },
+                                    }}
+                                >
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => navigate('/booking-service?service=1')} 
+                                        sx={{
+                                            width: { lg: '100%', xs: '100%', sm: 'auto', }, 
+                                            fontSize: { xs: '0.875rem', sm: '1rem' }, 
+                                        }}
+                                    >
+                                        Tiếp tục đặt dịch vụ
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => navigate('/home')}
+                                        sx={{
+                                            width: { lg: '100%', xs: '100%', sm: 'auto' }, 
+                                            fontSize: { xs: '0.875rem', sm: '1rem' },
+                                        }}
+                                    >
+                                        Quay về trang chủ
+                                    </Button>
+                                </Box>
                         </>
                     ) : (
                         <>

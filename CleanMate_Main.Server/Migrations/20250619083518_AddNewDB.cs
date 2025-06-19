@@ -107,9 +107,13 @@ namespace CleanMate_Main.Server.Migrations
                     VoucherId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Discount_Percentage = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
-                    ExpireDate = table.Column<DateOnly>(type: "date", nullable: true)
+                    Discount_Percentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
+                    ExpireDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    VoucherCode = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
+                    IsEventVoucher = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -348,7 +352,9 @@ namespace CleanMate_Main.Server.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     VoucherId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    UsedAt = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -659,6 +665,13 @@ namespace CleanMate_Main.Server.Migrations
                 table: "User_Wallet",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Voucher_VoucherCode",
+                table: "Voucher",
+                column: "VoucherCode",
+                unique: true,
+                filter: "[VoucherCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Wallet_Transaction_RelatedBookingId",

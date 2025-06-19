@@ -73,7 +73,7 @@ const AllRoute = () => {
                 <Route path='/blog-fullwidth' element={<BlogPage />} />
                 <Route path='/blog-left-sidebar' element={<BlogPageLeft />} />
                 <Route path='/blog' element={<BlogPageFullwidth />} />
-                <Route path='/team-single/:id' element={<TeamSinglePage />} />
+                <Route path='/team-single' element={<TeamSinglePage />} />
                 <Route path='/login' element={<LoginPage />} />
                 <Route path='/register/user' element={<SignUpPageUser />} />
                 <Route path='/register/employee' element={<SignUpPageEmployee />} />

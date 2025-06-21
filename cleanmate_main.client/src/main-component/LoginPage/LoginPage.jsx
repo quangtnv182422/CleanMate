@@ -147,6 +147,10 @@ const LoginPage = (props) => {
         }
     };
 
+    const textSecurityStyle = showPassword
+        ? { WebkitTextSecurity: 'none' }
+        : { WebkitTextSecurity: 'disc' };
+
 
     return (
         <Grid className="loginWrapper">
@@ -207,7 +211,7 @@ const LoginPage = (props) => {
                                             '&::-ms-clear': { display: 'none' },
                                             '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                             '&::-webkit-textfield-decoration-container': { display: 'none' },
-                                            '-webkit-text-security': 'disc',
+                                            ...textSecurityStyle,
                                         }
                                     }}
                                 />

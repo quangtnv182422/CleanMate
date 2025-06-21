@@ -158,6 +158,10 @@ const SignUpPageEmployee = (props) => {
             setError('Vui lòng kiểm tra lại các trường thông tin!');
         }
     };
+
+    const textSecurityStyle = showPassword
+        ? { WebkitTextSecurity: 'none' }
+        : { WebkitTextSecurity: 'disc' };
     return (
         <div style={{ position: 'relative' }}>
             {loading && (
@@ -344,7 +348,7 @@ const SignUpPageEmployee = (props) => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
-                                                '-webkit-text-security': 'disc',
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />
@@ -383,7 +387,7 @@ const SignUpPageEmployee = (props) => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
-                                                '-webkit-text-security': 'disc',
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />

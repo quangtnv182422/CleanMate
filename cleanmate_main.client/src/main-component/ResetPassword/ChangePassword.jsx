@@ -185,6 +185,7 @@ const ChangePassword = () => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                                '-webkit-text-security': 'disc',
                                             }
                                         }}
                                     />

@@ -145,6 +145,10 @@ const SignUpPageUser = () => {
         }
     };
 
+    const textSecurityStyle = showPassword
+        ? { WebkitTextSecurity: 'none' }
+        : { WebkitTextSecurity: 'disc' };
+
     return (
         <div style={{ position: 'relative' }}>
             {loading && (
@@ -262,7 +266,7 @@ const SignUpPageUser = () => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
-                                                '-webkit-text-security': 'disc',
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />
@@ -301,7 +305,7 @@ const SignUpPageUser = () => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
-                                                '-webkit-text-security': 'disc',
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />

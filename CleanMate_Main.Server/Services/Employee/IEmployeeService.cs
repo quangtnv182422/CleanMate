@@ -40,5 +40,9 @@ namespace CleanMate_Main.Server.Services.Employee
         Task<List<CleanerDTO>> GetAvailableCleanersAsync();
         Task<IEnumerable<FeedbackHistoryViewModel>> GetFeedbackHistoryAsync(string employeeId);
         Task<bool> RecalculateCleanerRatingAsync(string employeeId, int newRating);
+
+        Task<List<CleanerListItemDTO>> GetCleanerListAsync();
+        Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId);
+        Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable);
     }
 }

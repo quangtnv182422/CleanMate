@@ -32,6 +32,9 @@ namespace CleanMate_Main.Server.Repository.Employee
         Task<IEnumerable<FeedbackHistoryViewModel>> GetFeedbackHistoryAsync(string employeeId);
         Task<int> CountFeedbackDone(string employeeId);
         Task<int> CheckAndCancelPastDueWorkAsync();
+        Task<List<CleanerListItemDTO>> GetCleanerListAsync();
+        Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId);
+        Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable);
 
     }
 }

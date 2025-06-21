@@ -573,5 +573,85 @@ namespace CleanMate_Main.Server.Repository.Employee
                 return 0;
             }
         }
+
+        public async Task<List<CleanerListItemDTO>> GetCleanerListAsync()
+        {
+            return await _context.CleanerProfiles
+                .Include(cp => cp.User)
+                .Select(cp => new CleanerListItemDTO
+                {
+                    CleanerId = cp.CleanerId,
+                    FullName = cp.User.FullName,
+                    Email = cp.User.Email,
+                    PhoneNumber = cp.User.PhoneNumber,
+                    Area = cp.Area,
+                    Available = cp.Available,
+                    ExperienceYear = cp.ExperienceYear
+                })
+                .ToListAsync();
+        }
+
+        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId)
+        {
+            var cleaner = await _context.CleanerProfiles
+                .Include(cp => cp.User)
+                .ThenInclude(u => u.Wallet)
+                .ThenInclude(w => w.Transactions)
+                .FirstOrDefaultAsync(cp => cp.CleanerId == cleanerId);
+
+            if (cleaner == null)
+            {
+                return null;
+            }
+
+            // Lấy danh sách booking dựa trên UserId của cleaner (CleanerId trong Booking là UserId)
+            var bookings = await _context.Bookings
+                .Where(b => b.CleanerId == cleaner.UserId)
+                .Select(b => new BookingDTO
+                {
+                    BookingId = b.BookingId,
+                    ServicePriceId = b.ServicePriceId,
+                    UserId = b.UserId,
+                    AddressId = b.AddressId,
+                    TotalPrice = b.TotalPrice,
+                    Note = b.Note,
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt,
+                    BookingStatusId = b.BookingStatusId
+                })
+                .ToListAsync();
+
+            return new CleanerDetailDTO
+            {
+                CleanerId = cleaner.CleanerId,
+                FullName = cleaner.User.FullName,
+                Email = cleaner.User.Email,
+                PhoneNumber = cleaner.User.PhoneNumber,
+                Area = cleaner.Area,
+                Available = cleaner.Available,
+                ExperienceYear = cleaner.ExperienceYear,
+                WalletBalance = cleaner.User.Wallet?.Balance ?? 0,
+                Transactions = cleaner.User.Wallet?.Transactions.Select(t => new WalletTransactionDTO
+                {
+                    TransactionId = t.TransactionId,
+                    Amount = t.Amount,
+                    TransactionType = t.TransactionType,
+                    Description = t.Description,
+                    CreatedAt = t.CreatedAt
+                }).ToList() ?? new List<WalletTransactionDTO>(),
+                Bookings = bookings
+            };
+        }
+
+        public async Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable)
+        {
+            var cleaner = await _context.CleanerProfiles.FindAsync(cleanerId);
+            if (cleaner != null)
+            {
+                cleaner.Available = isAvailable;
+                await _context.SaveChangesAsync();
+            }
+        }
+
     }
 }

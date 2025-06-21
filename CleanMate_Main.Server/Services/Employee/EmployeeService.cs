@@ -56,7 +56,7 @@ namespace CleanMate_Main.Server.Services.Employee
                 throw new KeyNotFoundException("Công việc không tồn tại.");
             }
 
-            DateTime startTime = booking.Date.ToDateTime(booking.StartTime); 
+            DateTime startTime = booking.Date.ToDateTime(booking.StartTime);
             DateTime currentTime = DateTimeVN.GetNow();
 
             if (startTime < currentTime)
@@ -64,7 +64,7 @@ namespace CleanMate_Main.Server.Services.Employee
                 throw new KeyNotFoundException("Công việc đã quá thời hạn để nhận.");
             }
 
-            if (wallet == null || wallet.Balance < CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK) 
+            if (wallet == null || wallet.Balance < CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK)
             {
                 throw new InvalidOperationException($"Số dư ví không đủ. Bạn cần tối thiểu {CommonConstants.MINIMUM_COINS_TO_ACCEPT_WORK.ToString("N0")} coins để nhận công việc.");
             }
@@ -103,7 +103,7 @@ namespace CleanMate_Main.Server.Services.Employee
             }
 
             DateTime startTime = booking.Date.ToDateTime(booking.StartTime);
-            DateTime currentTime = DateTimeVN.GetNow(); 
+            DateTime currentTime = DateTimeVN.GetNow();
 
             if (booking.Date != DateOnly.FromDateTime(currentTime))
             {
@@ -165,10 +165,10 @@ namespace CleanMate_Main.Server.Services.Employee
 
             decimal refundAmount = 0m;
             decimal refundPercentage = 0m;
-            int newStatus = CommonConstants.BookingStatus.CANCEL; 
+            int newStatus = CommonConstants.BookingStatus.CANCEL;
             if (timeDifference.TotalHours >= 8)
             {
-                refundAmount = booking.TotalPrice.Value * (1.0m -CommonConstants.COMMISSION_PERCENTAGE);
+                refundAmount = booking.TotalPrice.Value * (1.0m - CommonConstants.COMMISSION_PERCENTAGE);
                 refundPercentage = 1.0m;  // 100%
                 newStatus = CommonConstants.BookingStatus.NEW; // Set to NEW for >= 8 hours
                 employeeId = null;
@@ -191,10 +191,10 @@ namespace CleanMate_Main.Server.Services.Employee
             else
             {
                 refundPercentage = 0.0m; // 0%
-                refundAmount = - (booking.TotalPrice.Value * CommonConstants.COMMISSION_PERCENTAGE); // No refund for less than 1 hour
+                refundAmount = -(booking.TotalPrice.Value * CommonConstants.COMMISSION_PERCENTAGE); // No refund for less than 1 hour
             }
 
-                string refundReason = $"Hoàn tiền hủy công việc (mức hoàn: {refundPercentage * 100}%)";
+            string refundReason = $"Hoàn tiền hủy công việc (mức hoàn: {refundPercentage * 100}%)";
 
             if (refundAmount < 0)
             {
@@ -234,10 +234,10 @@ namespace CleanMate_Main.Server.Services.Employee
             }
 
             // Kiểm tra quyền: chỉ khách hàng (UserId) hoặc admin có thể xác nhận
-           /* if (booking.UserId != userId && !await IsAdminAsync(userId))
-            {
-                throw new InvalidOperationException("Bạn không có quyền xác nhận hoàn thành công việc này.");
-            }*/
+            /* if (booking.UserId != userId && !await IsAdminAsync(userId))
+             {
+                 throw new InvalidOperationException("Bạn không có quyền xác nhận hoàn thành công việc này.");
+             }*/
 
             if (booking.StatusId != CommonConstants.BookingStatus.PENDING_DONE)
             {
@@ -366,6 +366,21 @@ namespace CleanMate_Main.Server.Services.Employee
             cleanerProfile.AverageRating = newAverage;
 
             return await _employeeRepository.UpdatePersonalProfileAsync(cleanerProfile);
+        }
+
+        public async Task<List<CleanerListItemDTO>> GetCleanerListAsync()
+        {
+            return await _employeeRepository.GetCleanerListAsync();
+        }
+
+        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId)
+        {
+            return await _employeeRepository.GetCleanerDetailAsync(cleanerId);
+        }
+
+        public async Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable)
+        {
+            await _employeeRepository.ToggleCleanerAvailabilityAsync(cleanerId, isAvailable);
         }
     }
 }

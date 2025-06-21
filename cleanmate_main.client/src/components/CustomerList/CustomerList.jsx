@@ -16,28 +16,40 @@ import {
     Pagination,
     Button,
     TextField,
+    Tooltip,
+    Divider,
+    Avatar,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
     Modal
 } from '@mui/material';
+import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { toast } from 'react-toastify';
+import userAvatar from '../../images/user-image.png';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import ReactLoading from 'react-loading';
 
-import { toast } from 'react-toastify';
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [openModal, setOpenModal] = useState(false);
 
-    console.log(customers)
+    const handleCustomerDetail = (customer) => {
+        setSelectedCustomer(customer);
+        setOpenModal(true);
+    }
 
     const getCustomers = useCallback(async () => {
         try {
@@ -70,11 +82,11 @@ const CustomerList = () => {
             if (!sortConfig.key) return 0;
 
             const keyMapping = {
-                'tên khách hàng': 'fullName',
-                'số điện thoại': 'phoneNumber',
+                'khách hàng': 'fullName',
                 'email': 'email',
-                'trạng thái': 'isActive',
+                'số điện thoại': 'phoneNumber',
                 'ngày tạo': 'createdDate',
+                'trạng thái': 'isActive',
             };
 
             const englishKey = keyMapping[sortConfig.key] || sortConfig.key;
@@ -144,14 +156,6 @@ const CustomerList = () => {
 
             await getCustomers();
 
-            //setCustomers(prev =>
-            //    prev.map((customer) =>
-            //        customer.id === userId
-            //            ? { ...customer, isActive: false }
-            //            : customer
-            //    )
-            //);
-
             toast.success("Đã khóa tài khoản!");
         } catch (error) {
             console.error('Error locking customer:', error);
@@ -178,16 +182,8 @@ const CustomerList = () => {
                 throw new Error('Failed to unlock customer account');
             }
 
-            
-            await getCustomers();
 
-            //setCustomers(prev =>
-            //    prev.map((customer) =>
-            //        customer.id === userId
-            //            ? { ...customer, isActive: true }
-            //            : customer
-            //    )
-            //);
+            await getCustomers();
 
             toast.success('Đã mở khóa tài khoản!');
         } catch (error) {
@@ -197,9 +193,6 @@ const CustomerList = () => {
             setLoading(false);
         }
     };
-
-    console.log(customers)
-
 
     return (
         <Box sx={{ position: 'relative' }}>
@@ -292,7 +285,7 @@ const CustomerList = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
                         <TableRow>
-                            {['tên khách hàng', 'số điện thoại', 'email', 'trạng thái', 'ngày tạo'].map((key) => (
+                            {['khách hàng', 'email', 'số điện thoại', 'ngày tạo', 'trạng thái'].map((key) => (
                                 <TableCell key={key}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -311,15 +304,35 @@ const CustomerList = () => {
                                 </TableCell>
                             ))}
                             <TableCell>Thay đổi trạng thái</TableCell>
-                            <TableCell>Xem chi tiết</TableCell>
+                            <TableCell>Hành động</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {paginatedData?.map((row) => (
-                            <TableRow key={row.bookingId}>
-                                <TableCell>{row.fullName}</TableCell>
-                                <TableCell>{row.phoneNumber}</TableCell>
+                            <TableRow key={row.id}>
+                                <TableCell>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                    }}>
+                                        <img
+                                            src={row.avatar || userAvatar}
+                                            alt="Avatar"
+                                            style={{
+                                                width: '40px',
+                                                height: '40px',
+                                                borderRadius: '50%',
+                                                objectFit: 'cover',
+                                            }}
+                                        />
+
+                                        {row.fullName}
+                                    </Box>
+                                </TableCell>
                                 <TableCell>{row.email}</TableCell>
+                                <TableCell>{row.phoneNumber}</TableCell>
+                                <TableCell>{formatDate(row.createdDate)}</TableCell>
                                 <TableCell>
                                     <span style={{
                                         backgroundColor: row.isActive ? '#4CAF50' : '#F44336',
@@ -331,7 +344,6 @@ const CustomerList = () => {
                                         {row.isActive ? "Đã kích hoạt" : "Đã khóa"}
                                     </span>
                                 </TableCell>
-                                <TableCell>{formatDate(row.createdDate)}</TableCell>
                                 <TableCell>
                                     <Button
                                         variant="contained"
@@ -349,11 +361,24 @@ const CustomerList = () => {
                                 </TableCell>
                                 <TableCell
                                     sx={{
-                                        textAlign: 'center',
                                         cursor: 'pointer',
                                     }}
                                 >
-                                    <VisibilityIcon />
+                                    <Tooltip title="Xem chi tiết" arrow>
+                                        <IconButton color="primary" size="small" onClick={() => handleCustomerDetail(row)}>
+                                            <VisibilityIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Chỉnh sửa" arrow>
+                                        <IconButton color="warning" size="small">
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Xóa" arrow>
+                                        <IconButton color="error" size="small">
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -361,6 +386,73 @@ const CustomerList = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {openModal && (
+                <Modal
+                    open={openModal}
+                    onClose={() => setOpenModal(false)}
+                    disableAutoFocus
+                >
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '90%',
+                        maxWidth: 500,
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        borderRadius: 2,
+                        p: 3,
+                    }}>
+                        {/* Header */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#122B82' }}>
+                                Thông tin khách hàng
+                            </Typography>
+                            <IconButton onClick={() => setOpenModal(false)}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Box>
+
+                        <Divider sx={{ mb: 2 }} />
+
+                        {/* Avatar + Name + ID */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Avatar src={userAvatar || ''} alt={selectedCustomer.fullName} sx={{ width: 48, height: 48, mr: 2 }} />
+                            <Box>
+                                <Typography sx={style.valueStyle}>{selectedCustomer.fullName}</Typography>
+                                <Typography sx={style.id}>{selectedCustomer.id}</Typography>
+                            </Box>
+                        </Box>
+
+                        {/* Email */}
+                        <Box sx={{ mb: 1.5 }}>
+                            <Typography sx={style.labelStyle}>Email</Typography>
+                            <Typography sx={style.valueStyle}>{selectedCustomer.email}</Typography>
+                        </Box>
+
+                        {/* Phone */}
+                        <Box sx={{ mb: 1.5 }}>
+                            <Typography sx={style.labelStyle}>Số điện thoại</Typography>
+                            <Typography sx={style.valueStyle}>{selectedCustomer.phoneNumber}</Typography>
+                        </Box>
+
+                        {/* Status */}
+                        <Box sx={{ mb: 1.5 }}>
+                            <Typography sx={style.labelStyle}>Trạng thái</Typography>
+                            <Typography
+                                sx={{
+                                    fontWeight: 600,
+                                    color: selectedCustomer.isActive ? '#4CAF50' : '#F44336',
+                                }}
+                            >
+                                {selectedCustomer.isActive ? 'Đã kích hoạt' : 'Đã khóa'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Modal>
+            )}
 
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                 <Pagination
@@ -373,9 +465,23 @@ const CustomerList = () => {
                     {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData?.length)} of ${filteredData?.length}`}
                 </Typography>
             </Box>
-
         </Box>
     );
 }
+
+const style = {
+    id: {
+        fontSize: '0.8rem',
+        color: '#888',
+    },
+    labelStyle: {
+        fontSize: '0.8rem',
+        color: '#888',
+        marginTop: 1,
+    },
+    valueStyle: {
+        fontWeight: 500,
+    },
+};
 
 export default CustomerList;

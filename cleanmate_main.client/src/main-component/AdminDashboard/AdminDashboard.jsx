@@ -43,6 +43,8 @@ import WithdrawRequest from '../../components/WithdrawRequest/WithdrawRequest';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import CustomerList from '../../components/CustomerList/CustomerList';
+import ViewVoucherList from '../../components/ManageVoucher/ViewVoucherList';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 const drawerWidth = 300;
 
@@ -231,6 +233,10 @@ const AdminDashboard = () => {
         {
             title: 'Yêu cầu rút tiền',
             icon: <CurrencyExchangeIcon sx={style.drawerIcon} />
+        },
+        {
+            title: 'Danh sách voucher', 
+            icon: <ConfirmationNumberIcon sx={style.drawerIcon} />,
         }
     ];
 
@@ -592,6 +598,8 @@ const AdminDashboard = () => {
                 return <CleanerList />
             case 4:
                 return <WithdrawRequest />
+            case 5:
+                return <ViewVoucherList />
             default:
                 return <WorkListPage />;
         }

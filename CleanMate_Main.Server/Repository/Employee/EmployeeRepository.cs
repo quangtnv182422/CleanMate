@@ -330,11 +330,13 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .Select(t => new TransactionViewModel
                 {
                     TransactionId = t.TransactionId,
-                    BookingId = t.RelatedBookingId,
+                    WalletId = t.WalletId,
                     Amount = t.Amount,
-                    TransactionDate = t.CreatedAt,
                     TransactionType = t.TransactionType.ToString(),
-                    Description = t.Description ?? ""
+                    Description = t.Description ?? "",
+                    Month = t.CreatedAt.Month,
+                    Date = t.CreatedAt.Day,
+                    RelatedBookingId = t.RelatedBookingId
                 })
                 .ToListAsync();
 
@@ -357,6 +359,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                 WithdrawalRequests = withdrawalRequests
             };
         }
+
 
 
 
@@ -556,7 +559,7 @@ namespace CleanMate_Main.Server.Repository.Employee
 
                 if (!pastDueBookings.Any())
                 {
-                    return 0; // No bookings to update
+                    return 0;
                 }
 
                 foreach (var booking in pastDueBookings)

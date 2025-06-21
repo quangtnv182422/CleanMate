@@ -129,6 +129,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/managevoucher': {
+                target,
+                secure: false
+            }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),
         https: {

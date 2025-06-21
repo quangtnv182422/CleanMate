@@ -21,6 +21,12 @@ import {
     Modal,
     InputLabel,
     FormControl,
+    Card,
+    CardContent,
+    Grid,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
     List,
     ListItemIcon,
     ListItemButton,
@@ -93,6 +99,8 @@ const WorkList = () => {
             currency: 'VND'
         });
     };
+
+    console.log(data)
 
     const handleStatusChange = (event) => {
         setStatus(event.target.value);
@@ -195,45 +203,17 @@ const WorkList = () => {
             const sortableData = [...data].sort((a, b) => {
                 if (!sortConfig.key) return 0;
 
-                const keyMapping = {
-                    'tên': 'serviceName',
-                    'khách hàng': 'customerFullName',
-                    'người dọn': 'cleanerName',
-                    'giờ làm': 'startTime',
-                    'làm trong': 'duration',
-                    'địa chỉ': 'address',
-                    'ghi chú': 'note',
-                    'số tiền': 'totalPrice',
-                    'trạng thái': 'status',
-                    'createdAt': 'createdAt',
-                };
+                let valueA = a[sortConfig.key];
+                let valueB = b[sortConfig.key];
 
-                const englishKey = keyMapping[sortConfig.key] || sortConfig.key;
-                let valueA = a[englishKey];
-                let valueB = b[englishKey];
-
-                if (englishKey === 'cleanerName') {
-                    valueA = valueA || 'Chưa phân công';
-                    valueB = valueB || 'Chưa phân công';
-                }
-                if (englishKey === 'note') {
-                    valueA = valueA || 'không có ghi chú';
-                    valueB = valueB || 'không có ghi chú';
-                }
-                if (englishKey === 'startTime') {
-                    const dateTimeA = new Date(`${a.date}T${a.startTime}`);
-                    const dateTimeB = new Date(`${b.date}T${b.startTime}`);
-                    valueA = dateTimeA.getTime();
-                    valueB = dateTimeB.getTime();
-                } else if (englishKey === 'totalPrice') {
-                    valueA = Number(valueA);
-                    valueB = Number(valueB);
-                } else if (englishKey === 'createdAt') {
+                if (sortConfig.key === 'createdAt') {
                     valueA = new Date(valueA).getTime();
                     valueB = new Date(valueB).getTime();
-                } else if (typeof valueA === 'string') {
-                    valueA = valueA.toLowerCase();
-                    valueB = valueB?.toLowerCase();
+                }
+
+                if (sortConfig.key === 'totalPrice') {
+                    valueA = Number(valueA);
+                    valueB = Number(valueB);
                 }
 
                 if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -256,147 +236,126 @@ const WorkList = () => {
             return filteredData.slice(startIndex, startIndex + rowsPerPage);
         }, [filteredData, page, rowsPerPage]);
 
-        const handleSort = useCallback((vietnameseKey) => {
-            let direction = 'asc';
-            if (sortConfig.key === vietnameseKey && sortConfig.direction === 'asc') {
-                direction = 'desc';
-            }
-            setSortConfig({ key: vietnameseKey, direction });
-        }, [sortConfig]);
-
         return (
-            <Box>
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 1,
-                    '@media (max-width: 915px)': {
-                        width: '100%',
-                        justifyContent: 'flex-start',
-                        mt: 1,
+            <Box sx={{ backgroundColor: "#fff" }}>
+                <Box className="container" sx={{
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    padding: '0 16px',
+                    '@media (max-width: 400px)': {
+                        padding: '0 16px',
                     },
                 }}>
                     <Box sx={{
-                        maxWidth: '400px',
-                        width: '100%',
                         display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: 1,
-                    }}
-                    >
-                        <TextField
-                            key="search-input"
-                            type="text"
-                            name="search"
-                            placeholder="Tìm kiếm theo tên..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            inputProps={{ maxLength: 100 }}
-                            sx={{
-                                maxWidth: 300,
-                                '& .MuiOutlinedInput-input': {
-                                    padding: '10px 15px',
-                                },
-                                '@media (max-width: 600px)': {
-                                    maxWidth: '100%',
-                                },
-                            }}
-                        />
-                    </Box>
-                    <Box>
-                        <IconButton>
-                            <FileDownload />
-                        </IconButton>
-                        <IconButton>
-                            <FilterList />
-                        </IconButton>
-                        <Select
-                            value={rowsPerPage}
-                            onChange={(e) => setRowsPerPage(e.target.value)}
-                            size="small"
-                            sx={{ ml: 1 }}
+                        mb: 1,
+                        '@media (max-width: 915px)': {
+                            width: '100%',
+                            justifyContent: 'flex-start',
+                            mt: 1,
+                        },
+                    }}>
+                        <Box sx={{
+                            maxWidth: '400px',
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                        }}
                         >
-                            <MenuItem value={5}>5</MenuItem>
-                            <MenuItem value={10}>10</MenuItem>
-                            <MenuItem value={25}>25</MenuItem>
-                        </Select>
+                            <TextField
+                                key="search-input"
+                                type="text"
+                                name="search"
+                                placeholder="Tìm kiếm theo tên..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                inputProps={{ maxLength: 100 }}
+                                sx={{
+                                    maxWidth: 300,
+                                    '& .MuiOutlinedInput-input': {
+                                        padding: '10px 15px',
+                                    },
+                                    '@media (max-width: 600px)': {
+                                        maxWidth: '100%',
+                                    },
+                                }}
+                            />
+                        </Box>
+                        <Box>
+                            <Select
+                                value={sortConfig.key + '-' + sortConfig.direction}
+                                onChange={(e) => {
+                                    const [key, direction] = e.target.value.split('-');
+                                    setSortConfig({ key, direction });
+                                }}
+                                size="small"
+                                sx={{ ml: 1 }}
+                            >
+                                <MenuItem value="createdAt-desc">Mới nhất</MenuItem>
+                                <MenuItem value="createdAt-asc">Cũ nhất</MenuItem>
+                                <MenuItem value="totalPrice-asc">Giá thấp đến cao</MenuItem>
+                                <MenuItem value="totalPrice-desc">Giá cao đến thấp</MenuItem>
+                            </Select>
+                            <Select
+                                value={rowsPerPage}
+                                onChange={(e) => setRowsPerPage(e.target.value)}
+                                size="small"
+                                sx={{ ml: 1 }}
+                            >
+                                <MenuItem value={5}>5</MenuItem>
+                                <MenuItem value={10}>10</MenuItem>
+                                <MenuItem value={25}>25</MenuItem>
+                            </Select>
+                        </Box>
                     </Box>
                 </Box>
-
-                <TableContainer component={Paper} sx={{
-                    overflowX: 'auto',
-                    maxWidth: '100%',
-                    '& .MuiTable-root': {
-                        minWidth: 915,
-                    },
-                    '@media (max-width: 915px)': {
-                        width: '100vw',
-                        marginLeft: '-16px',
-                        marginRight: '-16px',
-                    },
-                }}>
-                    <Table sx={{ minWidth: 650 }} aria-label="work list table">
-                        <TableHead>
-                            <TableRow>
-                                {['tên', 'khách hàng', 'giờ làm', 'làm trong (tiếng)', 'địa chỉ', 'ghi chú', 'số tiền (VND)', 'trạng thái'].map((key) => (
-                                    <TableCell key={key}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            {key.charAt(0).toUpperCase() + key.slice(1)}
-                                            <IconButton onClick={() => handleSort(key)} size="small">
-                                                {sortConfig.key === key ? (
-                                                    sortConfig.direction === 'asc' ? (
-                                                        <ArrowUpward fontSize="small" />
-                                                    ) : (
-                                                        <ArrowDownward fontSize="small" />
-                                                    )
-                                                ) : (
-                                                    <ArrowUpward fontSize="small" color="disabled" />
-                                                )}
-                                            </IconButton>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                    {paginatedData.length === 0 ? (
+                        <Grid item xs={12}>
+                            <Typography align="center" sx={{ mt: 4, color: 'gray' }}>
+                                Hiện tại chưa có công việc nào.
+                            </Typography>
+                        </Grid>
+                    ) : (
+                        paginatedData.map((work, idx) => (
+                            <Grid item xs={12} sm={6} md={4} key={idx}>
+                                <Card sx={style.workCard} onClick={() => handleOpen(work.bookingId)}>
+                                    <CardContent>
+                                        <Typography variant="body2" sx={{ mb: 1, color: 'gray' }}>
+                                            Bắt đầu lúc <span style={style.dateTimeContent}>{formatTime(work.startTime)}</span> giờ ngày <span style={style.dateTimeContent}>{formatDate(work.date)}</span>
+                                        </Typography>
+                                        <Typography sx={{ mt: 2, fontWeight: 500 }}>Khách hàng: <span style={{ fontWeight: 'bold' }}>{work.customerFullName}</span></Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">Dịch vụ: <span style={{ fontWeight: 'bold' }}>{work.serviceName}</span></Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">Địa chỉ: <span style={{ fontWeight: 'bold' }}>{work.addressNo}, {work.address}</span></Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">Ghi chú: <span style={{ fontWeight: 'bold' }}>{work.note ? work.note : "Không có ghi chú"}</span></Typography>
+                                        <Box sx={style.priceSection}>
+                                            <Typography variant="h6" sx={{ color: '#1976D2' }}>
+                                                Số tiền: {formatPrice(work.totalPrice)}
+                                            </Typography>
+                                            <Typography
+                                                variant="subtitle2"
+                                                sx={{
+                                                    border: `1px solid ${colorMap[work.status] || '#000000'}`, 
+                                                    borderColor: colorMap[work.status] || '#000000',
+                                                    borderRadius: '8px',
+                                                    color: colorMap[work.status],
+                                                    backgroundColor: '#EBF5FB',
+                                                    display: 'inline-block',
+                                                    padding: '4px 8px',
+                                                }}
+                                            >
+                                                {work.status}
+                                            </Typography>
                                         </Box>
-                                    </TableCell>
-                                ))}
-                                <TableCell>Xem trước</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {paginatedData.map((row) => (
-                                <TableRow key={row.bookingId}>
-                                    <TableCell>{row.serviceName}</TableCell>
-                                    <TableCell>{row.customerFullName}</TableCell>
-                                    <TableCell>{`${formatDate(row.date)} (${formatTime(row.startTime)})`}</TableCell>
-                                    <TableCell sx={{ maxWidth: 160 }}>{row.duration}</TableCell>
-                                    <TableCell>{row.addressNo}, {row.address}</TableCell>
-                                    <TableCell>{row.note ? row.note : 'Không có ghi chú'}</TableCell>
-                                    <TableCell>{formatPrice(row.totalPrice)}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            style={{
-                                                backgroundColor: colorMap[row.status] || '#000000',
-                                                color: '#FFFFFF',
-                                                padding: '4px 8px',
-                                                borderRadius: '4px',
-                                                display: 'inline-block',
-                                            }}
-                                        >
-                                            {row.status}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                        }}
-                                        onClick={() => handleOpen(row.bookingId)}
-                                    >
-                                        <VisibilityOutlinedIcon />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))
+                    )}
+                </Grid>
 
                 {selectedWork && (
                     <Modal
@@ -566,7 +525,7 @@ const WorkList = () => {
 
                                 {item.coin && (
                                     <Box sx={{ marginLeft: 'auto', paddingRight: 2, color: '#000' }}>
-                                        Số dư ví: <span style={{ color: '#1976D2'} }>{formatPrice(item.coin)}</span>
+                                        Số dư ví: <span style={{ color: '#1976D2' }}>{formatPrice(item.coin)}</span>
                                     </Box>
                                 )}
                             </Box>
@@ -677,6 +636,28 @@ const style = {
     },
     fontBlack: {
         color: '#000',
+    },
+    dateTimeContent: {
+        color: '#1976D2',
+        fontWeight: 'bold',
+    },
+    priceSection: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: '16px',
+    },
+    workCard: {
+        border: '1px solid #eee',
+        borderRadius: '12px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+        cursor: 'pointer',
+        '&:hover': {
+            boxShadow: '0 5px 8px rgba(0,0,0,0.5)',
+            '@media (max-width: 600px)': {
+                boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+            },
+        },
     },
 };
 

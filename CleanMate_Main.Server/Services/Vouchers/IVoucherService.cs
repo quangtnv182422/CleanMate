@@ -10,6 +10,9 @@ namespace CleanMate_Main.Server.Services.Vouchers
         Task CreateVoucherAsync(VoucherDTO voucherDto, string adminId);
         Task UpdateVoucherAsync(VoucherDTO voucherDto);
         Task DeleteVoucherAsync(int voucherId);
-
+        Task AssignVoucherToUserAsync(string userId, int voucherId, int quantity);
+        Task AssignVoucherToUsersAsync(List<string> userIds, int voucherId, int quantity);
+        Task<IEnumerable<UserVoucherDTO>> GetAvailableVouchersForUserAsync(string userId);
+        Task<ApplyVoucherResult> ApplyVoucherAsync(string userId, string voucherCode, decimal totalAmount);
     }
 }

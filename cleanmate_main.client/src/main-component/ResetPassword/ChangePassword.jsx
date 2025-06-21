@@ -131,6 +131,10 @@ const ChangePassword = () => {
         }
     };
 
+    const textSecurityStyle = showPassword
+        ? { WebkitTextSecurity: 'none' }
+        : { WebkitTextSecurity: 'disc' };
+
     return (
         <div style={{ position: 'relative' }}>
             {loading && (
@@ -185,6 +189,7 @@ const ChangePassword = () => {
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />
@@ -193,7 +198,7 @@ const ChangePassword = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControl sx={{ width: '100%' }} variant="outlined">
-                                    <InputLabel htmlFor="outlined-adornment-password">Xác nhận mật khẩu</InputLabel>
+                                    <InputLabel htmlFor="outlined-adornment-password">Mật khẩu mới</InputLabel>
                                     <OutlinedInput
                                         id="outlined-adornment-password"
                                         type={showPassword ? 'text' : 'password'}
@@ -216,13 +221,14 @@ const ChangePassword = () => {
                                                 </IconButton>
                                             </InputAdornment>
                                         }
-                                        label="Xác nhận mật khẩu"
+                                        label="Mật khẩu mới"
                                         sx={{
                                             input: {
                                                 '&::-ms-reveal': { display: 'none' },
                                                 '&::-ms-clear': { display: 'none' },
                                                 '&::-webkit-credentials-auto-fill-button': { display: 'none' },
                                                 '&::-webkit-textfield-decoration-container': { display: 'none' },
+                                                ...textSecurityStyle,
                                             }
                                         }}
                                     />

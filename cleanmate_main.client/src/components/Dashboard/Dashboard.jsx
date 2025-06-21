@@ -9,6 +9,7 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MovingIcon from '@mui/icons-material/Moving';
+import useAuth from "../../hooks/useAuth.jsx";
 
 const sampleData = [
     { name: "Tháng 1", bookings: 40 },
@@ -32,10 +33,21 @@ const calculateChange = (current, previous) => {
 };
 
 export default function Dashboard() {
+    const { user } = useAuth();
     const [totalBookings, setTotalBookings] = useState(411);
     const [totalRevenue, setTotalRevenue] = useState(82000000);
     const [activeCleaners, setActiveCleaners] = useState(24);
     const [activeCustomers, setActiveCustomers] = useState(120);
+
+    const today = new Date();
+    const days = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const dayOfWeek = days[today.getDay()];
+
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+
+    const fullDate = `${dayOfWeek}, ${day}-${month}-${year}`;
 
     // Mock data for previous values
     const previousTotalBookings = 390;
@@ -65,8 +77,8 @@ export default function Dashboard() {
 
     return (
         <div className="p-6 space-y-6">
-            <Typography variant="h4" gutterBottom>Dashboard</Typography>
-
+            <Typography variant="h4" gutterBottom sx={{ color: '#1976D2' }}>Xin chào, {user?.fullName}</Typography>
+            <Typography vairant="body2" sx={{color: '#aaa', marginBottom: '10px'}}>{fullDate}</Typography>
             <Grid container spacing={3}>
                 <Grid item xs={6} sm={3}>
                     <Card>

@@ -62,7 +62,7 @@ namespace CleanMate_Main.Server.Services.Vouchers
             {
                 Description = voucherDto.Description,
                 DiscountPercentage = voucherDto.DiscountPercentage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeVN.GetNow(),
                 ExpireDate = voucherDto.ExpireDate,
                 VoucherCode = voucherDto.VoucherCode,
                 IsEventVoucher = voucherDto.IsEventVoucher,
@@ -95,6 +95,67 @@ namespace CleanMate_Main.Server.Services.Vouchers
                 throw new KeyNotFoundException("Voucher not found.");
 
             await _voucherRepository.DeleteVoucherAsync(voucherId);
+        }
+
+        public async Task AssignVoucherToUserAsync(string userId, int voucherId, int quantity)
+        {
+            if (!await _voucherRepository.VoucherExistsAsync(voucherId))
+                throw new KeyNotFoundException("Voucher not found.");
+
+            await _voucherRepository.AssignVoucherToUserAsync(userId, voucherId, quantity);
+        }
+
+        public async Task AssignVoucherToUsersAsync(List<string> userIds, int voucherId, int quantity)
+        {
+            if (!await _voucherRepository.VoucherExistsAsync(voucherId))
+                throw new KeyNotFoundException("Voucher not found.");
+
+            foreach (var userId in userIds)
+            {
+                await _voucherRepository.AssignVoucherToUserAsync(userId, voucherId, quantity);
+            }
+        }
+
+        public async Task<IEnumerable<UserVoucherDTO>> GetAvailableVouchersForUserAsync(string userId)
+        {
+            var userVouchers = await _voucherRepository.GetAvailableUserVouchersAsync(userId);
+            return userVouchers.Select(uv => new UserVoucherDTO
+            {
+                UserVoucherId = uv.UserVoucherId,
+                VoucherId = uv.VoucherId,
+                VoucherCode = uv.Voucher.VoucherCode,
+                Description = uv.Voucher.Description,
+                DiscountPercentage = uv.Voucher.DiscountPercentage,
+                ExpireDate = uv.Voucher.ExpireDate
+            }).ToList();
+        }
+
+        public async Task<ApplyVoucherResult> ApplyVoucherAsync(string userId, string voucherCode, decimal totalAmount)
+        {
+            var userVoucher = await _voucherRepository.GetUserVoucherByCodeAsync(userId, voucherCode);
+            if (userVoucher == null)
+            {
+                return new ApplyVoucherResult
+                {
+                    Success = false,
+                    Message = "Voucher không hợp lệ hoặc đã hết hạn."
+                };
+            }
+
+            decimal discountAmount = totalAmount * (userVoucher.Voucher.DiscountPercentage / 100);
+            decimal newTotal = totalAmount - discountAmount;
+
+            userVoucher.IsUsed = true;
+            userVoucher.UsedAt = DateTimeVN.GetNow();
+            await _voucherRepository.UpdateUserVoucherAsync(userVoucher);
+
+            return new ApplyVoucherResult
+            {
+                Success = true,
+                Message = "Áp dụng voucher thành công.",
+                DiscountAmount = discountAmount,
+                NewTotal = newTotal
+            };
         }
     }
 }

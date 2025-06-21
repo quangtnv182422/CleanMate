@@ -62,7 +62,7 @@ namespace CleanMate_Main.Server.Services.Vouchers
             {
                 Description = voucherDto.Description,
                 DiscountPercentage = voucherDto.DiscountPercentage,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTimeVN.GetNow(),
                 ExpireDate = voucherDto.ExpireDate,
                 VoucherCode = voucherDto.VoucherCode,
                 IsEventVoucher = voucherDto.IsEventVoucher,
@@ -95,6 +95,25 @@ namespace CleanMate_Main.Server.Services.Vouchers
                 throw new KeyNotFoundException("Voucher not found.");
 
             await _voucherRepository.DeleteVoucherAsync(voucherId);
+        }
+
+        public async Task AssignVoucherToUserAsync(string userId, int voucherId, int quantity)
+        {
+            if (!await _voucherRepository.VoucherExistsAsync(voucherId))
+                throw new KeyNotFoundException("Voucher not found.");
+
+            await _voucherRepository.AssignVoucherToUserAsync(userId, voucherId, quantity);
+        }
+
+        public async Task AssignVoucherToUsersAsync(List<string> userIds, int voucherId, int quantity)
+        {
+            if (!await _voucherRepository.VoucherExistsAsync(voucherId))
+                throw new KeyNotFoundException("Voucher not found.");
+
+            foreach (var userId in userIds)
+            {
+                await _voucherRepository.AssignVoucherToUserAsync(userId, voucherId, quantity);
+            }
         }
     }
 }

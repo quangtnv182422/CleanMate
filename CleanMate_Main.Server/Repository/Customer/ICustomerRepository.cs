@@ -9,5 +9,6 @@ namespace CleanMate_Main.Server.Repository.Customer
         Task LockUserAccountAsync(string userId);
         Task UnlockUserAccountAsync(string userId);
         Task<AspNetUser> GetUserById(string userId);
+        Task<CustomerDetailDTO> GetCustomerDetailAsync(string userId);
     }
 }

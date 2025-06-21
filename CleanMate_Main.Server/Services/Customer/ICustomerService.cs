@@ -9,5 +9,6 @@ namespace CleanMate_Main.Server.Services.Customer
         Task UnlockUserAccountAsync(string userId);
         Task<CustomerProfileViewModel> GetCustomerProfileAsync(string userId);
         Task<bool> UpdateCustomerProfileAsync(CustomerProfileViewModel profile);
+        Task<CustomerDetailDTO> GetCustomerDetailAsync(string userId);
     }
 }

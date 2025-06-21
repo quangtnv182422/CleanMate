@@ -73,6 +73,16 @@ namespace CleanMate_Main.Server.Services.Customer
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
+
+        public async Task<CustomerDetailDTO> GetCustomerDetailAsync(string userId)
+        {
+            var customerDetail = await _repository.GetCustomerDetailAsync(userId);
+            if (customerDetail == null)
+            {
+                throw new KeyNotFoundException("Không tìm thấy khách hàng.");
+            }
+            return customerDetail;
+        }
     }
 
     public class CustomerProfileViewModel

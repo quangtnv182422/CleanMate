@@ -13,5 +13,8 @@ namespace CleanMate_Main.Server.Repository.Vouchers
         Task AssignVoucherToUserAsync(string userId, int voucherId, int quantity);
         Task<bool> VoucherExistsAsync(int voucherId);
         Task<bool> VoucherCodeExistsAsync(string voucherCode);
+        Task<IEnumerable<UserVoucher>> GetAvailableUserVouchersAsync(string userId);
+        Task<UserVoucher> GetUserVoucherByCodeAsync(string userId, string voucherCode);
+        Task UpdateUserVoucherAsync(UserVoucher userVoucher);
     }
 }

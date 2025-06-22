@@ -10,5 +10,10 @@
         public string Password { get; set; }
 
         public string ConfirmPassword { get; set; }
+        public string? Identification { get; set; }
+        public string? Bank { get; set; }
+        public string? BankAccount { get; set; }
+
+
     }
 }

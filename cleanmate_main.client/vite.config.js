@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url';
+﻿import { fileURLToPath, URL } from 'node:url';
 
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
@@ -45,9 +45,91 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+    build: {
+        outDir: '../CleanMate_Main.Server/wwwroot', // Xuất file build vào wwwroot của backend
+        emptyOutDir: true, // Xóa nội dung thư mục đích trước khi build
+        assetsDir: 'assets', // Thư mục cho các file tĩnh (JS, CSS, hình ảnh)
+    },
     server: {
         proxy: {
-            '^/weatherforecast': {
+            '^/Authen': {
+                target,
+                secure: false
+            },
+            '^/cleanservice': {
+                target,
+                secure: false
+            },
+            '^/worklist': {
+                target,
+                secure: false
+            },
+            '^/bookingstatus': {
+                target,
+                secure: false
+            },
+            '^/address': {
+                target,
+                secure: false
+            },
+            '^/payments': {
+                target,
+                secure: false
+            },
+            '^/work': {
+                target,
+                secure: false
+            },
+            '^/request': {
+                target,
+                secure: false
+            },
+            '^/withdrawrequest': {
+                target,
+                secure: false
+            },
+            '^/wallet': {
+                target,
+                secure: false
+            },
+            '^/bookings': {
+                target,
+                secure: false
+            },
+            '^/feedback': {
+                target,
+                secure: false
+            },
+            '^/earning': {
+                target,
+                secure: false
+            },
+            '^/managebooking': {
+                target,
+                secure: false
+            }
+            ,
+            '^/cleanperhour': {
+                target,
+                secure: false
+            },
+            '^/viewfeedback': {
+                target,
+                secure: false
+            },
+            '^/customerprofile': {
+                target,
+                secure: false
+            },
+            '^/employeeprofile': {
+                target,
+                secure: false
+            },
+            '^/customerlist': {
+                target,
+                secure: false
+            },
+            '^/managevoucher': {
                 target,
                 secure: false
             }

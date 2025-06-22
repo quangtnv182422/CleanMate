@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@microsoft/signalr": "^8.0.7",
+    "react-helmet": "^6.1.0",
+    "react-loading": "^2.0.3"
+  }
+}

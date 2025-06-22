@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanMate_Main.Server.Models.Enum;
+using System;
 using System.Collections.Generic;
 
 namespace CleanMate_Main.Server.Models.Entities;
@@ -11,7 +12,7 @@ public partial class Payment
 
     public decimal Amount { get; set; }
 
-    public string PaymentMethod { get; set; } = null!;
+    public PaymentType PaymentMethod { get; set; } 
 
     public string PaymentStatus { get; set; } = null!;
 

@@ -1,14 +1,17 @@
-﻿import React, { useState } from 'react'
+﻿import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import HeaderTopbar from '../HeaderTopbar/HeaderTopbar'
 import MobileMenu from '../MobileMenu/MobileMenu'
-import Logo from '../../images/logo.svg'
-import LogoTransparent from '../../images/logo-transparent.png'
+import LogoTransparent from '../../images/header-logo-transparent.png'
+import { BookingContext } from '../../context/BookingProvider'
+import useAuth from '../../hooks/useAuth'
 
 
 
 const Header = (props) => {
+    const { noRatingOrder } = useContext(BookingContext);
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [menuActive, setMenuState] = useState(false);
 
     const SubmitHandler = (e) => {
@@ -42,52 +45,15 @@ const Header = (props) => {
                                 <div id="navbar" className="collapse navbar-collapse navigation-holder">
                                     <button className="menu-close"><i className="ti-close"></i></button>
                                     <ul className="nav navbar-nav mb-2 mb-lg-0">
-                                        <li className="menu-item-has-children">
-                                            <Link to="/home">Trang chủ</Link>
+                                        <li>
+                                            <Link onClick={ClickHandler} to="/about">Về chúng tôi</Link>
                                         </li>
-                                        <li><Link onClick={ClickHandler} to="/about">Về chúng tôi</Link></li>
                                         <li className="menu-item-has-children">
                                             <Link to="/service">Dịch vụ</Link>
-                                            {/*<ul className="sub-menu">*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service">Service</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service-s2">Service style 2</Link></li>*/}
-                                            {/*    <li><Link onClick={ClickHandler} to="/service-single/1">Service Single</Link></li>*/}
-                                            {/*</ul>*/}
                                         </li>
-                                        {/*<li className="menu-item-has-children">*/}
-                                        {/*    <Link to="/project">Pages</Link>*/}
-                                        {/*    <ul className="sub-menu">*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/project">Project</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/project-single/1">Project Single</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/team-single/1">Team Single</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/appointment">Appointment</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/terms">Terms & Conditions</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/testimonial">Testimonial</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/pricing">Pricing</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/404">Error 404</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/login">Login</Link></li>*/}
-                                        {/*        <li><Link onClick={ClickHandler} to="/register">Register</Link></li>*/}
-                                        {/*    </ul>*/}
-                                        {/*</li>*/}
-                                        <li className="menu-item-has-children">
-                                            <Link onClick={ClickHandler} to="/blog">Blog</Link>
-                                            <ul className="sub-menu">
-                                                {/*<li><Link onClick={ClickHandler} to="/blog">Blog right sidebar</Link></li>*/}
-                                                {/*<li><Link onClick={ClickHandler} to="/blog-left-sidebar">Blog left sidebar</Link></li>*/}
-                                                {/*<li><Link onClick={ClickHandler} to="/blog-fullwidth">Blog fullwidth</Link></li>*/}
-                                                {/*<li className="menu-item-has-children">*/}
-                                                {/*    <Link onClick={ClickHandler} to="/">Blog details</Link>*/}
-                                                {/*    <ul className="sub-menu">*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single/1">Blog details right sidebar</Link>*/}
-                                                {/*        </li>*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single-left-sidebar/1">Blog details left*/}
-                                                {/*            sidebar</Link></li>*/}
-                                                {/*        <li><Link onClick={ClickHandler} to="/blog-single-fullwidth/1">Blog details*/}
-                                                {/*            fullwidth</Link></li>*/}
-                                                {/*    </ul>*/}
-                                                {/*</li>*/}
-                                                
-                                            </ul>
+                                        <li className="order-item-none-feedback">
+                                            <Link to="/order/no-rating-yet">Đơn chưa đánh giá</Link>
+                                            <span className="badge">{user ? noRatingOrder.length : 0}</span>
                                         </li>
                                         <li className="menu-item-has-children">
                                             <Link to="/contact">Liên hệ</Link>

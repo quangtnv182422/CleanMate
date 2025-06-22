@@ -1,0 +1,415 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Maps + Place Autocomplete</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet" />
+    <style>
+        #map {
+            height: 60vh;
+            width: 100%;
+        }
+
+        #place-autocomplete-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .modal-content {
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="place-autocomplete-card" style="width: 80%"></div>
+
+    <div class="d-flex flex-column justify-content-center align-items-center" style="padding: 10px; background: #f3f3f3; height: 40vh;">
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-outline-primary me-2" id="backBtn">Quay lại</button>
+            <button class="btn btn-primary" id="selectBtn" disabled>Chọn loại nhà và số nhà</button>
+        </div>
+    </div>
+ Modal 
+<div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="text-center mb-3">Vui lòng chọn địa điểm</h5>
+                <div class="mb-3">
+                    <label>Loại nhà</label>
+                    <div class="d-grid gap-2 mt-1">
+                        <button class="btn btn-outline-primary" onclick="selectHouseType('house')">Nhà / nhà phố</button>
+                        <button class="btn btn-outline-primary" onclick="selectHouseType('apartment')">Căn hộ</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label id="houseTypeLabel" for="houseNumberInput">Số nhà, hẻm (ngõ)</label>
+                    <input type="text" class="form-control" id="houseNumberInput" placeholder="Số nhà 1, hẻm 2">
+                </div>
+                <small class="text-muted">*Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.</small>
+                <div class="mt-3">
+                    <button class="btn btn-primary w-100" id="confirmBtn">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzVSK3iVTuVSarQyvLDKvbu8Kyva0gvO8&libraries=places&callback=initMap" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let map, marker, infoWindow, selectedPlace = null;
+        let houseType = "house";
+        let user = JSON.parse(localStorage.getItem("user")) || null;
+        let houseNumberInput = "";
+        let serviceId = new URLSearchParams(window.location.search).get("service");
+
+        window.initMap = function () {
+            const center = { lat: 21.0278, lng: 105.8342 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                center,
+                zoom: 13,
+                mapTypeControl: false,
+            });
+
+            // ✅ Tạo input riêng thay vì dùng autocomplete.input
+            const input = document.createElement("input");
+            input.type = "text";
+            input.id = "place-autocomplete-input";
+            input.className = "form-control";
+            input.placeholder = "Nhập địa chỉ...";
+
+            // ✅ Khởi tạo autocomplete dựa trên input
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.setOptions({ componentRestrictions: { country: "vn" } });
+
+            const card = document.getElementById("place-autocomplete-card");
+            card.appendChild(input); // ✅ Gắn input vào card
+            map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(card);
+
+            autocomplete.addListener("place_changed", async () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry || !place.geometry.location) return;
+
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);
+
+                if (marker) marker.setMap(null);
+                marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+
+                if (infoWindow) infoWindow.close();
+                infoWindow = new google.maps.InfoWindow({
+                    content: `<strong>${place.name}</strong><br>${place.formatted_address}`,
+                });
+                infoWindow.open(map, marker);
+
+                selectedPlace = {
+                    id: place.place_id,
+                    displayName: place.name,
+                    formattedAddress: place.formatted_address,
+                    location: {
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                    }
+                };
+
+                document.getElementById("selectBtn").disabled = false;
+            });
+        }
+
+        // Sự kiện nút "Quay lại"
+        document.getElementById("backBtn").addEventListener("click", () => {
+            window.location.href = `/booking-service?service=${serviceId}`;
+        });
+
+        // Sự kiện nút "Chọn"
+        document.getElementById("selectBtn").addEventListener("click", () => {
+            const modal = new bootstrap.Modal(document.getElementById("addressModal"));
+            modal.show();
+        });
+
+        // Xử lý chọn loại nhà
+        function selectHouseType(type) {
+            houseType = type;
+            const label = document.getElementById("houseTypeLabel");
+            const input = document.getElementById("houseNumberInput");
+            label.textContent = type === "house" ? "Số nhà, hẻm (ngõ)" : "Căn hộ";
+            input.placeholder = type === "house" ? "Số nhà 1, hẻm 2" : "Lầu 1, phòng 2, block A";
+        }
+
+        // Xác nhận và gửi địa chỉ
+        document.getElementById("confirmBtn").addEventListener("click", async () => {
+            const houseNumber = document.getElementById("houseNumberInput").value;
+
+            if (!selectedPlace || !houseNumber || !user) return;
+
+            try {
+
+                const addressRes = await axios.get(`/address/get-address`, {
+                    withCredentials: true
+                });
+                const userAddresses = addressRes.data;
+                const hasAddress = Array.isArray(userAddresses) && userAddresses.length > 0;
+
+                await axios.post(
+                    "/address/add-address",
+                    {
+                        userId: user?.id,
+                        gg_DispalyName: selectedPlace.displayName,
+                        gg_FormattedAddress: selectedPlace.formattedAddress,
+                        gg_PlaceId: selectedPlace.id,
+                        addressNo: houseNumber,
+                        latitude: selectedPlace.location.lat,
+                        longitude: selectedPlace.location.lng,
+                        isInUse: true,
+                        isDefault: !hasAddress,
+                    },
+                    { withCredentials: true }
+                );
+
+                Toastify({ text: "Địa chỉ đã được thêm", backgroundColor: "#28a745", duration: 3000 }).showToast();
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
+                if (modalInstance) modalInstance.hide();
+                setTimeout(() => {
+                    window.location.href = `/booking-service?service=${serviceId}`;
+                }, 200);
+            } catch (err) {
+                Toastify({ text: "Lỗi khi thêm địa chỉ", backgroundColor: "#dc3545", duration: 3000 }).showToast();
+            }
+        });
+    </script>
+</body>
+</html>
+
+<!--<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Maps + Place Autocomplete</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet" />
+    <style>
+        #map {
+            height: 60vh;
+            width: 100%;
+        }
+
+        #place-autocomplete-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .modal-content {
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="place-autocomplete-card" style="width: 80%"></div>
+    <div class="d-flex flex-column justify-content-center align-items-center" style="padding: 10px; background: #f3f3f3; height: 40vh;">
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-outline-primary me-2" id="backBtn">Quay lại</button>
+            <button class="btn btn-primary" id="selectBtn" disabled>Chọn loại nhà và số nhà</button>
+        </div>
+    </div>-->
+
+    <!-- Modal -->
+    <!--<div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4">
+                <h5 class="text-center mb-3">Vui lòng chọn địa điểm</h5>
+                <div class="mb-3">
+                    <label>Loại nhà</label>
+                    <div class="d-grid gap-2 mt-1">
+                        <button class="btn btn-outline-primary" onclick="selectHouseType('house')">Nhà / nhà phố</button>
+                        <button class="btn btn-outline-primary" onclick="selectHouseType('apartment')">Căn hộ</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label id="houseTypeLabel" for="houseNumberInput">Số nhà, hẻm (ngõ)</label>
+                    <input type="text" class="form-control" id="houseNumberInput" placeholder="Số nhà 1, hẻm 2">
+                </div>
+                <small class="text-muted">*Vui lòng nhập đúng thông tin để Nhân viên có thể tìm thấy nhà bạn.</small>
+                <div class="mt-3">
+                    <button class="btn btn-primary w-100" id="confirmBtn">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBzVSK3iVTuVSarQyvLDKvbu8Kyva0gvO8&libraries=places,geometry&callback=initMap" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let map, marker, infoWindow, selectedPlace = null;
+        let houseType = "house";
+        let user = JSON.parse(localStorage.getItem("user")) || null;
+        let houseNumberInput = "";
+        let serviceId = new URLSearchParams(window.location.search).get("service");
+
+        // Định nghĩa khu vực dịch vụ
+        const serviceAreas = [
+            new google.maps.Polygon({
+                paths: [
+                    { lat: 21.0, lng: 105.8 },
+                    { lat: 21.1, lng: 105.8 },
+                    { lat: 21.1, lng: 105.9 },
+                    { lat: 21.0, lng: 105.9 }
+                ],
+                strokeColor: "#FF0000",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#FF0000",
+                fillOpacity: 0.35
+            }),
+            // Thêm các đa giác khác nếu cần
+        ];
+
+        window.initMap = function () {
+            const center = { lat: 21.0278, lng: 105.8342 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                center,
+                zoom: 13,
+                mapTypeControl: false,
+            });
+
+            // Vẽ khu vực dịch vụ lên bản đồ
+            serviceAreas.forEach(polygon => polygon.setMap(map));
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.id = "place-autocomplete-input";
+            input.className = "form-control";
+            input.placeholder = "Nhập địa chỉ...";
+
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.setOptions({ componentRestrictions: { country: "vn" } });
+
+            const card = document.getElementById("place-autocomplete-card");
+            card.appendChild(input);
+            map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(card);
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry || !place.geometry.location) return;
+
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);
+
+                if (marker) marker.setMap(null);
+                marker = new google.maps.Marker({
+                    map,
+                    position: place.geometry.location,
+                    title: place.name,
+                });
+
+                if (infoWindow) infoWindow.close();
+                infoWindow = new google.maps.InfoWindow({
+                    content: `<strong>${place.name}</strong><br>${place.formatted_address}`,
+                });
+                infoWindow.open(map, marker);
+
+                selectedPlace = {
+                    id: place.place_id,
+                    displayName: place.name,
+                    formattedAddress: place.formatted_address,
+                    location: {
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                    }
+                };
+
+                // Kiểm tra khu vực dịch vụ
+                const location = place.geometry.location;
+                const isInServiceArea = serviceAreas.some(polygon =>
+                    google.maps.geometry.poly.containsLocation(location, polygon)
+                );
+
+                if (isInServiceArea) {
+                    document.getElementById("selectBtn").disabled = false;
+                } else {
+                    document.getElementById("selectBtn").disabled = true;
+                    Toastify({
+                        text: "Địa chỉ này nằm ngoài khu vực cung cấp dịch vụ",
+                        backgroundColor: "#dc3545",
+                        duration: 3000
+                    }).showToast();
+                }
+            });
+        }
+
+        document.getElementById("backBtn").addEventListener("click", () => {
+            window.location.href = `/booking-service?service=${serviceId}`;
+        });
+
+        document.getElementById("selectBtn").addEventListener("click", () => {
+            const modal = new bootstrap.Modal(document.getElementById("addressModal"));
+            modal.show();
+        });
+
+        function selectHouseType(type) {
+            houseType = type;
+            const label = document.getElementById("houseTypeLabel");
+            const input = document.getElementById("houseNumberInput");
+            label.textContent = type === "house" ? "Số nhà, hẻm (ngõ)" : "Căn hộ";
+            input.placeholder = type === "house" ? "Số nhà 1, hẻm 2" : "Lầu 1, phòng 2, block A";
+        }
+
+        document.getElementById("confirmBtn").addEventListener("click", async () => {
+            const houseNumber = document.getElementById("houseNumberInput").value;
+            if (!selectedPlace || !houseNumber || !user) return;
+
+            try {
+                const addressRes = await axios.get("/address/get-address", {
+                    withCredentials: true
+                });
+                const userAddresses = addressRes.data;
+                const hasAddress = Array.isArray(userAddresses) && userAddresses.length > 0;
+
+                await axios.post(
+                    "/address/add-address",
+                    {
+                        userId: user?.id,
+                        gg_DispalyName: selectedPlace.displayName,
+                        gg_FormattedAddress: selectedPlace.formattedAddress,
+                        gg_PlaceId: selectedPlace.id,
+                        addressNo: houseNumber,
+                        latitude: selectedPlace.location.lat,
+                        longitude: selectedPlace.location.lng,
+                        isInUse: true,
+                        isDefault: !hasAddress,
+                    },
+                    { withCredentials: true }
+                );
+
+                Toastify({ text: "Địa chỉ đã được thêm", backgroundColor: "#28a745", duration: 3000 }).showToast();
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById("addressModal"));
+                if (modalInstance) modalInstance.hide();
+                setTimeout(() => {
+                    window.location.href = `/booking-service?service=${serviceId}`;
+                }, 200);
+            } catch (err) {
+                Toastify({ text: "Lỗi khi thêm địa chỉ", backgroundColor: "#dc3545", duration: 3000 }).showToast();
+            }
+        });
+    </script>
+</body>
+</html>-->

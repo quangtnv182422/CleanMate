@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import Logo from '../../images/logo-with-white-text.jpg'
+﻿import React from 'react'
+import { Link } from 'react-router-dom';
+import Logo from '../../images/footer-logo-transparent.png';
 import Services from '../../api/service';
 
 
@@ -17,55 +17,39 @@ const Footer = (props) => {
             <div className="wpo-upper-footer">
                 <div className="container">
                     <div className="row">
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-6 col-sm-12 col-12">
                             <div className="widget about-widget">
                                 <div className="logo widget-title">
                                     <img src={Logo} alt="blog" />
                                 </div>
                             </div>
                         </div>
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-6 col-sm-12 col-12">
                             <div className="widget link-widget">
                                 <div className="widget-title">
-                                    <h3>Quick Link</h3>
+                                    <h3>Xem nhanh</h3>
                                 </div>
                                 <ul>
-                                    <li><Link to="/about">About Us </Link></li>
-                                    <li><Link to="/service-s2">Service</Link></li>
-                                    <li><Link to="/appointment">Appointment</Link></li>
-                                    <li><Link to="/contact">Contact Us </Link></li>
-                                    <li><Link to="/project">Projects</Link></li>
-                                    <li><Link to="/terms">Terms & Conditions</Link></li>
-
+                                    <li><Link to="/about">Về chúng tôi </Link></li>
+                                    <li><Link to="/service-s2">Dịch vụ</Link></li>
+                                    <li><Link to="/contact">Liên hệ chúng tôi </Link></li>
+                                    <li><Link to="/terms">Chính sách & Điều khoản</Link></li>
                                 </ul>
                             </div>
                         </div>
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
+                        <div className="col col-lg-4 col-md-12 col-sm-12 col-12">
                             <div className="widget join-widget">
                                 <div className="widget-title">
-                                    <h3>Newsletter</h3>
+                                    <h3>Gửi thư cho chúng tôi</h3>
                                 </div>
-                                <p>Now use Lorem Ipsum their default
-                                    a search for uncover many.</p>
+                                <p>Gửi thư cho chúng tôi để được hỗ trợ.</p>
                                 <form onSubmit={SubmitHandler}>
                                     <input type="email" placeholder="support@gmail.com" required />
-                                    <button type="submit">Send Now <i className="ti-arrow-right"></i></button>
+                                    <button type="submit">Gửi ngay  <i className="ti-arrow-right"></i></button>
                                 </form>
                             </div>
                         </div>
 
-                        <div className="col col-lg-3 col-md-6 col-sm-12 col-12">
-                            <div className="widget link-widget">
-                                <div className="widget-title">
-                                    <h3>Services</h3>
-                                </div>
-                                <ul>
-                                    {Services.slice(0, 6).map((service, srv) => (
-                                        <li key={srv}><Link onClick={ClickHandler} to={`/service-single/${service.Id}`}>{service.sTitle}</Link></li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

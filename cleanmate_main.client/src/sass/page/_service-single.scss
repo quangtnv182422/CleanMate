@@ -1,104 +1,111 @@
-/*--------------------------------------------------------------
+﻿/*--------------------------------------------------------------
 7. wpo-service-single-section
 --------------------------------------------------------------*/
 
-.wpo-service-single-section{
+.wpo-service-single-section {
 
-    @media(max-width:991px){
-      padding-bottom: 60px;
+    @media(max-width:991px) {
+        padding-bottom: 60px;
     }
-    .wpo-service-single-wrap{
-        img{
+
+    .wpo-service-single-wrap {
+        img {
             width: 100%;
         }
 
-        .wpo-service-single-img{
-            img{
+        .wpo-service-single-img {
+            img {
                 max-height: 475px;
-                object-fit: cover;
+                object-fit: contain;
             }
         }
-        .wpo-service-single-content{
-            .wpo-service-single-content-des{
+
+        .wpo-service-single-content {
+            .wpo-service-single-content-des {
                 padding: 40px 0;
 
-                @media(max-width:767px){
+                @media(max-width:767px) {
                     padding: 35px 0;
                 }
 
-                h2{
+                h2 {
                     font-size: 33px;
                     font-family: $heading-font;
                     margin-bottom: 30px;
                     font-weight: 700;
 
-                    @media(max-width:767px){
+                    @media(max-width:767px) {
                         font-size: 25px;
                         margin-bottom: 16px;
                     }
                 }
 
-                p{
+                p {
                     margin-bottom: 30px;
                 }
-                .wpo-service-single-sub-img{
+
+                .wpo-service-single-sub-img {
                     margin-top: 50px;
-                    ul{
+
+                    ul {
                         display: flex;
                         list-style: none;
                     }
-    
-                    li{
+
+                    li {
                         padding-left: 10px;
                         padding-right: 10px;
-    
-                        &:last-child{
-                            padding-left:10px;
+
+                        &:last-child {
+                            padding-left: 10px;
                             padding-right: 0;
                         }
-    
-                        &:first-child{
-                            padding-left:0px;
+
+                        &:first-child {
+                            padding-left: 0px;
                         }
                     }
                 }
             }
-
         }
 
-        .wpo-related-section{
-            h2{
+        .wpo-related-section {
+            h2 {
                 font-size: 30px;
                 font-family: $heading-font;
                 margin-bottom: 30px;
                 font-weight: 700;
 
-                @media(max-width:575px){
+                @media(max-width:575px) {
                     font-size: 25px;
                 }
             }
-            .wpo-related-item{
+
+            .wpo-related-item {
                 background: $white;
                 padding: 30px 25px;
                 margin-bottom: 30px;
+                border: 1px solid #f1f1f1;
+                border-radius: 10px;
                 box-shadow: 0px 5px 15px 0px rgba(62, 65, 159, 0.1);
 
-                .wpo-related-icon{
+                .wpo-related-icon {
                     width: 65px;
                     height: 65px;
                     box-shadow: 0px 5px 15px 0px rgba(62, 65, 159, 0.1);
                     line-height: 65px;
                     text-align: center;
                     border-radius: 50%;
-                    img{
+
+                    img {
                         width: 36px;
                         line-height: 50px;
                         height: 36px;
-                        object-fit: contain;         
+                        object-fit: contain;
                     }
 
-                    .fi{
-                        &:before{
+                    .fi {
+                        &:before {
                             font-size: 30px;
                             color: $theme-primary-color;
                             line-height: unset;
@@ -106,55 +113,66 @@
                     }
                 }
 
-                .wpo-related-text{
-                    h3{
+                .wpo-related-text {
+                    h3 {
                         font-size: 20px;
                         font-weight: 600;
                         margin: 20px 0 10px;
+                        text-align: center;
 
-                        a{
+                        a {
                             color: $dark-gray;
 
-                            &:hover{
+                            &:hover {
                                 color: $theme-primary-color;
                             }
                         }
                     }
-                    p{
+
+                    p {
                         margin-bottom: 0;
+                    }
+
+                    .description {
+                        height: 300px;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 5;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
                 }
             }
         }
 
-        .wpo-benefits-section{
+        .wpo-benefits-section {
             padding-top: 30px;
 
-            
-    
-            h2{
+
+
+            h2 {
                 font-size: 30px;
                 font-family: $heading-font;
                 margin-bottom: 30px;
                 font-weight: 700;
             }
 
-            .accordion{
+            .accordion {
                 border-top: 1px solid #e1e1e1;
             }
 
-            .accordion-item{
+            .accordion-item {
                 border: 0;
                 border-bottom: 1px solid #e1e1e1;
 
-                .accordion-body{
+                .accordion-body {
                     padding-left: 0;
                     padding-right: 0;
                 }
 
-                button{
+                button {
                     padding: 16px;
-                    border:0;
+                    border: 0;
                     border-radius: 0;
                     padding-left: 0;
                     padding-right: 0;
@@ -164,7 +182,7 @@
                     font-family: $base-font;
                     font-weight: 600;
 
-                    &::after{
+                    &::after {
                         background: none;
                         font-family: "themify";
                         content: "\e622";
@@ -173,37 +191,35 @@
                         font-weight: 700;
                     }
 
-                    
-                    &.collapsed{
+
+                    &.collapsed {
                         color: #373b3e;
 
-                        &::after{
+                        &::after {
                             content: "\e61a";
                         }
                     }
-                    &:focus{
+
+                    &:focus {
                         box-shadow: none;
                         outline: none;
                         border-color: #e1e1e1;
-                        
                     }
-
-                    
                 }
 
-                .accordion-collapse{
+                .accordion-collapse {
                     border: 0;
                 }
             }
 
-            .accordion-button{
+            .accordion-button {
                 background: transparent;
             }
         }
     }
 
-    .wpo-project-details-list{
-         margin-top: 50px;
+    .wpo-project-details-list {
+        margin-top: 50px;
     }
 
     .wpo-minimal-wrap:before {
@@ -215,139 +231,147 @@
         content: "";
         background: rgba(34, 32, 71, 0.5);
         transition: all 0.3s;
-      }
-      
-      .wpo-project-details-text {
+    }
+
+    .wpo-project-details-text {
         text-align: center;
         padding: 40px;
         background: #0a308c;
-      }
-      
-      .wpo-project-details-text-3 {
+    }
+
+    .wpo-project-details-text-3 {
         text-align: center;
         padding: 40px;
         background: #092a77;
-      }
-      
-      .wpo-project-details-list .col {
+    }
+
+    .wpo-project-details-list .col {
         padding: 0;
-      }
-      .wpo-project-details-list .row {
+    }
+
+    .wpo-project-details-list .row {
         margin: 0 0px;
-      }
-      
-      .wpo-project-details-text h2,
-      .wpo-project-details-text-3 h2 {
+    }
+
+    .wpo-project-details-text h2,
+    .wpo-project-details-text-3 h2 {
         font-size: 22px;
         color: #fff;
         margin-bottom: 0;
-      }
-      
-      .wpo-project-details-text span,
-      .wpo-project-details-text-3 span {
+    }
+
+    .wpo-project-details-text span,
+    .wpo-project-details-text-3 span {
         font-size: 16px;
         color: #ddd;
         display: block;
         margin-bottom: 10px;
-      }
-      
-      .wpo-p-details-section {
+    }
+
+    .wpo-p-details-section {
         margin-top: 50px;
-      }
-      .wpo-p-details-section ul {
+    }
+
+    .wpo-p-details-section ul {
         list-style: none;
-      }
-      .wpo-p-details-section h5 {
+    }
+
+    .wpo-p-details-section h5 {
         font-size: 30px;
         margin-bottom: 30px;
         font-weight: 500;
-      }
-    
+    }
 }
-.wpo-single-sidebar{
+.wpo-related-item.disable {
+    opacity: 0.5;
+    pointer-events: none; /* Prevents interaction */
+    background-color: #f0f0f0;
+}
+
+.wpo-single-sidebar {
     padding-left: 20px;
 
-    @media(max-width:991px){
+    @media(max-width:991px) {
         padding-left: 0;
         margin-top: 60px;
     }
 
-    .widget{
+    .widget {
         padding: 30px 40px;
         margin-bottom: 40px;
         background: #f9f9f9;
 
-        @media(max-width:1200px){
-            padding:20px;
+        @media(max-width:1200px) {
+            padding: 20px;
         }
 
-        h2{
-           font-size: 25px;
-           font-family: $heading-font;
-           padding-bottom: 20px;
-           position: relative;
-           font-weight: 700;
-           text-align: left;
-           display: block;
-           margin-bottom: 30px;
+        h2 {
+            font-size: 25px;
+            font-family: $heading-font;
+            padding-bottom: 20px;
+            position: relative;
+            font-weight: 700;
+            text-align: left;
+            display: block;
+            margin-bottom: 30px;
 
-           &::before{
-               position: absolute;
-               left: 0;
-               bottom: 0;
-               background: $theme-primary-color;
-               content: "";
-               width: 70px;
-               height: 4px;
-           }
+            &::before {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                background: $theme-primary-color;
+                content: "";
+                width: 70px;
+                height: 4px;
+            }
         }
 
-        ul{
+        ul {
             list-style: none;
         }
-
     }
-    .wpo-service-widget{
-        ul{
 
-            li{
-                a{
-                  display: block;
-                  padding: 15px 0;
-                  font-size: 16px;
-                  color: $dark-gray;
-                  font-weight: 600;
-                  border-bottom: 1px solid #e1e1e1;
-                  padding-left: 30px;
-                  position: relative;
+    .wpo-service-widget {
+        ul {
 
-                  &:before{
-                      position: absolute;
-                      left: 0;
-                      top: 15px;
-                      font-family: "themify";
-                      content: "\e649";
-                      font-size: 14px;
-                      color: $theme-primary-color;
-                  }
+            li {
+                a {
+                    display: block;
+                    padding: 15px 0;
+                    font-size: 16px;
+                    color: $dark-gray;
+                    font-weight: 600;
+                    border-bottom: 1px solid #e1e1e1;
+                    padding-left: 30px;
+                    position: relative;
 
-                  &:hover{
-                      color: $theme-primary-color;
-                  }
+                    &:before {
+                        position: absolute;
+                        left: 0;
+                        top: 15px;
+                        font-family: "themify";
+                        content: "\e649";
+                        font-size: 14px;
+                        color: $theme-primary-color;
+                    }
 
-                  
+                    &:hover {
+                        color: $theme-primary-color;
+                    }
                 }
+
                 &:last-child {
-                    a{
+                    a {
                         padding-bottom: 0;
                         border-bottom: 0;
                     }
                 }
+
                 &:first-child {
-                    a{
+                    a {
                         padding-top: 0;
-                        
-                        &:before{
+
+                        &:before {
                             top: 2px;
                         }
                     }
@@ -356,25 +380,29 @@
         }
     }
 
-    .wpo-newsletter-widget{
-        p{
+    .wpo-newsletter-widget {
+        p {
             font-size: 18px;
             color: $dark-gray;
             text-align: left;
         }
-        span{
+
+        span {
             font-size: 15px;
             color: $cyan;
-            a{
+
+            a {
                 color: $dark-gray;
                 font-weight: 700;
-                &:hover{
+
+                &:hover {
                     color: $theme-primary-color;
                 }
             }
         }
-        .form{
-            input{
+
+        .form {
+            input {
                 border: 0;
                 display: block;
                 width: 100%;
@@ -384,53 +412,63 @@
                 padding: 15px;
                 text-align: center;
 
-                &:focus{
+                &:focus {
                     box-shadow: none;
                 }
             }
 
-            button{
-                background: $theme-primary-color;
+            button {
+                background: $dark-gray;
                 width: 100%;
                 height: 50px;
-                @include rounded-border(0px);
+                @include rounded-border(10px);
                 text-align: center;
-                color: $white;
+                color: $theme-primary-color;
+                font-size: 18px;
                 border: none;
                 margin: 20px 0;
+
+                &:hover {
+                    background: $theme-primary-color;
+                    color: $dark-gray;
+                    -moz-transition: inherit;
+                    -o-transition: inherit;
+                    -webkit-transition: inherit;
+                    transition: all 0.3s;
+                }
             }
-            
         }
     }
 
-    .wpo-instagram-widget{
-        
-       ul{
-           display: flex;
-           flex-wrap: wrap;
-           li{
-            -ms-flex: 0 0 33.33%;
-            -webkit-box-flex: 0;
-            flex: 0 0 33.33%;
-            max-width: 33.33%;
-            margin-bottom: 5px;
-            padding: 0px 3px;
+    .wpo-instagram-widget {
 
-            img{
-                width: 100%;
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+
+            li {
+                -ms-flex: 0 0 33.33%;
+                -webkit-box-flex: 0;
+                flex: 0 0 33.33%;
+                max-width: 33.33%;
+                margin-bottom: 5px;
+                padding: 0px 3px;
+
+                img {
+                    width: 100%;
+                }
             }
-           }
-       }
-    
+        }
     }
 
-    .wpo-contact-widget{
+    .wpo-contact-widget {
         border: 0;
         background: url(../../images/page-title.jpg) no-repeat center center;
         position: relative;
         background-size: cover;
         z-index: 1;
-        &:before{
+
+        &:before {
             position: absolute;
             left: 0;
             top: 0;
@@ -439,28 +477,28 @@
             background: rgba(22, 57, 103, 0.9);
             content: "";
             z-index: -1;
-         }
+        }
 
-        h2{
+        h2 {
             font-size: 36px;
             font-weight: 700;
             text-align: left;
             color: $white;
             margin-bottom: 20px;
 
-            &::before{
-                background:$white;
+            &::before {
+                background: $white;
             }
         }
 
-        p{
+        p {
             color: $white;
             font-size: 18px;
         }
 
 
-        a{
-            display:inline-block;
+        a {
+            display: inline-block;
             padding: 10px 20px;
             border: 1px solid $white;
             font-size: 18px;
@@ -469,7 +507,7 @@
             position: relative;
             margin-top: 10px;
 
-            &::before{
+            &::before {
                 font-family: "themify";
                 content: "\e628";
                 font-size: 18px;

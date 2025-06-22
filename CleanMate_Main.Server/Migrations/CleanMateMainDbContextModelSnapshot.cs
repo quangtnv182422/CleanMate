@@ -22,6 +22,48 @@ namespace CleanMate_Main.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AspNetRoleAspNetUser", b =>
+                {
+                    b.Property<string>("RolesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("AspNetRoleAspNetUser");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.AspNetRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
             modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.AspNetUser", b =>
                 {
                     b.Property<string>("Id")
@@ -34,6 +76,9 @@ namespace CleanMate_Main.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BankNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CCCD")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -52,6 +97,9 @@ namespace CleanMate_Main.Server.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
@@ -105,31 +153,562 @@ namespace CleanMate_Main.Server.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Booking", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("BookingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"));
+
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int")
+                        .HasColumnName("AddressId");
+
+                    b.Property<int>("BookingStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CleanerId")
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("ServicePriceId")
+                        .HasColumnType("int")
+                        .HasColumnName("Service_PriceId");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BookingId")
+                        .HasName("PK__Booking__73951AED83D6EF22");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("BookingStatusId");
+
+                    b.HasIndex("CleanerId");
+
+                    b.HasIndex("ServicePriceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Booking", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.BookingStatus", b =>
+                {
+                    b.Property<int>("BookingStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingStatusId"));
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("StatusDescription")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("BookingStatusId")
+                        .HasName("PK__Booking___54F9C05DC19E46C4");
+
+                    b.ToTable("Booking_Status", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CleanerProfile", b =>
+                {
+                    b.Property<int>("CleanerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CleanerId"));
+
+                    b.Property<string>("Area")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool?>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ExperienceYear")
+                        .HasColumnType("int")
+                        .HasColumnName("Experience_YEAR");
+
+                    b.Property<double?>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CleanerId")
+                        .HasName("PK__Cleaner___408F3436F8F474A9");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Cleaner_Profile", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CustomerAddress", b =>
+                {
+                    b.Property<int>("AddressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
+
+                    b.Property<string>("AddressNo")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_DispalyName")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_FormattedAddress")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GG_PlaceId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsInUse")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(20, 17)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(20, 17)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AddressId")
+                        .HasName("PK__Customer__091C2AFB3B54A574");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Customer_Address", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Duration", b =>
+                {
+                    b.Property<int>("DurationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DurationId"));
+
+                    b.Property<int>("DurationTime")
+                        .HasColumnType("int")
+                        .HasColumnName("DurationTime");
+
+                    b.Property<string>("SquareMeterSpecific")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("DurationId")
+                        .HasName("PK__Duration__AF77E836629F8EB9");
+
+                    b.ToTable("Duration", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Feedback", b =>
+                {
+                    b.Property<int>("FeedbackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeedbackId"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CleanerId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<double?>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("FeedbackId")
+                        .HasName("PK__Feedback__6A4BEDD68825A544");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("CleanerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedback", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Payment_Status");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("PaymentId")
+                        .HasName("PK__Payment__9B556A38F361AE19");
+
+                    b.HasIndex("BookingId");
+
+                    b.ToTable("Payment", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Service", b =>
+                {
+                    b.Property<int>("ServiceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceId"));
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.HasKey("ServiceId")
+                        .HasName("PK__Service__C51BB00A2FD83140");
 
-                    b.HasKey("Id");
+                    b.ToTable("Service", (string)null);
+                });
 
-                    b.HasIndex("NormalizedName")
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.ServicePrice", b =>
+                {
+                    b.Property<int>("PriceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PriceId"));
+
+                    b.Property<int>("DurationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10, 2)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PriceId")
+                        .HasName("PK__Service___49575BAF3F8AE4AE");
+
+                    b.HasIndex("DurationId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("Service_Price", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserVoucher", b =>
+                {
+                    b.Property<int>("UserVoucherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserVoucherId"));
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("VoucherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserVoucherId")
+                        .HasName("PK__User_Vou__8017D499A0476362");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VoucherId");
+
+                    b.ToTable("User_Voucher", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.Property<int>("WalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WalletId"));
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("WalletId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("User_Wallet");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Voucher", b =>
+                {
+                    b.Property<int>("VoucherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VoucherId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasColumnType("decimal(5, 2)")
+                        .HasColumnName("Discount_Percentage");
+
+                    b.Property<DateOnly>("ExpireDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsEventVoucher")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VoucherCode")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("VoucherId")
+                        .HasName("PK__Voucher__3AEE7921AB741345");
+
+                    b.HasIndex("VoucherCode")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasFilter("[VoucherCode] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Voucher", (string)null);
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WalletTransaction", b =>
+                {
+                    b.Property<int>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("RelatedBookingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("WalletId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("RelatedBookingId");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("Wallet_Transaction");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WithdrawRequest", b =>
+                {
+                    b.Property<int>("RequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RequestId"));
+
+                    b.Property<string>("AdminNote")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RequestId");
+
+                    b.HasIndex("ProcessedBy");
+
+                    b.HasIndex("TransactionId")
+                        .IsUnique()
+                        .HasFilter("[TransactionId] IS NOT NULL");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WithdrawRequest", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -238,9 +817,218 @@ namespace CleanMate_Main.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AspNetRoleAspNetUser", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetRole", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Booking", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.CustomerAddress", "Address")
+                        .WithMany("Bookings")
+                        .HasForeignKey("AddressId")
+                        .HasConstraintName("FK_Booking_CustomerAddress");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.BookingStatus", "BookingStatus")
+                        .WithMany("Bookings")
+                        .HasForeignKey("BookingStatusId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Booking__Booking__0B91BA14");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "Cleaner")
+                        .WithMany("BookingCleaners")
+                        .HasForeignKey("CleanerId")
+                        .HasConstraintName("FK__Booking__Cleaner__09A971A2");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.ServicePrice", "ServicePrice")
+                        .WithMany("Bookings")
+                        .HasForeignKey("ServicePriceId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Booking__Service__08B54D69");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany("BookingUsers")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Booking__UserId__0A9D95DB");
+
+                    b.Navigation("Address");
+
+                    b.Navigation("BookingStatus");
+
+                    b.Navigation("Cleaner");
+
+                    b.Navigation("ServicePrice");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CleanerProfile", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany("CleanerProfiles")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Cleaner_P__UserI__03F0984C");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CustomerAddress", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany("CustomerAddresses")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Customer___UserI__797309D9");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Feedback", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Booking", "Booking")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("BookingId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Feedback__Bookin__10566F31");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "Cleaner")
+                        .WithMany("FeedbackCleaners")
+                        .HasForeignKey("CleanerId")
+                        .HasConstraintName("FK__Feedback__Cleane__123EB7A3");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany("FeedbackUsers")
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK__Feedback__UserId__114A936A");
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Cleaner");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Payment", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Booking", "Booking")
+                        .WithMany("Payments")
+                        .HasForeignKey("BookingId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Payment__Booking__160F4887");
+
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.ServicePrice", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Duration", "Duration")
+                        .WithMany("ServicePrices")
+                        .HasForeignKey("DurationId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Service_P__Durat__73BA3083");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Service", "Service")
+                        .WithMany("ServicePrices")
+                        .HasForeignKey("ServiceId")
+                        .IsRequired()
+                        .HasConstraintName("FK__Service_P__Servi__74AE54BC");
+
+                    b.Navigation("Duration");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserVoucher", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany("UserVouchers")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__User_Vouc__UserI__7F2BE32F");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Voucher", "Voucher")
+                        .WithMany("UserVouchers")
+                        .HasForeignKey("VoucherId")
+                        .IsRequired()
+                        .HasConstraintName("FK__User_Vouc__Vouch__00200768");
+
+                    b.Navigation("User");
+
+                    b.Navigation("Voucher");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithOne("Wallet")
+                        .HasForeignKey("CleanMate_Main.Server.Models.Entities.UserWallet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_UserWallet_User");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.Booking", "Booking")
+                        .WithMany()
+                        .HasForeignKey("RelatedBookingId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_WalletTransaction_Booking");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.UserWallet", "Wallet")
+                        .WithMany("Transactions")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WalletTransaction_Wallet");
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Wallet");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.WithdrawRequest", b =>
+                {
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "Admin")
+                        .WithMany()
+                        .HasForeignKey("ProcessedBy")
+                        .HasConstraintName("FK_Withdraw_Admin");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.WalletTransaction", "Transaction")
+                        .WithMany()
+                        .HasForeignKey("TransactionId")
+                        .HasConstraintName("FK_Withdraw_Transaction");
+
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK_Withdraw_User");
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Transaction");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -267,7 +1055,7 @@ namespace CleanMate_Main.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("CleanMate_Main.Server.Models.Entities.AspNetRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -287,6 +1075,67 @@ namespace CleanMate_Main.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.AspNetUser", b =>
+                {
+                    b.Navigation("BookingCleaners");
+
+                    b.Navigation("BookingUsers");
+
+                    b.Navigation("CleanerProfiles");
+
+                    b.Navigation("CustomerAddresses");
+
+                    b.Navigation("FeedbackCleaners");
+
+                    b.Navigation("FeedbackUsers");
+
+                    b.Navigation("UserVouchers");
+
+                    b.Navigation("Wallet");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Booking", b =>
+                {
+                    b.Navigation("Feedbacks");
+
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.BookingStatus", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.CustomerAddress", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Duration", b =>
+                {
+                    b.Navigation("ServicePrices");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Service", b =>
+                {
+                    b.Navigation("ServicePrices");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.ServicePrice", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.UserWallet", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("CleanMate_Main.Server.Models.Entities.Voucher", b =>
+                {
+                    b.Navigation("UserVouchers");
                 });
 #pragma warning restore 612, 618
         }

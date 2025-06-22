@@ -9,8 +9,7 @@ import Logo from '../../images/logo.svg'
 const ErrorPage =() => {
     return(
         <Fragment>
-            <Navbar Logo={Logo}/>
-            <PageTitle pageTitle={'404'} pagesub={'404'}/> 
+            
             <Error/>
             <Footer/>
             <Scrollbar/>

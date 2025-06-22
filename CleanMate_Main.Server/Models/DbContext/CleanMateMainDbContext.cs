@@ -1,4 +1,5 @@
 ﻿using CleanMate_Main.Server.Models.Entities;
+using CleanMate_Main.Server.Models.Enum;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,22 @@ namespace CleanMate_Main.Server.Models.DbContext
 
         public virtual DbSet<Voucher> Vouchers { get; set; }
 
+        public virtual DbSet<UserWallet> UserWallets { get; set; }
+
+        public virtual DbSet<WalletTransaction> WalletTransactions { get; set; }
+
+        public virtual DbSet<WithdrawRequest> WithdrawRequests { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("MyCnn");
+                optionsBuilder.UseSqlServer(ConnectionString);
+            }
+
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -47,7 +64,7 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Booking");
 
-                entity.Property(e => e.Address).HasMaxLength(255);
+                entity.Property(e => e.AddressId).HasColumnName("AddressId");
                 entity.Property(e => e.CleanerId).HasMaxLength(450);
                 entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("(getdate())")
@@ -79,6 +96,12 @@ namespace CleanMate_Main.Server.Models.DbContext
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Booking__UserId__0A9D95DB");
+
+                entity.HasOne(d => d.Address)
+                    .WithMany(p => p.Bookings)
+                    .HasForeignKey(d => d.AddressId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Booking_CustomerAddress");
             });
 
             modelBuilder.Entity<BookingStatus>(entity =>
@@ -115,6 +138,22 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.ToTable("Customer_Address");
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
+                entity.Property(e => e.GG_FormattedAddress)
+                        .HasMaxLength(450)
+                        .IsUnicode(true);
+                entity.Property(e => e.GG_DispalyName)
+                        .HasMaxLength(450)
+                        .IsUnicode(true);
+                entity.Property(e => e.GG_PlaceId)
+                        .HasMaxLength(450);
+                entity.Property(e => e.AddressNo)
+                        .HasMaxLength(450)
+                        .IsUnicode(true);
+                entity.Property(e => e.IsInUse).HasDefaultValue(false);
+                entity.Property(e => e.IsDefault).HasDefaultValue(false);
+                entity.Property(e => e.Latitude).HasColumnType("decimal(20, 17)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(20, 17)");
+
 
                 entity.HasOne(d => d.User).WithMany(p => p.CustomerAddresses)
                     .HasForeignKey(d => d.UserId)
@@ -128,8 +167,8 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Duration");
 
-                entity.Property(e => e.Description).HasMaxLength(255);
-                entity.Property(e => e.Duration1).HasColumnName("Duration");
+                entity.Property(e => e.SquareMeterSpecific).HasMaxLength(255);
+                entity.Property(e => e.DurationTime).HasColumnName("DurationTime");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
@@ -172,7 +211,9 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
-                entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+                entity.Property(e => e.PaymentMethod)
+                     .HasConversion<string>()
+                     .HasMaxLength(50);
                 entity.Property(e => e.PaymentStatus)
                     .HasMaxLength(50)
                     .HasColumnName("Payment_Status");
@@ -190,7 +231,7 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.ToTable("Service");
 
-                entity.Property(e => e.Description).HasMaxLength(255);
+                entity.Property(e => e.Description);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
@@ -221,6 +262,9 @@ namespace CleanMate_Main.Server.Models.DbContext
 
                 entity.Property(e => e.UserId).HasMaxLength(450);
 
+                entity.Property(e => e.IsUsed).HasDefaultValue(false); // Mặc định chưa sử dụng
+                entity.Property(e => e.UsedAt).HasColumnType("datetime"); // Thời điểm sử dụng
+
                 entity.HasOne(d => d.User).WithMany(p => p.UserVouchers)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -245,7 +289,93 @@ namespace CleanMate_Main.Server.Models.DbContext
                 entity.Property(e => e.DiscountPercentage)
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("Discount_Percentage");
+                entity.Property(e => e.VoucherCode).HasMaxLength(50).IsUnicode(false);
+                entity.HasIndex(e => e.VoucherCode).IsUnique();
+                entity.Property(e => e.IsEventVoucher).HasDefaultValue(false);
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                   /* .HasDefaultValue(VoucherStatus.ACTIVE.ToString()) // Giá trị mặc định là "ACTIVE"*/
+                    .HasConversion<string>(); // Ánh xạ nullable enum sang string
             });
+
+            modelBuilder.Entity<UserWallet>(entity =>
+            {
+                entity.HasKey(e => e.WalletId);
+                entity.Property(e => e.Balance).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.Wallet)
+                    .HasForeignKey<UserWallet>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_UserWallet_User");
+            });
+
+            modelBuilder.Entity<WalletTransaction>(entity =>
+            {
+                entity.HasKey(e => e.TransactionId);
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.TransactionType)
+                    .HasConversion<string>()
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.Wallet)
+                    .WithMany(w => w.Transactions)
+                    .HasForeignKey(e => e.WalletId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_WalletTransaction_Wallet");
+
+                entity.HasOne(e => e.Booking)
+                   .WithMany() 
+                   .HasForeignKey(e => e.RelatedBookingId)
+                   .OnDelete(DeleteBehavior.SetNull) 
+                   .HasConstraintName("FK_WalletTransaction_Booking");
+            });
+
+            modelBuilder.Entity<WithdrawRequest>(entity =>
+            {
+                entity.ToTable("WithdrawRequest");
+
+                entity.HasIndex(e => e.TransactionId).IsUnique();
+
+                entity.Property(e => e.Status)
+                    .HasConversion<string>()
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.RequestedAt)
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Withdraw_User");
+
+                entity.HasOne(e => e.Admin)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProcessedBy)
+                    .HasConstraintName("FK_Withdraw_Admin");
+
+                entity.HasOne(e => e.Transaction)
+                    .WithMany()
+                    .HasForeignKey(e => e.TransactionId)
+                    .HasConstraintName("FK_Withdraw_Transaction");
+            });
+
 
             OnModelCreatingPartial(modelBuilder);
         }

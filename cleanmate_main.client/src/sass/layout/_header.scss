@@ -1,4 +1,4 @@
-/*--------------------------------------------------------------
+﻿/*--------------------------------------------------------------
 2. header
 --------------------------------------------------------------*/
 
@@ -15,7 +15,18 @@
         text-align: center;
         padding: 0;
     }
+
+    .user-avatar-container {
+        display: none !important;
+    }
+
+    .login-cta {
+        display: none !important;
+    }
 }
+
+
+
 
 @media (max-width: 767px) {
 
@@ -60,15 +71,9 @@
     }
 }
 
-.topbar .contact-info ul li a {
+.topbar .contact-info ul li {
     color: #fff;
 }
-
-
-.topbar .contact-info ul li a:hover {
-    color: #7db1f0;
-}
-
 
 .topbar ul li:first-child {
     padding-left: 0;
@@ -78,6 +83,26 @@
 .topbar .contact-intro ul {
     float: none;
     margin-bottom: 0;
+}
+
+.order-item-none-feedback {
+    position: relative;
+
+    .badge{
+        position: absolute;
+        top: 20px;
+        right: -5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: red;
+        color: #fff;
+        font-size: 11px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50px;
+        z-index: 1000;
+    }
 }
 
 
@@ -118,9 +143,9 @@
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 110%;
     right: 0;
-    z-index: 99999;
+    z-index: 999999;
     display: none;
     min-width: 180px;
     padding: 8px 0;
@@ -144,31 +169,184 @@
     background-color: #f0f0f0;
 }
 
-.user-avatar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
+.cleanmate-wallet {
+    height: 115px;
+    margin: 5px 0;
+    background-color: #fff;
 
-    img {
-        width: 100%;
-        border-radius: 50px;
-        object-fit: cover;
+    .cleanmate-wallet-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+        padding: 10px;
     }
 
-    .user-avatar-information {
-        margin: 0;
-        white-space: nowrap;
+    .cleanmate-wallet-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 100px;
+        padding: 10px;
+        margin: 0 10px;
+        border-radius: 6px;
+        color: #000;
+        border: 1px solid #ccc;
 
-        p {
-            margin-bottom: 0;
-            color: #fff;
+        .cleanmate-wallet-balance {
+            margin-bottom: 10px;
+        }
+
+        .cleanmate-wallet-button {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+
+            .withdraw-button,
+            .deposit-button {
+                width: 100%;
+            }
+
+            .deposit-button {
+                color: #fff;
+                background-color: #13287E;
+
+                &:hover {
+                    color: #13287E;
+                    border: 1.4px solid #13287E;
+                    background-color: transparent;
+                }
+            }
+
+            .withdraw-button {
+                color: #13287E;
+                border: 1.4px solid #13287E;
+
+                &:hover {
+                    background-color: #13287E;
+                    color: #fff;
+                }
+            }
         }
     }
 }
+
+.user-avatar-container {
+    display: flex;
+    justify-content: center;
+    height: 50px;
+
+    .user-avatar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        width: 30px;
+        height: 50px;
+        cursor: pointer;
+        position: relative;
+
+        img {
+            width: 100%;
+            border-radius: 50px;
+            object-fit: cover;
+        }
+
+        .user-avatar-information {
+            margin: 0;
+            white-space: nowrap;
+
+            p {
+                margin-bottom: 0;
+                color: #fff;
+            }
+        }
+    }
+}
+
+
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: -120px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 350px;
+    font-family: Arial, sans-serif;
+    padding: 10px;
+
+    @media (max-width: 767px) {
+        right: -160px;
+        width: 100%;
+    }
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.user-info {
+    margin-left: 10px;
+    flex: 1;
+}
+
+.name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-name {
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.user-personal-page {
+    border-bottom: 1px solid #eee;
+    padding: 5px 0;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #777;
+}
+
+.dropdown-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.logout-btn {
+    margin-top: 35px;
+    border-top: 1px solid #eee;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+    color: #000;
+}
+
 
 
 @media (max-width: 1200px) {
@@ -1148,8 +1326,8 @@
             border: 0;
             text-align: center;
             margin-left: auto;
-            margin-top: 30px;
-            margin-right: 30px;
+            margin-top: 5px;
+            margin-right: 5px;
             margin-bottom: 30px;
             width: 40px;
             height: 40px;
@@ -1363,7 +1541,7 @@
 
 .fixed-navbar.active .wpo-site-header {
     position: fixed;
-    z-index: 9999;
+    z-index: 999;
     top: 0;
     left: 0;
     width: 100%;

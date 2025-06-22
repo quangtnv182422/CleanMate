@@ -1,6 +1,6 @@
-import React from 'react'
-import abimg from '../../images/about.jpg'
-import sign from '../../images/signeture.png'
+﻿import React from 'react'
+import abimg from '../../images/about-image.jpg'
+import sign from '../../images/signature.png'
 
 
 const About = (props) => {
@@ -17,20 +17,17 @@ const About = (props) => {
                         <div className="col-lg-7 col-md-12 col-12">
                             <div className="wpo-about-content">
                                 <div className="wpo-section-title-s2">
-                                    <h2>Over 25+ Years Experience
-                                        In Cleaning Service</h2>
+                                    <h2>Đôi lời giới thiệu về chúng tôi</h2>
                                 </div>
                                 <div className="wpo-about-content-inner">
-                                    <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable and going through the cites of the word in classical literature, discovered the
-                                        undoubtable source. Lorem Ipsum comes from sections.</p>
-                                    <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots
-                                        in a piece of classical Latin literature from 45 BC, making it over 2000 years
-                                        old consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                                        ut labore et dolore magna aliqua.</p>
+                                    <p>Bạn mệt mỏi vì phải tìm kiếm người dọn dẹp đáng tin cậy? CleanMate là giải pháp tối ưu dành cho bạn! Chúng tôi là nền tảng sáng tạo kết nối liền mạch những cá nhân và doanh nghiệp có nhu cầu với những người dọn dẹp chuyên nghiệp, đáng tin cậy. Hãy nói lời tạm biệt với căng thẳng
+                                        và chào đón một không gian sạch sẽ, lấp lánh - thật dễ dàng.</p>
+                                    <p>Tại CleanMate, chúng tôi tin rằng một không gian sạch sẽ không nên là một thứ xa xỉ, mà là một điều thiết thực dễ dàng tiếp cận. Chúng tôi thấu hiểu khó khăn khi tìm kiếm các dịch vụ dọn dẹp
+                                        đáng tin cậy, đó là lý do tại sao chúng tôi đã tạo ra một nền tảng trực quan được thiết kế để đơn giản hóa cuộc sống của bạn. Dù bạn là một người bận rộn, một gia đình năng động, hay một người dọn dẹp đang tìm kiếm cơ hội, CleanMate sẽ là cầu nối, biển những không gian nguyên sơ và những kết nối công việc hiệu quả thành hiện thực.</p>
                                     <div className="signeture">
-                                        <h4>Brubaker Nilka</h4>
-                                        <p>Vertex Chambers, CEO</p>
-                                        <span><img src={sign} alt=""/></span>
+                                        <h4>Trương Nguyễn Việt Quang</h4>
+                                        <p>CEO của CleanMate</p>
+                                        <span><img src={sign} alt="chữ ký giám đốc"/></span>
                                     </div>
                                 </div>
                             </div>

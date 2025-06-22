@@ -580,7 +580,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .Include(cp => cp.User)
                 .Select(cp => new CleanerListItemDTO
                 {
-                    CleanerId = cp.CleanerId,
+                    CleanerId = cp.User.Id,
                     FullName = cp.User.FullName,
                     Email = cp.User.Email,
                     PhoneNumber = cp.User.PhoneNumber,
@@ -591,13 +591,13 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .ToListAsync();
         }
 
-        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId)
+        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(string cleanerId)
         {
             var cleaner = await _context.CleanerProfiles
                 .Include(cp => cp.User)
                 .ThenInclude(u => u.Wallet)
                 .ThenInclude(w => w.Transactions)
-                .FirstOrDefaultAsync(cp => cp.CleanerId == cleanerId);
+                .FirstOrDefaultAsync(cp => cp.User.Id == cleanerId);
 
             if (cleaner == null)
             {
@@ -643,9 +643,9 @@ namespace CleanMate_Main.Server.Repository.Employee
             };
         }
 
-        public async Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable)
+        public async Task ToggleCleanerAvailabilityAsync(string cleanerId, bool isAvailable)
         {
-            var cleaner = await _context.CleanerProfiles.FindAsync(cleanerId);
+            var cleaner = await _context.CleanerProfiles.FirstOrDefaultAsync(c => c.User.Id == cleanerId);
             if (cleaner != null)
             {
                 cleaner.Available = isAvailable;

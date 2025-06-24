@@ -81,6 +81,7 @@ const BookingService = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedDuration, setSelectedDuration] = useState(1);
     const [price, setPrice] = useState(160000);
+    const [discountPrice, setDiscountPrice] = useState(0);
     const [priceId, setServicePriceId] = useState(1);
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
@@ -92,6 +93,8 @@ const BookingService = () => {
     const [open, setOpen] = useState(false);
     const [isAvailable, setIsAvailable] = useState(null);
     const [openVoucherList, setOpenVoucherList] = useState(false);
+
+    console.log(discountPrice)
 
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
@@ -310,7 +313,7 @@ const BookingService = () => {
                 selectedEmployee,
                 selectedDuration,
                 selectedSpecificArea,
-                price,
+                price: discountPrice ? discountPrice : price,
                 selectedDay,
                 formatSpecificTime: selectedSpecificTimes.format('HH:mm:ss'),
                 note,
@@ -335,6 +338,7 @@ const BookingService = () => {
                 },
                 body: JSON.stringify({
                     voucherCode: voucher.voucherCode,
+                    totalAmount: price,
                 }),
                 credentials: 'include',
             });
@@ -345,9 +349,10 @@ const BookingService = () => {
             }
 
             const data = await response.json();
-            console.log(data)
-            toast.success(`Áp dụng voucher thành công! Giảm ${data.discount || 0}%`);
+            setDiscountPrice(data.newTotal);
+            toast.success(`Áp dụng voucher thành công! Giảm giá còn ${formatVNDCurrency(data.newTotal)}`);
             await getVouchers();
+            setOpenVoucherList(false);
         } catch (error) {
             console.error('Lỗi khi áp dụng voucher:', error);
             toast.error(error.message || 'Không thể áp dụng voucher.');
@@ -679,7 +684,7 @@ const BookingService = () => {
                     </Box>
 
                     <Box sx={style.footer}>
-                        <Typography fontWeight="bold">{`${formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
+                        <Typography fontWeight="bold">{`${discountPrice ? formatVNDCurrency(discountPrice) :  formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
                         <Button
                             variant="contained"
                             sx={{
@@ -797,7 +802,7 @@ const BookingService = () => {
                                                 sx={{ p: 1, minWidth: 'auto', fontWeight: 'bold' }}
                                                 onClick={() => handleApplyVoucher(voucher)}
                                             >
-                                                Áp dụng mã khuyến mại
+                                                Dùng ngay
                                             </Button>
                                         </Box>
                                     </Card>

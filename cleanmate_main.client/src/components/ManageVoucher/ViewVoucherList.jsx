@@ -76,6 +76,29 @@ const ViewVoucherList = () => {
     // Trạng thái lưu danh sách id của customers được chọn cho mỗi voucher
     const [selectedByVoucher, setSelectedByVoucher] = useState({});
 
+    const getVouchers = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/managevoucher', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch vouchers');
+            }
+
+            const data = await response.json();
+            setVouchers(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [])
+
     const assignCustomerToVoucher = async (voucherId, customerId) => {
         try {
             setLoading(true);
@@ -231,28 +254,7 @@ const ViewVoucherList = () => {
         setOpenVoucherDetails(true)
     }
 
-    const getVouchers = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await fetch('/managevoucher', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch vouchers');
-            }
-
-            const data = await response.json();
-            setVouchers(data);
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
-    }, [])
+    
 
     const handleGetVoucherDetails = async (voucherId) => {
         try {
@@ -400,12 +402,6 @@ const ViewVoucherList = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     }
-
-    const formatTime = (time) => {
-        if (!time) return '';
-        const [hour, minute] = time.split(':');
-        return `${hour}:${minute}`;
-    };
 
     const renderStatusChip = (status) => {
         switch (status) {

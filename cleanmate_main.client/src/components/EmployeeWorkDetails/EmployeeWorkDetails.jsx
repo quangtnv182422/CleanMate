@@ -10,6 +10,8 @@ const EmployeeWorkDetails = () => {
     const [connection, setConnection] = useState(null);
     const { user } = useAuth();
 
+    console.log(selectedWork)
+
     // Set up SignalR connection
     useEffect(() => {
         const newConnection = new HubConnectionBuilder()

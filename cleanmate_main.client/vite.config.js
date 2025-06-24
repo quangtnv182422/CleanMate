@@ -132,7 +132,15 @@ export default defineConfig({
             '^/managevoucher': {
                 target,
                 secure: false
-            }
+            },
+            '^/customervoucher': {
+                target,
+                secure: false
+            },
+            '^/employeelist': {
+                target,
+                secure: false
+            },
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),
         https: {

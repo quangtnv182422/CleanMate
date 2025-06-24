@@ -45,6 +45,7 @@ import Dashboard from '../../components/Dashboard/Dashboard';
 import CustomerList from '../../components/CustomerList/CustomerList';
 import ViewVoucherList from '../../components/ManageVoucher/ViewVoucherList';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import CleanerList from '../../components/CleanerList/CleanerList';
 
 const drawerWidth = 300;
 
@@ -56,10 +57,6 @@ const colorMap = {
     'Chờ xác nhận': '#FFD700',      // Vàng
     'Hoàn thành': '#28A745',        // Xanh lá
 };
-
-const CleanerList = () => {
-    return <h1>CleanerList</h1>
-}
 
 const AdminDashboard = () => {
     const navigate = useNavigate();

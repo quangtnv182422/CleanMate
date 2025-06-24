@@ -52,12 +52,40 @@ const VoucherForm = ({ open, onClose, onSubmit, initialData }) => {
 
     const handleSubmit = () => {
         onSubmit(formData);
+        if (!initialData) {
+            setFormData({
+                voucherCode: '',
+                description: '',
+                discountPercentage: 0,
+                expireDate: '',
+                isEventVoucher: false,
+                createdBy: '',
+                status: 0,
+            });
+        }
     }
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>{initialData ? 'Chỉnh sửa Voucher' : 'Tạo Voucher mới'}</DialogTitle>
-            <DialogContent>
+            <DialogContent
+                sx={{// Custom scrollbar
+                    '&::-webkit-scrollbar': {
+                        width: '6px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#c1c1c1',
+                        borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: '#a0a0a0',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '4px',
+                    },
+                }}
+            >
                 <TextField fullWidth margin="normal" name="voucherCode" label="Mã voucher" value={formData.voucherCode} onChange={handleChange} />
                 <TextField fullWidth margin="normal" name="description" label="Mô tả" value={formData.description} onChange={handleChange} />
                 <TextField fullWidth margin="normal" name="discountPercentage" label="Giảm giá (%)" type="number" value={formData.discountPercentage} onChange={handleChange} />

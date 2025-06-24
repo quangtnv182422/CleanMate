@@ -1,5 +1,5 @@
 ﻿import { style } from './style.js';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import voucher_icon from '../../images/voucher-icon.png';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import { BookingContext } from '../../context/BookingProvider.jsx';
 
 export const cleaningVouchers = [
     {
@@ -78,12 +79,15 @@ export const cleaningVouchers = [
 const WORKS_PER_PAGE = 6;
 
 const VoucherList = () => {
+    const { vouchers, setVouchers } = useContext(BookingContext);
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    //const [vouchers, setVouchers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const filteredVoucher = cleaningVouchers.filter((voucher) =>
-        voucher.name.toLowerCase().includes(search.toLowerCase())
+    const filteredVoucher = vouchers.filter((voucher) =>
+        voucher.voucherCode.toLowerCase().includes(search.toLowerCase())
     );
 
     const totalPages = Math.ceil(filteredVoucher.length / WORKS_PER_PAGE);
@@ -91,6 +95,14 @@ const VoucherList = () => {
         (page - 1) * WORKS_PER_PAGE,
         page * WORKS_PER_PAGE
     );
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
 
 
     return (
@@ -129,7 +141,7 @@ const VoucherList = () => {
                                     <CardContent>
                                         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
                                             <img src={voucher_icon} alt="voucher_icon" />
-                                            <Typography variant="h6" sx={{ color: '#1976D2'}}>{voucher.name}</Typography>
+                                            <Typography variant="h6" sx={{ color: '#1976D2'}}>{voucher.voucherCode}</Typography>
                                         </Box>
                                         <Typography variant="body2" color="text.secondary">
                                             {voucher.description}
@@ -137,9 +149,7 @@ const VoucherList = () => {
                                         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1, mb: 1 }}>
                                             <HourglassBottomIcon size="small" fontSize="12px" color="warning" />
                                             <Typography variant="caption" sx={{ color: 'green' }}>
-                                                {voucher.expiredInDays
-                                                ? `Hết hạn sau ${voucher.expiredInDays} ngày`
-                                                    : `HSD: ${voucher.expiryDate}`}
+                                                Ngày hết hạn: {formatDate(voucher.expireDate)}
                                             </Typography>
                                         </Box>
                                     </CardContent>

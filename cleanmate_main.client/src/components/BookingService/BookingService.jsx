@@ -76,6 +76,7 @@ const BookingService = () => {
         }
     }, [user, authLoading, navigate]);
 
+    const [appliedVoucher, setAppliedVoucher] = useState(null);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [selectedSpecificArea, setSelectedSpecificArea] = useState('15');
     const [selectedEmployee, setSelectedEmployee] = useState(1);
@@ -93,8 +94,6 @@ const BookingService = () => {
     const [open, setOpen] = useState(false);
     const [isAvailable, setIsAvailable] = useState(null);
     const [openVoucherList, setOpenVoucherList] = useState(false);
-
-    console.log(discountPrice)
 
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
@@ -322,14 +321,16 @@ const BookingService = () => {
         });
     };
 
-    console.log(vouchers)
-
     const handleSelectAddress = (address) => {
         setSelectedAddress(address);
         toggleDropdown();
     };
 
     const handleApplyVoucher = async (voucher) => {
+        if (appliedVoucher) {
+            toast.info('Bạn chỉ có thể áp dụng một voucher cho mỗi đơn hàng.');
+            return;
+        }
         try {
             const response = await fetch('/customervoucher/apply', {
                 method: 'POST',
@@ -350,6 +351,7 @@ const BookingService = () => {
 
             const data = await response.json();
             setDiscountPrice(data.newTotal);
+            setAppliedVoucher(voucher);
             toast.success(`Áp dụng voucher thành công! Giảm giá còn ${formatVNDCurrency(data.newTotal)}`);
             await getVouchers();
             setOpenVoucherList(false);

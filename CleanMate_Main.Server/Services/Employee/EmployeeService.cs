@@ -373,12 +373,12 @@ namespace CleanMate_Main.Server.Services.Employee
             return await _employeeRepository.GetCleanerListAsync();
         }
 
-        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId)
+        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(string cleanerId)
         {
             return await _employeeRepository.GetCleanerDetailAsync(cleanerId);
         }
 
-        public async Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable)
+        public async Task ToggleCleanerAvailabilityAsync(string cleanerId, bool isAvailable)
         {
             await _employeeRepository.ToggleCleanerAvailabilityAsync(cleanerId, isAvailable);
         }

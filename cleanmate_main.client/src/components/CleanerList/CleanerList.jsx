@@ -17,8 +17,6 @@ import {
     Button,
     TextField,
     Tooltip,
-    Divider,
-    Avatar,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -28,45 +26,99 @@ import {
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import userAvatar from '../../images/user-image.png';
-import LockIcon from '@mui/icons-material/Lock';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import CloseIcon from '@mui/icons-material/Close';
 import ReactLoading from 'react-loading';
-import CustomerDetails from './CustomerDetails/CustomerDetails';
-import { WorkContext } from '../../context/WorkProvider';
+import CleanerDetails from './CleanerDetails/CleanerDetails';
 
-
-const CustomerList = () => {
-    const { customers, setCustomers, loading, setLoading, getCustomers } = useContext(WorkContext);
+const CleanerList = () => {
+    const [employees, setEmployees] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [cleanerId, setCleanerId] = useState(null);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [openModal, setOpenModal] = useState(false);
-    const [customerId, setCustomerId] = useState(null);
+    const [openConfirmation, setOpenConfirmation] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-    const handleCustomerDetail = (customer) => {
-        setCustomerId(customer.id);
+    const handleOpenModal = (row) => {
+        setCleanerId(row.cleanerId);
         setOpenModal(true);
     }
 
-    
+    const hanleOpenConfirmation = (row) => {
+        setSelectedEmployee(row);
+        setOpenConfirmation(true);
+    }
+
+    const getEmployees = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/employeelist', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setEmployees(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const handleToggleAvailability = async () => {
+        if (!selectedEmployee.cleanerId) return;
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/employeelist/${selectedEmployee.cleanerId}/toggle-availability`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(!selectedEmployee.available)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            toast.success(data.message);
+            setOpenConfirmation(false);
+            await getEmployees();
+        } catch (error) {
+            console.error(error);
+            toast.error("Đã xảy ra lỗi khi thay đổi trạng thái nhân viên.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        getEmployees();
+    }, [getEmployees])
 
     const [sortConfig, setSortConfig] = useState({ key: 'createdDate', direction: 'desc' });
 
     // Sử dụng sortConfig để sắp xếp dữ liệu
     const sortedData = useMemo(() => {
-        const sortableData = [...customers].sort((a, b) => {
+        const sortableData = [...employees].sort((a, b) => {
             if (!sortConfig.key) return 0;
 
             const keyMapping = {
-                'khách hàng': 'fullName',
+                'nhân viên': 'fullName',
                 'email': 'email',
                 'số điện thoại': 'phoneNumber',
-                'ngày tạo': 'createdDate',
-                'trạng thái': 'isActive',
+                'khu vực hoạt động': 'area',
+                'kinh nghiệm': 'experienceYear',
+                'tình trạng': 'available',
             };
 
             const englishKey = keyMapping[sortConfig.key] || sortConfig.key;
@@ -88,7 +140,7 @@ const CustomerList = () => {
         });
 
         return sortableData;
-    }, [customers, sortConfig]);
+    }, [employees, sortConfig]);
 
     const filteredData = useMemo(() => {
         return sortedData.filter((row) =>
@@ -108,71 +160,6 @@ const CustomerList = () => {
         }
         setSortConfig({ key: vietnameseKey, direction });
     }, [sortConfig]);
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-    }
-
-    const handleLock = async (userId, isActive) => {
-        if (!isActive) return; // Không cho phép khóa nếu đã khóa
-
-        try {
-            setLoading(true);
-            const response = await fetch(`/customerlist/${userId}/lock`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to lock customer account');
-            }
-
-            await getCustomers();
-
-            toast.success("Đã khóa tài khoản!");
-        } catch (error) {
-            console.error('Error locking customer:', error);
-            toast.error('Không thể khóa tài khoản khách hàng: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleUnLock = async (userId, isActive) => {
-        if (isActive) return; // Không cho phép kích hoạt nếu đã kích hoạt
-
-        try {
-            setLoading(true);
-            const response = await fetch(`/customerlist/${userId}/unlock`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to unlock customer account');
-            }
-
-
-            await getCustomers();
-
-            toast.success('Đã mở khóa tài khoản!');
-        } catch (error) {
-            console.error('Error unlocking customer:', error);
-            toast.error('Không thể kích hoạt tài khoản khách hàng: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <Box sx={{ position: 'relative' }}>
@@ -213,7 +200,7 @@ const CustomerList = () => {
                         key="search-input"
                         type="text"
                         name="search"
-                        label="Tìm kiếm theo tên khách hàng"
+                        label="Tìm kiếm theo tên nhân viên"
                         size="small"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -265,7 +252,7 @@ const CustomerList = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="work list table">
                     <TableHead>
                         <TableRow>
-                            {['khách hàng', 'email', 'số điện thoại', 'ngày tạo', 'trạng thái'].map((key) => (
+                            {['nhân viên', 'email', 'số điện thoại', 'khu vực hoạt động', 'kinh nghiệm', 'tình trạng'].map((key) => (
                                 <TableCell key={key}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -283,7 +270,6 @@ const CustomerList = () => {
                                     </Box>
                                 </TableCell>
                             ))}
-                            <TableCell>Thay đổi trạng thái</TableCell>
                             <TableCell>Hành động</TableCell>
                         </TableRow>
                     </TableHead>
@@ -312,32 +298,18 @@ const CustomerList = () => {
                                 </TableCell>
                                 <TableCell>{row.email}</TableCell>
                                 <TableCell>{row.phoneNumber}</TableCell>
-                                <TableCell>{formatDate(row.createdDate)}</TableCell>
+                                <TableCell>{row.area}</TableCell>
+                                <TableCell>{row.experienceYear === 0 ? "Chưa có kinh nghiệm" : `${row.experienceYear} năm`}</TableCell>
                                 <TableCell>
                                     <span style={{
-                                        backgroundColor: row.isActive ? '#4CAF50' : '#F44336',
+                                        backgroundColor: row.available ? '#4CAF50' : '#F44336',
                                         color: '#FFFFFF',
                                         padding: '4px 8px',
                                         borderRadius: '4px',
                                         display: 'inline-block',
                                     }}>
-                                        {row.isActive ? "Đã kích hoạt" : "Đã khóa"}
+                                        {row.available ? "Khả dụng" : "Không khả dụng"}
                                     </span>
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="contained"
-                                        startIcon={row.isActive ? <LockIcon /> : <LockOpenIcon />}
-                                        onClick={() => {
-                                            if (row.isActive) {
-                                                handleLock(row.id, row.isActive);
-                                            } else {
-                                                handleUnLock(row.id, row.isActive);
-                                            }
-                                        }}
-                                    >
-                                        {row.isActive ? "Khóa" : "Kích hoạt"}
-                                    </Button>
                                 </TableCell>
                                 <TableCell
                                     sx={{
@@ -345,18 +317,13 @@ const CustomerList = () => {
                                     }}
                                 >
                                     <Tooltip title="Xem chi tiết" arrow>
-                                        <IconButton color="primary" size="small" onClick={() => handleCustomerDetail(row)}>
+                                        <IconButton color="primary" size="small" onClick={() => handleOpenModal(row)}>
                                             <VisibilityIcon />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Chỉnh sửa" arrow>
-                                        <IconButton color="warning" size="small">
+                                    <Tooltip title="Thay đổi trạng thái" arrow>
+                                        <IconButton color="warning" size="small" onClick={() => hanleOpenConfirmation(row)}>
                                             <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Xóa" arrow>
-                                        <IconButton color="error" size="small">
-                                            <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
@@ -373,8 +340,8 @@ const CustomerList = () => {
                     onClose={() => setOpenModal(false)}
                     disableAutoFocus
                 >
-                    <CustomerDetails
-                        customerId={customerId}
+                    <CleanerDetails
+                        cleanerId={cleanerId}
                         setOpenModal={setOpenModal}
                     />
                 </Modal>
@@ -391,23 +358,29 @@ const CustomerList = () => {
                     {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, filteredData?.length)} of ${filteredData?.length}`}
                 </Typography>
             </Box>
+
+            {openConfirmation && (
+                <Dialog
+                    open={openConfirmation}
+                    onClose={() => setOpenConfirmation(false)}
+                    disableAutoFocus
+                >
+                    <DialogTitle>
+                        Thay đổi trạng thái nhân viên
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography>
+                            Bạn có chắc chắn muốn thay đổi trạng thái của nhân viên này không?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" color="error" onClick={() => setOpenConfirmation(false)}>Hủy</Button>
+                        <Button variant="contained" color="success" onClick={handleToggleAvailability}>Thay đổi</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </Box>
-    );
+    )
 }
 
-const style = {
-    id: {
-        fontSize: '0.8rem',
-        color: '#888',
-    },
-    labelStyle: {
-        fontSize: '0.8rem',
-        color: '#888',
-        marginTop: 1,
-    },
-    valueStyle: {
-        fontWeight: 500,
-    },
-};
-
-export default CustomerList;
+export default CleanerList;

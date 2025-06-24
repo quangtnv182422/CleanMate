@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import {
     Box,
     Typography,
@@ -15,14 +15,21 @@ import {
     IconButton,
     Pagination,
     Button,
-    Chip, 
+    Chip,
     Divider,
     TextField,
     Tooltip,
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    Checkbox,
+    ListItemText,
+    List,
+    ListItem,
+    ListItemIcon,
+    FormControlLabel,
+    Switch,
 } from '@mui/material';
 import { FileDownload, FilterList, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -31,9 +38,22 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VoucherForm from './VoucherForm/VoucherForm';
+import PeopleIcon from '@mui/icons-material/People';
+import { WorkContext } from '../../context/WorkProvider';
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
 
 const ViewVoucherList = () => {
+    const { customers, setCustomers } = useContext(WorkContext)
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -45,6 +65,161 @@ const ViewVoucherList = () => {
     const [openForm, setOpenForm] = useState(false);
     const [editingVoucher, setEditingVoucher] = useState(null);
     const token = localStorage.getItem('token');
+
+    // Trạng thái cho Dialog gán khách hàng
+    const [openAssignDialog, setOpenAssignDialog] = useState(false);
+    const [currentVoucherId, setCurrentVoucherId] = useState(null);
+    const [tempSelectedCustomers, setTempSelectedCustomers] = useState([]);
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [isMultiAssign, setIsMultiAssign] = useState(false);
+
+    // Trạng thái lưu danh sách id của customers được chọn cho mỗi voucher
+    const [selectedByVoucher, setSelectedByVoucher] = useState({});
+
+    const assignCustomerToVoucher = async (voucherId, customerId) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`/managevoucher/assign`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    voucherId: voucherId,
+                    userId: customerId
+                }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Lỗi khi gán khách hàng');
+            }
+
+            const data = await response.json();
+            toast.success('Gán khách hàng thành công!');
+            await getVouchers();
+            return data;
+        } catch (error) {
+            console.error('Lỗi khi gán khách hàng:', error);
+            toast.error(error.message || 'Có lỗi xảy ra!');
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const assignMultipleCustomersToVoucher = async (voucherId, customerIds) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`/managevoucher/assign-multiple`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    voucherId: voucherId,
+                    UserIds: customerIds,
+                }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Lỗi khi gán nhiều khách hàng');
+            }
+
+            const data = await response.json();
+            toast.success('Gán nhiều khách hàng thành công!');
+            await getVouchers();
+            return data;
+        } catch (error) {
+            console.error('Lỗi khi gán nhiều khách hàng:', error);
+            toast.error(error.message || 'Có lỗi xảy ra!');
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Hàm xử lý mở Dialog gán khách hàng
+    const handleOpenAssignDialog = (voucherId) => {
+        if (!customers || customers.length === 0) {
+            toast.error('Không có khách hàng để gán!');
+            return;
+        }
+        setCurrentVoucherId(voucherId);
+        const assignedCustomerIds = selectedByVoucher[voucherId] || [];
+        setTempSelectedCustomers(assignedCustomerIds);
+        setCustomerSearch('');
+        setOpenAssignDialog(true);
+    };
+
+    // Hàm xử lý đóng Dialog
+    const handleCloseAssignDialog = () => {
+        setOpenAssignDialog(false);
+        setCurrentVoucherId(null);
+        setTempSelectedCustomers([]);
+        setCustomerSearch('');
+    };
+
+    // Hàm xử lý thay đổi lựa chọn khách hàng trong Dialog
+    const handleCustomerToggle = (customerId) => {
+        setTempSelectedCustomers((prev) =>
+            prev.includes(customerId)
+                ? prev.filter((id) => id !== customerId)
+                : isMultiAssign ? [...prev, customerId] : [customerId]
+        );
+    };
+
+    // Hàm xử lý chọn tất cả/bỏ chọn tất cả trong Dialog
+    const handleToggleSelectAllCustomers = () => {
+        const allSelected = filteredCustomers.every((customer) =>
+            tempSelectedCustomers.includes(customer.id)
+        );
+
+        if (allSelected) {
+            setTempSelectedCustomers([]);
+        } else {
+            setTempSelectedCustomers(
+                filteredCustomers.map((customer) => customer.id)
+            );
+        }
+    };
+
+    // Hàm xử lý lưu lựa chọn khách hàng
+    const handleSaveCustomers = async () => {
+        if (!tempSelectedCustomers.length) {
+            toast.error('Vui lòng chọn ít nhất một khách hàng!');
+            return;
+        }
+        try {
+            if (isMultiAssign) {
+                await assignMultipleCustomersToVoucher(currentVoucherId, tempSelectedCustomers);
+                setSelectedByVoucher((prev) => ({
+                    ...prev,
+                    [currentVoucherId]: tempSelectedCustomers,
+                }));
+            } else {
+                await assignCustomerToVoucher(currentVoucherId, tempSelectedCustomers[0]);
+                setSelectedByVoucher((prev) => ({
+                    ...prev,
+                    [currentVoucherId]: [tempSelectedCustomers[0]],
+                }));
+            }
+            handleCloseAssignDialog();
+        } catch (error) {
+            console.error('Lỗi khi lưu:', error);
+        }
+    };
+
+    const filteredCustomers = useMemo(() => {
+        return customers.filter((customer) =>
+            customer.fullName.toLowerCase().includes(customerSearch.toLowerCase())
+        );
+    }, [customers, customerSearch]);
 
     const handleOpenConfirmDelete = (row) => {
         setSelectedVoucher(row);
@@ -107,6 +282,11 @@ const ViewVoucherList = () => {
     }, [getVouchers])
 
     const handleDeleteVoucher = async (voucherId) => {
+        const assigned = selectedByVoucher[voucherId];
+        if (assigned && assigned.length > 0) {
+            toast.warning(`Voucher đã được gán cho ${assigned.length} khách hàng. Không thể xóa!`);
+            return;
+        }
         try {
             const response = await fetch(`/managevoucher/${voucherId}`, {
                 method: 'DELETE',
@@ -137,7 +317,7 @@ const ViewVoucherList = () => {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(data),
-                credentials: 'include', 
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -345,6 +525,7 @@ const ViewVoucherList = () => {
                                     </Box>
                                 </TableCell>
                             ))}
+                            <TableCell>Gán cho</TableCell>
                             <TableCell>Hành động</TableCell>
                         </TableRow>
                     </TableHead>
@@ -358,6 +539,20 @@ const ViewVoucherList = () => {
                                 <TableCell>{row.isEventVoucher ? "Có" : "Không"}</TableCell>
                                 <TableCell>{row.createdBy}</TableCell>
                                 <TableCell>{renderStatusChip(row.status)}</TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<PeopleIcon />}
+                                        onClick={() => handleOpenAssignDialog(row.voucherId)}
+                                    >
+                                        {
+                                            Array.isArray(selectedByVoucher[row?.voucherId]) && selectedByVoucher[row?.voucherId].length > 0
+                                                ? `${selectedByVoucher[row.voucherId].length} khách hàng`
+                                                : 'Chưa gán'
+                                        }
+                                    </Button>
+                                </TableCell>
                                 <TableCell
                                     sx={{
                                         cursor: 'pointer',
@@ -404,10 +599,86 @@ const ViewVoucherList = () => {
                 </Typography>
             </Box>
 
+            <Dialog
+                open={openAssignDialog}
+                onClose={handleCloseAssignDialog}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Gán khách hàng cho voucher</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ mb: 2 }}>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={isMultiAssign}
+                                    onChange={(e) => setIsMultiAssign(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="Gán nhiều khách hàng"
+                        />
+                    </Box>
+                    <TextField
+                        fullWidth
+                        label="Tìm kiếm khách hàng"
+                        value={customerSearch}
+                        onChange={(e) => setCustomerSearch(e.target.value)}
+                        sx={{ mb: 2, mt: 1 }}
+                    />
+                    <Button
+                        variant="outlined"
+                        onClick={handleToggleSelectAllCustomers}
+                        sx={{ mb: 2 }}
+                        disabled={!isMultiAssign}
+                    >
+                        {filteredCustomers.every((customer) =>
+                            tempSelectedCustomers.includes(customer.id)
+                        )
+                            ? 'Bỏ chọn tất cả'
+                            : 'Chọn tất cả'}
+                    </Button>
+                    <List sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                        {filteredCustomers && filteredCustomers.length > 0 ? (
+                            filteredCustomers.map((customer) => (
+                                <ListItem
+                                    key={customer.id}
+                                    dense
+                                    onClick={() => handleCustomerToggle(customer.id)}
+                                    selected={tempSelectedCustomers.includes(customer.id)}
+                                >
+                                    <ListItemIcon>
+                                        <Checkbox
+                                            edge="start"
+                                            checked={tempSelectedCustomers.includes(customer.id)}
+                                            disableRipple
+                                            disabled={!isMultiAssign && tempSelectedCustomers.length >= 1}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText primary={customer.fullName} />
+                                </ListItem>
+                            ))
+                        ) : (
+                            <Typography>Không tìm thấy khách hàng</Typography>
+                        )}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseAssignDialog}>Hủy</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSaveCustomers}
+                        disabled={loading || (!isMultiAssign && !tempSelectedCustomers.length) || (!isMultiAssign && tempSelectedCustomers.length > 1)}
+                    >
+                        Lưu
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             {openConfirmDelete && (
                 <>
                     <Dialog
-                        open={openConfirmDelete} 
+                        open={openConfirmDelete}
                         onClose={() => setOpenConfirmDelete(false)}
                         disableAutoFocus
                     >
@@ -422,7 +693,7 @@ const ViewVoucherList = () => {
                             <Button
                                 variant="contained"
                                 onClick={() => {
-                                    handleDeleteVoucher(selectedVoucher.voucherId);
+                                    handleDeleteVoucher(selectedVoucher?.voucherId);
                                     setOpenConfirmDelete(false);
                                 }}
                                 color="error"
@@ -453,13 +724,13 @@ const ViewVoucherList = () => {
                             boxShadow: 2,
                             color: 'text.primary',
                         }}>
-                            <Typography id="voucher-modal-title" variant="h5" component="h2" gutterBottom sx={{ m: 2, textAlign: 'center', color: '#1565C0'} }>
-                                {selectedVoucher.voucherCode}
+                            <Typography id="voucher-modal-title" variant="h5" component="h2" gutterBottom sx={{ m: 2, textAlign: 'center', color: '#1565C0' }}>
+                                {selectedVoucher?.voucherCode}
                             </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1, mb: 2, mx: 2 }}>
                                 <TextField
-                                    value={selectedVoucher.voucherCode}
+                                    value={selectedVoucher?.voucherCode}
                                     variant="standard"
                                     InputProps={{
                                         readOnly: true,
@@ -470,21 +741,21 @@ const ViewVoucherList = () => {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => navigator.clipboard.writeText(selectedVoucher.voucherCode)}
+                                    onClick={() => navigator.clipboard.writeText(selectedVoucher?.voucherCode)}
                                     sx={{ ml: 1 }}
                                 >
                                     Copy
                                 </Button>
                             </Box>
 
-                            <Divider/>
+                            <Divider />
 
-                            <Box sx={{ my: 2, p:2 }}>
-                                <Typography variant="body1"><strong>Mô tả:</strong> {selectedVoucher.description}.</Typography>
-                                <Typography variant="body1"><strong>Ngày hết hạn:</strong> {formatDate(selectedVoucher.expireDate)}</Typography>
-                                <Typography variant="body1"><strong>Voucher sự kiện:</strong> {selectedVoucher.isEventVoucher ? "Có" : "Không"}</Typography>
-                                <Typography variant="body1"><strong>Được tạo bởi:</strong> {selectedVoucher.createdBy}</Typography>
-                                <Typography variant="body1"><strong>Trạng thái:</strong> {selectedVoucher.status}</Typography>
+                            <Box sx={{ my: 2, p: 2 }}>
+                                <Typography variant="body1"><strong>Mô tả:</strong> {selectedVoucher?.description}.</Typography>
+                                <Typography variant="body1"><strong>Ngày hết hạn:</strong> {formatDate(selectedVoucher?.expireDate)}</Typography>
+                                <Typography variant="body1"><strong>Voucher sự kiện:</strong> {selectedVoucher?.isEventVoucher ? "Có" : "Không"}</Typography>
+                                <Typography variant="body1"><strong>Được tạo bởi:</strong> {selectedVoucher?.createdBy}</Typography>
+                                <Typography variant="body1"><strong>Trạng thái:</strong> {renderStatusChip(selectedVoucher?.status)}</Typography>
                             </Box>
                         </Box>
                     </Modal>

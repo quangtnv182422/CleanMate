@@ -100,14 +100,42 @@ const BookingProvider = ({ children }) => {
     const [userAddress, setUserAddress] = useState([]);
     const [orderLength, setOrderLength] = useState(0);
     const [noRatingOrder, setNoRatingOrder] = useState([]);
+    const [vouchers, setVouchers] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const location = useLocation();
     const { user, loading: authLoading, refreshAuth } = useAuth();
     const role = user?.roles?.[0] || '';
 
-    // hàm fetch booking chưa feedback
+    const getVouchers = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/customervoucher/available', {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                credentials: 'include',
+            })
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setVouchers(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false)
+        }
+    }, [setVouchers])
+
+    useEffect(() => {
+        getVouchers();
+    }, [getVouchers])
+
+    // hàm fetch booking chưa feedback
     const fetchNoRatingBooking = useCallback(async () => {
         try {
             const userId = user?.id;
@@ -205,7 +233,10 @@ const BookingProvider = ({ children }) => {
                 refetchUserAddress: fetchUserAddress,
                 loading,
                 fetchNoRatingBooking,
-                refreshAuth, // Thêm refreshAuth vào context để sử dụng ở nơi khác
+                refreshAuth, // Thêm refreshAuth vào context để sử dụng ở nơi khác,
+                vouchers,
+                setVouchers,
+                getVouchers,
             }}
         >
             {children}

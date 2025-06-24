@@ -2,7 +2,7 @@
 {
     public class CleanerListItemDTO
     {
-        public int CleanerId { get; set; }
+        public string CleanerId { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

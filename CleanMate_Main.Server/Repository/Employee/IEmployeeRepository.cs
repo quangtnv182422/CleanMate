@@ -33,8 +33,8 @@ namespace CleanMate_Main.Server.Repository.Employee
         Task<int> CountFeedbackDone(string employeeId);
         Task<int> CheckAndCancelPastDueWorkAsync();
         Task<List<CleanerListItemDTO>> GetCleanerListAsync();
-        Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId);
-        Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable);
+        Task<CleanerDetailDTO> GetCleanerDetailAsync(string cleanerId);
+        Task ToggleCleanerAvailabilityAsync(string cleanerId, bool isAvailable);
 
     }
 }

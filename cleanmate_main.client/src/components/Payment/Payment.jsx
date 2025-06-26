@@ -21,6 +21,8 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import useAuth from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { Circles } from 'react-loader-spinner';
+import { useContext } from 'react';
+import { BookingContext } from '../../context/BookingProvider';
 const paymentMethods = [
 
     {
@@ -99,6 +101,7 @@ const style = {
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { getVouchers } = useContext(BookingContext)
 
     const { user, loading } = useAuth();
 
@@ -115,6 +118,9 @@ const Payment = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [coin, setCoin] = useState(null);
     const { selectedAddress,
+        appliedVoucher,
+        voucherCode,
+        discountPrice,
         price,
         selectedDay,
         formatSpecificTime,
@@ -157,6 +163,11 @@ const Payment = () => {
 
     const processPayment = async () => {
         const isoDate = convertToISODate(selectedDay);
+
+        if (appliedVoucher) {
+            await handleApplyVoucher(voucherCode, price);
+        }
+
         const bookingData = {
             ServicePriceId: priceId,
             UserId: user?.id,
@@ -164,7 +175,7 @@ const Payment = () => {
             AddressId: selectedAddress.addressId,
             Date: isoDate,
             StartTime: formatSpecificTime,
-            TotalPrice: price
+            TotalPrice: discountPrice || price
         };
 
         setIsLoading(true);
@@ -225,6 +236,34 @@ const Payment = () => {
             setIsLoading(false)
         }
     }
+
+    const handleApplyVoucher = async (voucherCode, price) => {
+        try {
+            const response = await fetch('/customervoucher/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    voucherCode: voucherCode,
+                    totalAmount: price,
+                }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Áp dụng voucher thất bại.');
+            }
+
+            await getVouchers();
+            toast.success('Voucher đã được áp dụng thành công!');
+            
+        } catch (error) {
+            console.error('Lỗi khi áp dụng voucher:', error);
+            toast.error(error.message || 'Không thể áp dụng voucher.');
+        }
+    };
 
     return (
         <>
@@ -351,7 +390,7 @@ const Payment = () => {
                         <Box>
                             <Typography variant="body2">Số tiền phải thanh toán</Typography>
                             <Typography variant="h6" sx={{ color: '#1565C0', fontWeight: 600 }}>
-                                {formatPrice(price)}
+                                {discountPrice ? formatPrice(discountPrice) : formatPrice(price)}
                             </Typography>
                         </Box>
                         <Button
@@ -377,8 +416,8 @@ const Payment = () => {
                         >
                             <DialogTitle>Xác nhận thanh toán</DialogTitle>
                             <DialogContent>
-                                <DialogContentText>
-                                        Bạn có chắc chắn muốn thanh toán qua <strong>{selectedMethod === "CleanMate" ? "Ví CleanMate" : selectedMethod === 'cash' ? "Tiền mặt" : "Chuyển khoản ngân hàng"}</strong> với số tiền <strong>{price.toLocaleString()} VND</strong>?
+                                    <DialogContentText>
+                                        Bạn có chắc chắn muốn thanh toán qua <strong>{selectedMethod === "CleanMate" ? "Ví CleanMate" : selectedMethod === 'cash' ? "Tiền mặt" : "Chuyển khoản ngân hàng"}</strong> với số tiền <strong>{discountPrice ? discountPrice.toLocaleString() : price.toLocaleString()} VND</strong>?
                                 </DialogContentText>
                             </DialogContent>
                             <DialogActions>

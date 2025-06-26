@@ -112,6 +112,9 @@ const BookingService = () => {
     };
 
     const formatVNDCurrency = (amount) => {
+        if (appliedVoucher) {
+            return (price - (appliedVoucher.discountPercentage * price / 100)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        }
         return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
     function formatDate(dateString) {
@@ -312,7 +315,10 @@ const BookingService = () => {
                 selectedEmployee,
                 selectedDuration,
                 selectedSpecificArea,
-                price: discountPrice ? discountPrice : price,
+                appliedVoucher,
+                voucherCode: appliedVoucher ? appliedVoucher.voucherCode : null,
+                discountPrice: price - (appliedVoucher ? appliedVoucher.discountPercentage * price /100 : 0),
+                price: price,
                 selectedDay,
                 formatSpecificTime: selectedSpecificTimes.format('HH:mm:ss'),
                 note,
@@ -326,39 +332,9 @@ const BookingService = () => {
         toggleDropdown();
     };
 
-    const handleApplyVoucher = async (voucher) => {
-        if (appliedVoucher) {
-            toast.info('Bạn chỉ có thể áp dụng một voucher cho mỗi đơn hàng.');
-            return;
-        }
-        try {
-            const response = await fetch('/customervoucher/apply', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    voucherCode: voucher.voucherCode,
-                    totalAmount: price,
-                }),
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Áp dụng voucher thất bại.');
-            }
-
-            const data = await response.json();
-            setDiscountPrice(data.newTotal);
-            setAppliedVoucher(voucher);
-            toast.success(`Áp dụng voucher thành công! Giảm giá còn ${formatVNDCurrency(data.newTotal)}`);
-            await getVouchers();
-            setOpenVoucherList(false);
-        } catch (error) {
-            console.error('Lỗi khi áp dụng voucher:', error);
-            toast.error(error.message || 'Không thể áp dụng voucher.');
-        }
+    const handleApplyVoucher = (voucher) => {
+        setAppliedVoucher(voucher);
+        setOpenVoucherList(false);
     };
 
 
@@ -686,7 +662,7 @@ const BookingService = () => {
                     </Box>
 
                     <Box sx={style.footer}>
-                        <Typography fontWeight="bold">{`${discountPrice ? formatVNDCurrency(discountPrice) :  formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
+                        <Typography fontWeight="bold">{`${appliedVoucher ? formatVNDCurrency(discountPrice) :  formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
                         <Button
                             variant="contained"
                             sx={{

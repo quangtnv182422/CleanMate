@@ -62,7 +62,7 @@
 * Configure services, promotions, and payment settings
 * Handle user complaints and resolve disputes
 
-## 📸 Screenshots
+## 📸 Some Main Screenshots Page
 
 * Service page
    ![image](https://github.com/user-attachments/assets/7bd272ea-bafa-4231-b7b8-ab66c61fe2bf)

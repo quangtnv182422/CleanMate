@@ -141,6 +141,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/dashboard': {
+                target,
+                secure: false
+            }
         },
         port: parseInt(env.DEV_SERVER_PORT || '60391'),
         https: {

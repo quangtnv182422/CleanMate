@@ -6,38 +6,42 @@ import { styles } from "./styles.js";
 import GroupIcon from '@mui/icons-material/Group';
 import PaidIcon from '@mui/icons-material/Paid';
 import ViewStreamIcon from '@mui/icons-material/ViewStream';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import MovingIcon from '@mui/icons-material/Moving';
 import useAuth from "../../hooks/useAuth.jsx";
-
-const sampleData = [
-    { name: "Tháng 1", bookings: 40 },
-    { name: "Tháng 2", bookings: 55 },
-    { name: "Tháng 3", bookings: 72 },
-    { name: "Tháng 4", bookings: 61 },
-    { name: "Tháng 5", bookings: 88 },
-    { name: "Tháng 6", bookings: 95 },
-    { name: "Tháng 7", bookings: 40 },
-    { name: "Tháng 8", bookings: 88 },
-    { name: "Tháng 9", bookings: 64 },
-    { name: "Tháng 10", bookings: 150 },
-    { name: "Tháng 11", bookings: 35 },
-    { name: "Tháng 12", bookings: 78 },
-];
-
-// Helper function to calculate % change
-const calculateChange = (current, previous) => {
-    if (previous === 0) return 0;
-    return (((current - previous) / previous) * 100).toFixed(1);
-};
 
 export default function Dashboard() {
     const { user } = useAuth();
-    const [totalBookings, setTotalBookings] = useState(411);
-    const [totalRevenue, setTotalRevenue] = useState(82000000);
-    const [activeCleaners, setActiveCleaners] = useState(24);
-    const [activeCustomers, setActiveCustomers] = useState(120);
+    const [summary, setSummary] = useState(null);
+    const [orderPerMonth, setOrderPerMonth] = useState([]);
+
+    console.log(orderPerMonth);
+
+    useEffect(() => {
+        fetch('/dashboard/summary')
+            .then((res) => {
+                if (!res.ok) throw new Error('Lỗi khi gọi API');
+                return res.json();
+            })
+            .then((data) => {
+                setSummary(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch('/dashboard/orders-per-month')
+            .then((res) => {
+                if (!res.ok) throw new Error('Lỗi khi gọi API');
+                return res.json();
+            })
+            .then((data) => {
+                setOrderPerMonth(data);
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+    }, []);
 
     const today = new Date();
     const days = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -48,32 +52,6 @@ export default function Dashboard() {
     const year = today.getFullYear();
 
     const fullDate = `${dayOfWeek}, ${day}-${month}-${year}`;
-
-    // Mock data for previous values
-    const previousTotalBookings = 390;
-    const previousTotalRevenue = 76000000;
-    const previousActiveCleaners = 22;
-    const previousActiveCustomers = 130;
-
-    const changes = {
-        bookings: calculateChange(totalBookings, previousTotalBookings),
-        revenue: calculateChange(totalRevenue, previousTotalRevenue),
-        cleaners: calculateChange(activeCleaners, previousActiveCleaners),
-        customers: calculateChange(activeCustomers, previousActiveCustomers),
-    };
-
-    const renderChange = (value) => (
-        <Box sx={styles.movingContainer}>
-            {parseFloat(value) >= 0 ? (
-                <MovingIcon sx={styles.movingIcon} />
-            ) : (
-                <MovingIcon sx={{ ...styles.movingIcon, color: 'red', transform: 'rotate(65deg)' }} />
-            )}
-            <Typography variant="body1" sx={{ ...styles.movingValue, color: parseFloat(value) >= 0 ? 'green' : 'red' }}>
-                {Math.abs(value)}%
-            </Typography>
-        </Box>
-    );
 
     return (
         <div className="p-6 space-y-6">
@@ -88,8 +66,7 @@ export default function Dashboard() {
                                 <Typography variant="h6" sx={styles.cardTitle}>Tổng số đơn</Typography>
                             </Box>
                             <Box sx={styles.cardValueContainer}>
-                                <Typography variant="h5" sx={styles.cardValue}>{totalBookings}</Typography>
-                                {renderChange(changes.bookings)}
+                                <Typography variant="h5" sx={styles.cardValue}>{summary?.totalBookings}</Typography>
                             </Box>
                         </CardContent>
                     </Card>
@@ -103,8 +80,7 @@ export default function Dashboard() {
                                 <Typography variant="h6" sx={styles.cardTitle}>Doanh thu (VND)</Typography>
                             </Box>
                             <Box sx={styles.cardValueContainer}>
-                                <Typography variant="h5" sx={styles.cardValue}>{totalRevenue.toLocaleString()}</Typography>
-                                {renderChange(changes.revenue)}
+                                <Typography variant="h5" sx={styles.cardValue}>{summary?.totalRevenue.toLocaleString()}</Typography>
                             </Box>
                         </CardContent>
                     </Card>
@@ -118,8 +94,7 @@ export default function Dashboard() {
                                 <Typography variant="h6" sx={styles.cardTitle}>Tổng nhân viên</Typography>
                             </Box>
                             <Box sx={styles.cardValueContainer}>
-                                <Typography variant="h5" sx={styles.cardValue}>{activeCleaners}</Typography>
-                                {renderChange(changes.cleaners)}
+                                <Typography variant="h5" sx={styles.cardValue}>{summary?.totalCleaners}</Typography>
                             </Box>
                         </CardContent>
                     </Card>
@@ -133,8 +108,7 @@ export default function Dashboard() {
                                 <Typography variant="h6" sx={styles.cardTitle}>Tổng người dùng</Typography>
                             </Box>
                             <Box sx={styles.cardValueContainer}>
-                                <Typography variant="h5" sx={styles.cardValue}>{activeCustomers}</Typography>
-                                {renderChange(changes.customers)}
+                                <Typography variant="h5" sx={styles.cardValue}>{summary?.totalUsers}</Typography>
                             </Box>
                         </CardContent>
                     </Card>
@@ -147,7 +121,7 @@ export default function Dashboard() {
                                 Đơn hàng theo tháng
                             </Typography>
                             <ResponsiveContainer width="100%" height={350}>
-                                <BarChart data={sampleData}>
+                                <BarChart data={orderPerMonth}>
                                     <XAxis dataKey="name" />
                                     <YAxis />
                                     <Tooltip />

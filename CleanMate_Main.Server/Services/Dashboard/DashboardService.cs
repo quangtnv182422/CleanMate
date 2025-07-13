@@ -27,9 +27,21 @@ namespace CleanMate_Main.Server.Services.Dashboard
             };
         }
 
-        public async Task<Dictionary<int, int>> GetBookingsPerMonthAsync()
+        public async Task<List<object>> GetBookingsPerMonthAsync()
         {
-            return await _repository.GetMonthlyBookingCountsAsync();
+            var rawData = await _repository.GetMonthlyBookingCountsAsync();
+
+            var result = Enumerable.Range(1, 12)
+                .Select(month => new
+                {
+                    name = $"Tháng {month}",
+                    bookings = rawData.ContainsKey(month) ? rawData[month] : 0
+                })
+                .Cast<object>()
+                .ToList();
+
+            return result;
         }
+
     }
 }

@@ -3,6 +3,6 @@
     public interface IDashboardService
     {
         Task<object> GetDashboardSummaryAsync();
-        Task<Dictionary<int, int>> GetBookingsPerMonthAsync();
+        Task<List<object>> GetBookingsPerMonthAsync();
     }
 }

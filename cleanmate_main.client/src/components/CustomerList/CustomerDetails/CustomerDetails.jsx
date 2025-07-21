@@ -59,47 +59,6 @@ const CustomerDetails = ({ customerId, setOpenModal }) => {
         getCustomerDetails();
     }, [getCustomerDetails])
 
-    const mockFetchFeedbackList = async () => {
-        const names = [
-            'Nguyễn Văn A', 'Trần Thị B', 'Lê Văn C', 'Phạm Thị D', 'Hoàng Văn E',
-            'Đặng Thị F', 'Bùi Văn G', 'Vũ Thị H', 'Đỗ Văn I', 'Trịnh Thị J'
-        ];
-
-        const comments = [
-            'Ứng dụng rất dễ dùng và tiện lợi!',
-            'Tôi gặp chút lỗi khi đăng nhập.',
-            'Rất thích tính năng nhắc nhở.',
-            'Nên có thêm giao diện tối.',
-            'Tốc độ phản hồi khá nhanh.',
-            'Chưa thấy chức năng chia sẻ.',
-            'Hỗ trợ tốt, phản hồi nhanh.',
-            'Nội dung rõ ràng, dễ hiểu.',
-            'Cảm ơn đội ngũ phát triển!',
-            'Giao diện đẹp và thân thiện.'
-        ];
-
-        const feedbacks = Array.from({ length: 30 }, (_, i) => {
-            const name = names[Math.floor(Math.random() * names.length)];
-            const comment = comments[Math.floor(Math.random() * comments.length)];
-            const rating = Math.floor(Math.random() * 5) + 1;
-            const daysAgo = Math.floor(Math.random() * 30); // cách đây 0–29 ngày
-            const createdAt = new Date();
-            createdAt.setDate(createdAt.getDate() - daysAgo);
-
-            return {
-                id: i + 1,
-                userName: name,
-                comment,
-                rating,
-                createdAt: createdAt.toISOString()
-            };
-        });
-
-        return new Promise(resolve => {
-            setTimeout(() => resolve(feedbacks), 500); // giả lập delay 0.5s
-        });
-    };
-
     return (
         <>
             {loading && (

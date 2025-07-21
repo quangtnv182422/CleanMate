@@ -71,8 +71,12 @@ namespace CleanMate_Main.Server.Repository.Customer
             var user = await _context.Users
                 .Include(u => u.CustomerAddresses)
                 .Include(u => u.Wallet)
-                .ThenInclude(w => w.Transactions)
+                    .ThenInclude(w => w.Transactions)
                 .Include(u => u.BookingUsers)
+                .Include(u => u.FeedbackUsers) 
+                    .ThenInclude(f => f.Booking)
+                .Include(u => u.FeedbackUsers)
+                     .ThenInclude(f => f.Cleaner)
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
@@ -120,7 +124,19 @@ namespace CleanMate_Main.Server.Repository.Customer
                     CreatedAt = b.CreatedAt,
                     UpdatedAt = b.UpdatedAt,
                     BookingStatusId = b.BookingStatusId
-                }).ToList()
+                }).ToList(),
+                Feedbacks = user.FeedbackUsers.Select(f => new FeedbackDTO
+                {
+                    FeedbackId = f.FeedbackId,
+                    BookingId = f.BookingId,
+                    CleanerId = f.CleanerId,
+                    Rating = f.Rating,
+                    Content = f.Content,
+                    CreatedAt = f.CreatedAt,
+                    UpdatedAt = f.UpdatedAt
+                }).ToList(),
+
+                ServiceCount = user.BookingUsers.Count(b => b.BookingStatusId == 6)
             };
 
             return customerDetail;

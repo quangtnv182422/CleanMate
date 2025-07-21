@@ -32,7 +32,6 @@ import ReactLoading from 'react-loading';
 const CleanerDetails = ({ cleanerId, setOpenModal }) => {
     const [loading, setLoading] = useState(true);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
-    console.log(cleanerId)
 
     const getEmployeeDetails = useCallback(async () => {
         try {
@@ -51,7 +50,7 @@ const CleanerDetails = ({ cleanerId, setOpenModal }) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [cleanerId]);
 
     useEffect(() => {
         getEmployeeDetails();

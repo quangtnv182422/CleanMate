@@ -1,4 +1,4 @@
-﻿import { createContext, useState } from 'react';
+﻿import { createContext, useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth';
 export const WorkContext = createContext();
@@ -8,6 +8,8 @@ const WorkProvider = ({ children }) => {
     const [selectedWork, setSelectedWork] = useState(null);
     const [open, setOpen] = useState(false);
     const [openFeedback, setOpenFeedback] = useState(false);
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
     const handleOpen = async (bookingId) => {
@@ -83,6 +85,29 @@ const WorkProvider = ({ children }) => {
         setSelectedWork(null);
     };
 
+    const getCustomers = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/customerlist', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+            const data = await response.json();
+            setCustomers(data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        getCustomers();
+    }, [getCustomers])
+
     return <WorkContext.Provider value={{
         data,
         setData,
@@ -93,7 +118,12 @@ const WorkProvider = ({ children }) => {
         open,
         handleAcceptWork,
         openFeedback,
-        setOpenFeedback
+        setOpenFeedback,
+        customers,
+        setCustomers,
+        loading,
+        setLoading,
+        getCustomers
     }}>{children}</WorkContext.Provider>
 }
 

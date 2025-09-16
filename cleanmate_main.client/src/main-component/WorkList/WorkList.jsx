@@ -100,13 +100,6 @@ const WorkList = () => {
         });
     };
 
-    console.log(data)
-
-    const handleStatusChange = (event) => {
-        setStatus(event.target.value);
-        setPage(1); // Reset to first page when status changes
-    };
-
     const fetchWorkList = useCallback(async () => {
         if (loading) return;
         if (!user || role !== 'Cleaner') {

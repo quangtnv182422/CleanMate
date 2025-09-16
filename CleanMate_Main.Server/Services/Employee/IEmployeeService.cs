@@ -42,7 +42,7 @@ namespace CleanMate_Main.Server.Services.Employee
         Task<bool> RecalculateCleanerRatingAsync(string employeeId, int newRating);
 
         Task<List<CleanerListItemDTO>> GetCleanerListAsync();
-        Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId);
-        Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable);
+        Task<CleanerDetailDTO> GetCleanerDetailAsync(string cleanerId);
+        Task ToggleCleanerAvailabilityAsync(string cleanerId, bool isAvailable);
     }
 }

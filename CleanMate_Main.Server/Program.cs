@@ -9,6 +9,7 @@ using CleanMate_Main.Server.Repository.Bookings;
 using CleanMate_Main.Server.Repository.CleanService.AllService;
 using CleanMate_Main.Server.Repository.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Repository.Customer;
+using CleanMate_Main.Server.Repository.Dashboard;
 using CleanMate_Main.Server.Repository.Employee;
 using CleanMate_Main.Server.Repository.Feedbacks;
 using CleanMate_Main.Server.Repository.Payments;
@@ -22,6 +23,7 @@ using CleanMate_Main.Server.Services.Bookings;
 using CleanMate_Main.Server.Services.CleanService.AllService;
 using CleanMate_Main.Server.Services.CleanService.CleanPerHour;
 using CleanMate_Main.Server.Services.Customer;
+using CleanMate_Main.Server.Services.Dashboard;
 using CleanMate_Main.Server.Services.Employee;
 using CleanMate_Main.Server.Services.Feedbacks;
 using CleanMate_Main.Server.Services.Payments;
@@ -105,6 +107,9 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 //Voucher
 builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
 builder.Services.AddScoped<IVoucherService, VoucherService>();
+//Dashboard
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 //PayOS
 builder.Services.AddScoped<IPayosService, PayosService>();
 //emailSender

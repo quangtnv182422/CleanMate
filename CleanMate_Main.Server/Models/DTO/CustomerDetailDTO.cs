@@ -8,9 +8,11 @@
         public string PhoneNumber { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsActive { get; set; }
+        public int ServiceCount { get; set; }
         public List<CustomerAddressDTO> Addresses { get; set; }
         public decimal WalletBalance { get; set; }
         public List<WalletTransactionDTO> Transactions { get; set; }
         public List<BookingDTO> Bookings { get; set; }
+        public List<FeedbackDTO> Feedbacks { get; set; }
     }
 }

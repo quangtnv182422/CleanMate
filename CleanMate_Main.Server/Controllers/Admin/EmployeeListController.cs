@@ -24,7 +24,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
         }
 
         [HttpGet("{cleanerId}/detail")]
-        public async Task<IActionResult> GetCleanerDetail(int cleanerId)
+        public async Task<IActionResult> GetCleanerDetail(string cleanerId)
         {
             var cleanerDetail = await _cleanerService.GetCleanerDetailAsync(cleanerId);
             if (cleanerDetail == null)
@@ -35,7 +35,7 @@ namespace CleanMate_Main.Server.Controllers.Admin
         }
 
         [HttpPost("{cleanerId}/toggle-availability")]
-        public async Task<IActionResult> ToggleCleanerAvailability(int cleanerId, [FromBody] bool isAvailable)
+        public async Task<IActionResult> ToggleCleanerAvailability(string cleanerId, [FromBody] bool isAvailable)
         {
             await _cleanerService.ToggleCleanerAvailabilityAsync(cleanerId, isAvailable);
             return Ok(new { message = "Đã cập nhật tình trạng cleaner." });

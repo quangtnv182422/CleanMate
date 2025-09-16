@@ -86,6 +86,9 @@ const BookingConfirmation = () => {
         selectedEmployee,
         selectedDuration,
         selectedSpecificArea,
+        appliedVoucher,
+        voucherCode,
+        discountPrice,
         price,
         selectedDay,
         formatSpecificTime,
@@ -136,7 +139,7 @@ const BookingConfirmation = () => {
                     </div>
                     <div className="d-flex justify-content-between">
                         <span>Phí dịch vụ ({selectedEmployee} nhân viên x {selectedDuration}h x {selectedSpecificArea}m²)</span>
-                        <span>{formatPrice(price)}</span>
+                        <span>{discountPrice ? formatPrice(discountPrice) : formatPrice(price)}</span>
                     </div>
                     <hr />
                     <div className="d-flex justify-content-between text-muted">
@@ -149,11 +152,11 @@ const BookingConfirmation = () => {
                 <div className="mb-3">
                     <div className="d-flex justify-content-between fw-semibold">
                         <span>Tiền dịch vụ</span>
-                        <span>{formatPrice(price)}</span>
+                        <span>{discountPrice ? formatPrice(discountPrice) : formatPrice(price)}</span>
                     </div>
                     <div className="d-flex justify-content-between fw-bold">
                         <span>Tổng tiền</span>
-                        <span>{formatPrice(price)}</span>
+                        <span>{discountPrice ? formatPrice(discountPrice) : formatPrice(price)}</span>
                     </div>
                 </div>
             </div>
@@ -169,6 +172,9 @@ const BookingConfirmation = () => {
                             selectedEmployee,
                             selectedDuration,
                             selectedSpecificArea,
+                            appliedVoucher,
+                            voucherCode,
+                            discountPrice,
                             price,
                             selectedDay,
                             formatSpecificTime,

@@ -64,8 +64,8 @@ namespace CleanMate_Main.Server.Repository.Employee
                             ServiceName = service.Name,
                             ServiceDescription = duration.SquareMeterSpecific + "m² làm trong " + duration.DurationTime + " giờ",
                             Duration = $"{duration.DurationTime} giờ",
-                            Price = ChangeType.ChangeMoneyType(servicePrice.Price),
-                            Commission = ChangeType.ChangeMoneyType(Math.Floor(servicePrice.Price * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000),
+                            Price = ChangeType.ChangeMoneyType((decimal)booking.TotalPrice),
+                            Commission = ChangeType.ChangeMoneyType(Math.Floor((decimal)booking.TotalPrice * CommonConstants.COMMISSION_PERCENTAGE / 1000) * 1000),
                             Date = booking.Date.ToString("dd-MM-yyyy"),
                             StartTime = ChangeType.ChangeTimeType(booking.StartTime),
                             Address = address.GG_DispalyName,
@@ -330,11 +330,13 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .Select(t => new TransactionViewModel
                 {
                     TransactionId = t.TransactionId,
-                    BookingId = t.RelatedBookingId,
+                    WalletId = t.WalletId,
                     Amount = t.Amount,
-                    TransactionDate = t.CreatedAt,
                     TransactionType = t.TransactionType.ToString(),
-                    Description = t.Description ?? ""
+                    Description = t.Description ?? "",
+                    Month = t.CreatedAt.Month,
+                    Date = t.CreatedAt.Day,
+                    RelatedBookingId = t.RelatedBookingId
                 })
                 .ToListAsync();
 
@@ -357,6 +359,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                 WithdrawalRequests = withdrawalRequests
             };
         }
+
 
 
 
@@ -556,7 +559,7 @@ namespace CleanMate_Main.Server.Repository.Employee
 
                 if (!pastDueBookings.Any())
                 {
-                    return 0; // No bookings to update
+                    return 0;
                 }
 
                 foreach (var booking in pastDueBookings)
@@ -580,7 +583,7 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .Include(cp => cp.User)
                 .Select(cp => new CleanerListItemDTO
                 {
-                    CleanerId = cp.CleanerId,
+                    CleanerId = cp.User.Id,
                     FullName = cp.User.FullName,
                     Email = cp.User.Email,
                     PhoneNumber = cp.User.PhoneNumber,
@@ -591,13 +594,13 @@ namespace CleanMate_Main.Server.Repository.Employee
                 .ToListAsync();
         }
 
-        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(int cleanerId)
+        public async Task<CleanerDetailDTO> GetCleanerDetailAsync(string cleanerId)
         {
             var cleaner = await _context.CleanerProfiles
                 .Include(cp => cp.User)
                 .ThenInclude(u => u.Wallet)
                 .ThenInclude(w => w.Transactions)
-                .FirstOrDefaultAsync(cp => cp.CleanerId == cleanerId);
+                .FirstOrDefaultAsync(cp => cp.User.Id == cleanerId);
 
             if (cleaner == null)
             {
@@ -643,9 +646,9 @@ namespace CleanMate_Main.Server.Repository.Employee
             };
         }
 
-        public async Task ToggleCleanerAvailabilityAsync(int cleanerId, bool isAvailable)
+        public async Task ToggleCleanerAvailabilityAsync(string cleanerId, bool isAvailable)
         {
-            var cleaner = await _context.CleanerProfiles.FindAsync(cleanerId);
+            var cleaner = await _context.CleanerProfiles.FirstOrDefaultAsync(c => c.User.Id == cleanerId);
             if (cleaner != null)
             {
                 cleaner.Available = isAvailable;

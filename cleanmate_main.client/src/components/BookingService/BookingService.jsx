@@ -33,6 +33,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import useAuth from '../../hooks/useAuth';
@@ -40,6 +41,7 @@ import ReactLoading from 'react-loading';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import ViewCleaningTools from './ViewCleaningTools/ViewCleaningTools';
+import voucher_icon from '../../images/voucher-icon.png';
 import { cleaningVouchers } from '../../components/VoucherList/VoucherList';
 
 
@@ -56,7 +58,9 @@ const BookingService = () => {
         userAddress,
         setUserAddress,
         refetchUserAddress,
-        loading
+        loading,
+        vouchers,
+        getVouchers
     } = useContext(BookingContext);
 
     const navigate = useNavigate();
@@ -72,11 +76,13 @@ const BookingService = () => {
         }
     }, [user, authLoading, navigate]);
 
+    const [appliedVoucher, setAppliedVoucher] = useState(null);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [selectedSpecificArea, setSelectedSpecificArea] = useState('15');
     const [selectedEmployee, setSelectedEmployee] = useState(1);
     const [selectedDuration, setSelectedDuration] = useState(1);
     const [price, setPrice] = useState(160000);
+    const [discountPrice, setDiscountPrice] = useState(0);
     const [priceId, setServicePriceId] = useState(1);
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedSpecificTimes, setSelectedSpecificTimes] = useState(null);
@@ -88,8 +94,6 @@ const BookingService = () => {
     const [open, setOpen] = useState(false);
     const [isAvailable, setIsAvailable] = useState(null);
     const [openVoucherList, setOpenVoucherList] = useState(false);
-
-    console.log(cleaningVouchers)
 
     const now = dayjs();
     const todayStr = now.format('DD/MM/YYYY');
@@ -108,8 +112,19 @@ const BookingService = () => {
     };
 
     const formatVNDCurrency = (amount) => {
+        if (appliedVoucher) {
+            return (price - (appliedVoucher.discountPercentage * price / 100)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        }
         return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+
 
     useEffect(() => {
         const defaultAddress = userAddress?.find((addr) => addr.isDefault === true);
@@ -300,7 +315,10 @@ const BookingService = () => {
                 selectedEmployee,
                 selectedDuration,
                 selectedSpecificArea,
-                price,
+                appliedVoucher,
+                voucherCode: appliedVoucher ? appliedVoucher.voucherCode : null,
+                discountPrice: price - (appliedVoucher ? appliedVoucher.discountPercentage * price /100 : 0),
+                price: price,
                 selectedDay,
                 formatSpecificTime: selectedSpecificTimes.format('HH:mm:ss'),
                 note,
@@ -313,6 +331,12 @@ const BookingService = () => {
         setSelectedAddress(address);
         toggleDropdown();
     };
+
+    const handleApplyVoucher = (voucher) => {
+        setAppliedVoucher(voucher);
+        setOpenVoucherList(false);
+    };
+
 
     if (authLoading || loading) {
         return (
@@ -638,7 +662,7 @@ const BookingService = () => {
                     </Box>
 
                     <Box sx={style.footer}>
-                        <Typography fontWeight="bold">{`${formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
+                        <Typography fontWeight="bold">{`${appliedVoucher ? formatVNDCurrency(discountPrice) :  formatVNDCurrency(price)} / ${selectedDuration}h`}</Typography>
                         <Button
                             variant="contained"
                             sx={{
@@ -708,7 +732,7 @@ const BookingService = () => {
                         </Typography>
 
                         <Grid container spacing={2}>
-                            {cleaningVouchers.map((voucher, index) => (
+                            {vouchers.map((voucher, index) => (
                                 <Grid item xs={12} key={index}>
                                     <Card
                                         variant="outlined"
@@ -720,36 +744,21 @@ const BookingService = () => {
                                             borderRadius: 2,
                                         }}
                                     >
-                                        <Box sx={{ flexGrow: 1 }}>
-                                            {/* Title & Description */}
-                                            <Typography fontWeight="bold" fontSize="15px">
-                                                {voucher.name}
-                                            </Typography>
-                                            <Typography fontSize="13px" color="text.secondary">
+                                        <CardContent>
+                                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
+                                                <img src={voucher_icon} alt="voucher_icon" />
+                                                <Typography variant="h6" sx={{ color: '#1976D2' }}>{voucher.voucherCode}</Typography>
+                                            </Box>
+                                            <Typography variant="body2" color="text.secondary">
                                                 {voucher.description}
                                             </Typography>
-
-                                            {/* Expiration */}
-                                            <Typography
-                                                fontSize="12px"
-                                                color="error"
-                                                sx={{ mt: 0.5 }}
-                                            >
-                                                {voucher.expiredInDays
-                                                    ? `Hết hạn sau ${voucher.expiredInDays} ngày`
-                                                    : `HSD: ${voucher.expiryDate}`}
-                                            </Typography>
-
-                                            {/* Tag/Label */}
-                                            {voucher.tag && (
-                                                <Chip
-                                                    label={voucher.tag}
-                                                    size="small"
-                                                    sx={{ mt: 1 }}
-                                                    color="default"
-                                                />
-                                            )}
-                                        </Box>
+                                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1, mb: 1 }}>
+                                                <HourglassBottomIcon size="small" fontSize="12px" color="warning" />
+                                                <Typography variant="caption" sx={{ color: 'green' }}>
+                                                    Ngày hết hạn: {formatDate(voucher.expireDate)}
+                                                </Typography>
+                                            </Box>
+                                        </CardContent>
 
                                         {/* Favorite & Button */}
                                         <Box
@@ -769,6 +778,7 @@ const BookingService = () => {
                                                 size="small"
                                                 color="primary"
                                                 sx={{ p: 1, minWidth: 'auto', fontWeight: 'bold' }}
+                                                onClick={() => handleApplyVoucher(voucher)}
                                             >
                                                 Dùng ngay
                                             </Button>

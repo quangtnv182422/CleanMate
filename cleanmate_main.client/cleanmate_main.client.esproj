@@ -10,8 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\components\BookingService\ViewCleaningTools\" />
+    <Folder Include="src\components\CleanerList\CleanerDetails\" />
     <Folder Include="src\components\ConfirmBooking\" />
     <Folder Include="src\components\BookingConfirmation\" />
+    <Folder Include="src\components\CustomerList\CustomerDetails\" />
     <Folder Include="src\components\GoogleMap\" />
     <Folder Include="src\components\EmployeeWorkDetails\" />
     <Folder Include="src\components\Loading\" />
@@ -22,7 +24,6 @@
     <Folder Include="src\components\VoucherList\" />
     <Folder Include="src\components\Revenue\" />
     <Folder Include="src\main-component\ConfirmMail\" />
-    <Folder Include="src\main-component\AdminDashboard\" />
     <Folder Include="src\main-component\NoRating\" />
     <Folder Include="src\main-component\ProtectedRoute\" />
     <Folder Include="src\main-component\OrderDetails\" />
